@@ -1,5 +1,5 @@
 <!-- vscode-markdown-toc -->
-* 1. [1.UDP传输应用层需注意的问题](#UDP)
+* 1. [1.UDP传输应用层注意问题](#UDP)
 * 2. [2.UDP分片原理](#UDP-1)
 * 3. [3.UDP与MTU](#UDPMTU)
 * 4. [4.UDP分片设计](#UDP-1)
@@ -13,7 +13,7 @@
 <!-- /vscode-markdown-toc -->
 # UDP分片
 
-##  1. <a name='UDP'></a>1.UDP传输应用层需注意的问题
+##  1. <a name='UDP'></a>1.UDP传输应用层注意问题
 * 1）数据包确认机制
 * 2）数据包重发机制
 * 3）<font color=#A52A2A>尽量不发送大于路径MTU的数据包
