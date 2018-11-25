@@ -31,7 +31,7 @@
     <th width=10%, bgcolor=black>long</th>
     <th width=10%, bgcolor=black>long long</th>
     <th width=10%, bgcolor=black>float</th>
-    <th width="10%", bgcolor=black>double</th>
+    <th width=10%, bgcolor=black>double</th>
   </tr>
   <tr>
     <td bgcolor=black> 16bit/B </td>
@@ -115,8 +115,8 @@
 ![位运算](images/位运算.png)
 
 ###  3.2. <a name='-1'></a>位域结构 
-* 格式
-    struct 位域结构名 { 类型说明符 位域名：位域长度; }; 
+* 格式  
+    `struct 位域结构名 { 类型说明符 位域名：位域长度; };`
 * 示例  
     例1:  
     ```
