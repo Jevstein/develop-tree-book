@@ -44,7 +44,7 @@
 ![UDP分层数据校验](images/UDP分层数据校验.png)
 
 ##  6. <a name='UDP-1'></a>UDP分片实现
-详情见：https://github.com/Jevstein/dnpractice/tree/master/course/udp/udp-piece
+详见：[UDP piece](https://github.com/Jevstein/dnpractice/tree/master/course/udp/udp-piece)
 
 <font color=gray size=1>
 来自：动脑学院.Darren老师

@@ -38,8 +38,9 @@
 ![观察者模式](images/观察者模式.png)
 ![发布订阅者模式](images/发布订阅者模式.png)
 
-<font color=gray size=1>
-参考:
-1.动脑学院.lee老师
-2.https://www.cnblogs.com/lovesong/p/5272752.html
-</font>
+
+>参考:
+>
+>1.动脑学院.lee老师
+>
+>2.[观察者模式与发布/订阅模式区别](https://www.cnblogs.com/lovesong/p/5272752.html)
