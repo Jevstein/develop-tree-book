@@ -69,11 +69,12 @@
 </table>
 
 ##  2. <a name='-1'></a>大端小端 
-###  2.1. <a name='-1'></a>定义    
+###  2.1. <a name='-1'></a>定义   
+字节序不是由操作系统决定的，而是由<font color=red>CPU</font>架构决定的，比如x86的是little endian，而PPC (PowerPC) 是big endian.
 * 大端(Big-endian): 高尾端  
-    高位存于低地址，如windows,网络字节序；
+    高位存于低地址。如: PPC(PowerPC),网络字节序；
 * 小端(Little-endian)：低尾端    
-    低位存于低地址  
+    低位存于低地址。如: x86
     
     举例: 有一int数0x12345678，则MSB=0x12，LSB=0x78. 如下图:
 
@@ -91,18 +92,31 @@
     {//返回:1=大端，0=小端
         int i=0x12345678;
         char *c=(char *)&i; 
-        return(*c==0x12)
+        return (*c==0x12);
     }
     ```
 * 方法2
     ```
     bool check_big()
     {//返回:1=大端，0=小端
-        union  { long a; char b }u;
+        union  { long a; char b; }u;
         u.a = 1;
-        return (u.b == 1) ? 0:1;
+        return (u.b == 1) ? 0 : 1;
     }
     ``` 
+* 方法3
+    ```
+    bool check_big()
+    {//返回:1=大端，0=小端
+        int i = 48;
+        int* p = &i;
+        char c = 0;
+        c = *((char*)p);
+
+        return (c == '0') ? 0 : 1;
+    }
+    ```
+
 
 ###  2.3. <a name='-1'></a>优劣
 * 大端  
