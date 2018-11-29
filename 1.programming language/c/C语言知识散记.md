@@ -7,11 +7,6 @@
 * 3. [位运算](#-1)
 	* 3.1. [位运算](#-1)
 	* 3.2. [位域结构](#-1)
-* 4. [ 内存对齐](#-1)
-	* 4.1. [默认对齐](#-1)
-	* 4.2. [自定义对齐](#-1)
-		* 4.2.1. [pragma pack](#pragmapack)
-		* 4.2.2. [__attribute__((packed))](#attribute__packed)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -126,7 +121,7 @@
 
 ##  3. <a name='-1'></a>位运算
 ###  3.1. <a name='-1'></a>位运算   
-![位运算](images/位运算.png)
+![位运算图](images/位运算.png)
 
 ###  3.2. <a name='-1'></a>位域结构 
 * 格式  
@@ -162,72 +157,3 @@
         int c:2；
     };
     ``` 
-##  4. <a name='-1'></a> 内存对齐
-###  4.1. <a name='-1'></a>默认对齐
-例1:
-```
-    #include <stdio.h>
-    union { char x[5]; int i; } a;
-    int main()
-    {
-        a.x[0] = 10;
-        a.x[1] = 1;
-        printf("%d, %d\n", a.i, sizeof(a));
-        return 0;
-    }
-    //答案：266,8
-    //1). 1*256 + 10 = 266
-    //2). 基本类型int=4对齐 => 8
-```
-例2:
-```
-    #include <iostream>
-    using namespace std;
-    struct TypeA { char c; int i; short i2; };
-    struct TypeB { char c[3]; TypeA a; double d; };
-    int main()
-    {
-        TypeA a;
-        TypeB b;
-        cout << sizeof(a) << ", "<< sizeof(b) << endl;
-        return 0;
-    }
-    //答案：12, 24
-    //1). 最大基本类型int=4对齐 => 12
-    //2). 最大基本类型double=8对齐 => 24
-```
-###  4.2. <a name='-1'></a>自定义对齐
-####  4.2.1. <a name='pragmapack'></a>pragma pack
-```
-// 2字节对齐, 以下sizeof(student)=6
-#pragma pack(2) //(或 pragma(push,4))
-struct student {
-     int age,
-     char c;
-};
-#pragma pack(pop) //注意这个和push是成对用的
-```
-####  4.2.2. <a name='attribute__packed'></a>__attribute__((packed))
-* 不希望编译器对结构体做对齐处理，而希望按照它原有的大小分配空间，则用到__attribute__((packed))
-```
-    typedef struct Student_t
-    {
-        int age;
-        char c;
-    }__attribute__((packed)) Student; 
-
-    typedef struct Node_t
-    {
-        int a;
-        char c;
-    }__attribute__((aligned(4))) Node;
-```
-```
-    #define PACK  __attribute__  ((packed))
-    typedef int cache_line_int __attribute__((aligned(LEVEL1_DCACHE_LINESIZE)));
-    struct data
-    {
-        cache_line_int a;
-        cache_line_int b;
-    };
-```
