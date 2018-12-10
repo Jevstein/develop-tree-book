@@ -450,7 +450,7 @@ async 以非同步方式执行文件系统的输入输出操作
 
 具体关系可以看下图：
 
-![软连接与硬连接](images/linux-system-9.jpg)   
+![软连接与硬连接](images/linux-system-9.jpg)   
 从图上可以看出硬链接和软链接的区别：    
 1：硬链接原文件和新文件的inode编号一致。而软链接不一样。
 2：对原文件删除，会导致软链接不可用，而硬链接不受影响。
@@ -470,4 +470,4 @@ async 以非同步方式执行文件系统的输入输出操作
 ##  6. <a name='linux-1'></a>linux内核参数优化
 内核参数是用户和系统内核之间交互的一个接口，通过这个接口，用户可以在系统运行的同时动态更新内核配置，而这些内核参数是通过Linux Proc文件系统存在的。因此，可以通过调整Proc文件系统达到优化Linux性能的目的。
 
-> 来自: [带你真正认识Linux 系统结构](https://www.linuxprobe.com/linux-system-structure.html)
+> 来自: [带你真正认识Linux 系统结构](https://www.linuxprobe.com/linux-system-structure.html)

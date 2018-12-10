@@ -40,6 +40,7 @@ libevent是一个轻量级的开源的高性能的事件触发的网络库，适
 * 跨平台，支持Windows、Linux、BSD和Mac OS;
 * 支持多种I/O多路复用技术（epoll、poll、dev/poll、select和kqueue等），在不同的操作系统下，做了多路复用模型的抽象，可以选择使用不同的模型，通过事件函数提供服务;
 * 支持I/O，定时器和信号等事件;
+* 此外封装了http和https等；
 
 ##  2. <a name='libevent-1'></a>libevent的安装
  $ ./configure  
