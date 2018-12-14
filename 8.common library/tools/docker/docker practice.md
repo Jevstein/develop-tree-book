@@ -50,7 +50,7 @@
 	* 4.1. [C/C++程序源码](#CC-1)
 	* 4.2. [镜像选择](#-1)
 	* 4.3. [下载镜像](#-1)
-	* 4.4. [制作应用程序镜像： 源码镜像](#-1)
+	* 4.4. [制作应用程序镜像： g++镜像](#g)
 		* 4.4.1. [编写dockerfile](#dockerfile)
 		* 4.4.2. [生成镜像](#-1)
 		* 4.4.3. [使用镜像](#-1)
@@ -60,6 +60,7 @@
 		* 4.5.2. [生成镜像](#-1)
 		* 4.5.3. [使用镜像](#-1)
 		* 4.5.4. [ 删除镜像](#-1)
+	* 4.6. [制作带环境变量的镜像 {生产}](#-1)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -695,7 +696,7 @@ $ docker pull gcc
 $ docker images
 ```
 
-###  4.4. <a name='-1'></a>制作应用程序镜像： 源码镜像
+###  4.4. <a name='g'></a>制作应用程序镜像： g++镜像
 
 ####  4.4.1. <a name='dockerfile'></a>编写dockerfile
 ```
@@ -757,7 +758,7 @@ $ docker images -a
 $ docker image rm [id]
 ```
 
-###  4.5. <a name='-1'></a>制作应用程序镜像： 可执行程序镜像{推荐}
+###  4.5. <a name='-1'></a>制作应用程序镜像： 可执行镜像{推荐}
 
 ####  4.5.1. <a name='dockerfile-1'></a>编写dockerfile
 本地调用命令：gcc docker_demo.c 编译成可执行文件a.out，然后编写dockerfile。
@@ -804,7 +805,7 @@ $ docker images -a
 $ docker image rm [id]
 ```
 
-### 制作带环境变量的镜像 {生产}
+###  4.6. <a name='-1'></a>制作带环境变量的镜像 {生产}
 
 
 
