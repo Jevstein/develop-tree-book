@@ -77,7 +77,8 @@ if(x < y ) {
 ```
 
 ##  5. <a name='Cwhileforifgoto'></a>如何处理C中的循环,如while/for？ (if/goto)
-<font color=red>循环对汇编语言来说，依然采用类似if和goto的方式解决</font>。 
+<font color=red>循环对汇编语言来说，依然采用类似if和goto的方式解决</font>。如图:  
+
 ![while与goto](images/while与goto.jpg)
 
 ##  6. <a name='C-1'></a>如何实现C中的函数调用？
