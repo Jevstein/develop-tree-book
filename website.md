@@ -1,8 +1,9 @@
 <!-- vscode-markdown-toc -->
 * 1. [大咖博客](#)
 	* 1.1. [动脑大咖](#-1)
-* 2. [实用技巧](#-1)
-* 3. [实用工具](#-1)
+* 2. [网络课堂](#-1)
+* 3. [实用技巧](#-1)
+* 4. [实用工具](#-1)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -27,9 +28,11 @@
 * darren老师
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
 
+##  2. <a name='-1'></a>网络课堂
+* [侯捷 - 「STL」与泛型编程（GP）](https://www.bilibili.com/video/av25432066/)
             
-##  2. <a name='-1'></a>实用技巧
+##  3. <a name='-1'></a>实用技巧
 * [取变量名](https://unbug.github.io/codelf)
 
-##  3. <a name='-1'></a>实用工具
+##  4. <a name='-1'></a>实用工具
 
