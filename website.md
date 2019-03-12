@@ -1,6 +1,7 @@
 <!-- vscode-markdown-toc -->
 * 1. [大咖博客](#)
 	* 1.1. [动脑大咖](#-1)
+	* 1.2. [精彩博文](#-1)
 * 2. [网络课堂](#-1)
 * 3. [实用技巧](#-1)
 * 4. [实用工具](#-1)
@@ -27,6 +28,9 @@
 
 * darren老师
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
+
+###  1.2. <a name='-1'></a>精彩博文
+* [架构师之路18年精选100篇](https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w)  
 
 ##  2. <a name='-1'></a>网络课堂
 * [侯捷 - 「STL」与泛型编程（GP）](https://www.bilibili.com/video/av25432066/)
