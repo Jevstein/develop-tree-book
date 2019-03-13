@@ -31,6 +31,7 @@
 
 ###  1.2. <a name='-1'></a>精彩博文
 * [架构师之路18年精选100篇](https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w)  
+* [网络服务器开发热点分析与解决](http://gad.qq.com/article/detail/10015)
 
 ##  2. <a name='-1'></a>网络课堂
 * [侯捷 - 「STL」与泛型编程（GP）](https://www.bilibili.com/video/av25432066/)
