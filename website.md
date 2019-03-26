@@ -15,6 +15,7 @@
 
 ##  1. <a name=''></a>大咖博客
 * [逍遥子](https://me.csdn.net/hjx_1000)
+* [陶辉笔记](https://blog.csdn.net/russell_tao/article/details/82413977)
 
 ###  1.1. <a name='-1'></a>动脑大咖
 * lee老师
