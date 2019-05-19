@@ -24,11 +24,12 @@
 
 * king老师
 	* [bojing](http://bojing.wang)
-	* [51cto](http://blog.51cto.com/wangbojing/2090885)
+	* [51cto](http://blog.51cto.com/wangbojing)
 	* [github](https://github.com/wangbojing)
 
 * darren老师
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
+	* [github](https://github.com/qingfuliao)
 
 ###  1.2. <a name='-1'></a>精彩博文
 * [架构师之路18年精选100篇](https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w)  
