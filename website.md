@@ -31,6 +31,9 @@
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
 	* [github](https://github.com/qingfuliao)
 
+* 动脑学员
+	* [Harlon's BLOG](http://harlon.org/)
+
 ###  1.2. <a name='-1'></a>精彩博文
 * [架构师之路18年精选100篇](https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w)  
 * [网络服务器开发热点分析与解决](http://gad.qq.com/article/detail/10015)
