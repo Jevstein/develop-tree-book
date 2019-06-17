@@ -532,7 +532,7 @@ $ docker exec -it d74fff341687 /bin/bash
 #命令格式：
     docker exec -it  容器id  /bin/bash
 ```
-* 3、生产方式进入容器
+* 3、生产方式进入容器  
 我们生产中常用的进入容器方法是使用脚本，脚本内容如下:
 ```
 #!/bin/bash
