@@ -26,6 +26,7 @@
 	* [bojing](http://bojing.wang)
 	* [51cto](http://blog.51cto.com/wangbojing)
 	* [github](https://github.com/wangbojing)
+	* [知乎-南阳居士](https://www.zhihu.com/people/wang-bo-jing-85/activities)
 
 * darren老师
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
