@@ -33,6 +33,9 @@
 	* [音视频高级开发](https://www.jianshu.com/u/d71cbb36d1f8)
 	* [github](https://github.com/qingfuliao)
 
+* ict老师
+	* [github](http://github.com/ictxiangxin)
+
 * 动脑学员
 	* [Harlon's BLOG](http://harlon.org/)
 
