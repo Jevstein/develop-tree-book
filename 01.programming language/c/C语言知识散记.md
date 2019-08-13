@@ -67,9 +67,9 @@
 ###  2.1. <a name='-1'></a>定义   
 字节序不是由操作系统决定的，而是由<font color=red>CPU</font>架构决定的，比如x86的是little endian，而PPC (PowerPC) 是big endian.
 * 大端(Big-endian): 高尾端  
-    高位存于低地址。如: PPC(PowerPC),网络字节序；
+    高位存于低地址。如: PPC(PowerPC)、IBM、Sun, 网络字节序；
 * 小端(Little-endian)：低尾端    
-    低位存于低地址。如: x86
+    低位存于低地址。如: x86、DEC
     
     举例: 有一int数0x12345678，则MSB=0x12，LSB=0x78. 如下图:
 
