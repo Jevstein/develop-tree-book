@@ -6,11 +6,11 @@
 
 ```c
 static char *emojis__[] = { ":smile:", ":smirk:", ":sweat_smile:", ":laughing:", ":v:" };
-const int count = sizeof(emojis__) / sizeof(emojis__[0]);
 char **p = emojis__;
-for (int i = 0; i < count; i++, p++)
+const int count = sizeof(emojis__) / sizeof(emojis__[0]);
+for (int i = 0; i < count; i++)
 {
-	printf("%s ", *p);
+	printf("%s ", *(p + i));
 }
 ```
 
