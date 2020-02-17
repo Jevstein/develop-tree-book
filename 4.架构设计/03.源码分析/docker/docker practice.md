@@ -62,32 +62,32 @@ $ sudo apt-get install \
 **注: Ubuntu 16.04+ 上的 Docker CE默认使用`overlay2`存储层驱动, `无需手动配置`。**
 
 ####  2.1.5. 安装基本软件
-* 由于apt源使用HTTPS以确保软件下载过程中不被篡改。因此，我们首先需要添加使用HTTPS传输的软件包以及CA证书：
+* 1.由于apt源使用HTTPS以确保软件下载过程中不被篡改。因此，我们首先需要添加使用HTTPS传输的软件包以及CA证书：
 ```shell
 $ sudo apt-get install apt-transport-https ca-certificates curl software-properties-common lrzsz -y
 ```
-* 为了确认所下载软件包的合法性，需要添加软件源的GPG密钥。并向source.list中添加Docker软件源。
-    * 使用官方推荐源 {`不推荐`}
-    ```shell
-    $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-    $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-```
-    * **使用阿里云的源 {推荐}**
+* 2.为了确认所下载软件包的合法性，需要添加软件源的GPG密钥。并向source.list中添加Docker软件源。
     
+    * 1）使用官方推荐源 {`不推荐`}
+    ```shell
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    
+    $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    ```
+    * **2）使用阿里云的源 {推荐}**
     ```shell
     $ curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+	
+	$ sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+```
     
-$ sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
-    ```
-    
-* **使用国内其它源 {推荐}**
+    * **3）使用国内其它源 {推荐}**
     ```shell
-    $ curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
-    
-$ sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+$ curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+	
+    $ sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
     ```
-* 注意：如果遇到"curl: (1) Protocol "https" not supported or disabled in libcurl"错误，根据错误提示需要解决curl对https协议的支持.
+* 3.注意：如果遇到"curl: (1) Protocol "https" not supported or disabled in libcurl"错误，根据错误提示需要解决curl对https协议的支持.
 ```shell
 $ curl --version
 // 若是curl版本过低则升级重装
@@ -110,7 +110,7 @@ $ make
 $ sudo make install
 ```
 
-####  2.1.6. <a name='DockerCE'></a>安装 Docker CE
+####  2.1.6. 安装 Docker CE
 更新apt软件包缓存，并安装docker-ce
 ```shell
 // 软件源升级

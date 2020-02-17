@@ -1,6 +1,6 @@
 [TOC]
 
-# GDB调试
+# GDB的安装和调试
 
 ​	GDB是GNU开源组织发布的一个强大的UNIX下的程序调试工具。或许，各位比较喜欢那种图形界面方式的，像VC、BCB等IDE的调试，但如果你是在UNIX平台下做软件，你会发现GDB这个调试工具有比VC、BCB的图形化调试器更强大的功能。所谓“寸有所长，尺有所短”就是这个道理。
 
@@ -17,7 +17,7 @@
 
 ### 1.1.mac的下安装
 
-​	最新版本的 Mac 系统默认只能使用 lldb 进行程序调试，但没有自带的gdb工具，如直接在终端上输入gdb，将报错：“-bash: gdb: command not found”。这对于习惯gdb调试的人来说是难以忍受的，下面看自定义安装gdb的详细步骤：
+​	最新版本的 Mac 系统默认只能使用 **lldb** 进行程序调试（**lldb一样强大，语法和gdb类似，mac推荐使用lldb**），但没有自带的gdb工具，如直接在终端上输入gdb，将报错：“-bash: gdb: command not found”。这对于癖好gdb调试的人来说是难以忍受的，下面就看看mac下自定义安装gdb的详细步骤：
 
 #### 1.1.1.详细安装步骤
 
@@ -27,13 +27,11 @@
   $ ruby -e"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   ```
 
-  更新homebrew使用命令:
+  ​	更新homebrew可使用命令:
 
   ```shell
   $ brew update
   ```
-
-  
 
 * 2.查看`homebrew`中是否有gdb安装包：$ brew search gdb
 
@@ -233,36 +231,7 @@ $ gcc -g -O1 -o helloworld helloworld.c -lstdc++
 
 
 
-### 2.2.gdb的基本命令
-
-```shell
-#gdb启动helloworld程序
-$ gdb helloworld
-
-(gdb) l			#l: list的缩写，从第一行开始列出源码
-(gdb) 			#回车: 重复上一次命令,翻页显示后面的代码
-
-(gdb) b helloworld.c:5 	#b: break的缩写, 在源程序第5行处设置断点
-(gdb) b func 						#b: break的缩写, 函数func()入口处设置断点
-(gdb) info break				#查看断点信息
-
-(gdb) r			#r: run的缩写，运行程序。后面可以加入程序的启动参数，类似“gdb --args /your/binary arg1 arg2”
-
-(gdb) c 		#c: continue的缩写，继续运行程序直到下一个断点（类似于VS里的F5）
-(gdb) n			#n: next的缩写，逐过程步进，不会进入子函数（类似VS里的F10）
-(gdb) s			#s: setp的缩写，逐语句步进，会进入子函数（类似VS里的F11）
-(gdb) u			#u: until的缩写，运行至当前语句块结束
-(gdb) f			#f: finish的缩写，运行至函数结束并跳出，并打印函数的返回值（类似VS的Shift+F11）
-(gdb) p a		#p:  print的缩写，打印变量a的值
-
-(gdb) bt		#打印堆栈信息，也可以用where
-
-(gdb) q			#退出gdb
-```
-
-
-
-### 2.3.gdb启动程序的方法
+### 2.2.gdb启动程序的方法
 
 ```shell
 1、$ gdb <program>
@@ -278,6 +247,7 @@ $ gdb helloworld
 	 (gdb) attach <PID>
 	 #同3
 ```
+
 ​	GDB启动时，可以加上一些GDB的启动开关，详细的开关可以用gdb -help查看。常用的参数如下：
 
 ```shell
@@ -292,6 +262,117 @@ $ gdb helloworld
 -directory <directory>
 -d <directory> #加入一个源文件的搜索路径。默认搜索路径是环境变量中PATH所定义的路径。
 ```
+
+
+
+### 2.3.gdb的初级用法
+
+​	掌握以下几个初级命令，其实就足够简单地调试程序和进行排错了。
+
+```shell
+#gdb启动helloworld程序
+$ gdb helloworld
+
+(gdb) l			#l: list的缩写，从第一行开始列出源码
+(gdb) 			#回车: 重复上一次命令,翻页显示后面的代码
+
+(gdb) b helloworld.c:5 			#b: break的缩写, 在源程序第5行处设置断点
+(gdb) b func 								#b: break的缩写, 函数func()入口处设置断点
+(gdb) b *address						#b: break的缩写, 在程序运行的内存地址处停住
+(gdb) b  ... if <condition> #b: break的缩写, ...可以是上述的参数，condition表示条件，在条件成立时停住。比如在循环境体中，可以设置b if i=100，表示当i为100时停住程序
+(gdb) info break [n]				#查看断点信息（n表示断点号）
+
+(gdb) r			#r: run的缩写，运行程序。后面可以加入程序的启动参数，类似“gdb --args /your/binary arg1 arg2”
+
+(gdb) c 		#c: continue的缩写，继续运行程序直到下一个断点（类似于VS里的F5）
+(gdb) n			#n: next的缩写，逐过程步进，不会进入子函数（类似VS里的F10）
+(gdb) s			#s: setp的缩写，逐语句步进，会进入子函数（类似VS里的F11）
+(gdb) u			#u: until的缩写，运行至当前语句块结束
+(gdb) f			#f: finish的缩写，运行至函数结束并跳出，并打印函数的返回值（类似VS的Shift+F11）
+(gdb) p a		#p: print的缩写，打印变量a的值
+
+(gdb) bt		#bt: backtrace的缩写，打印堆栈信息，也可以用where
+
+(gdb) q			#退出gdb
+```
+
+
+
+### 2.4.gdb的中级用法
+
+​	gdb如果只是提供上述几个初级命令，当然是不足以说明其强大的。
+
+```shell
+#1.设置观察点（WatchPoint)
+#  观察某个表达式（变量也是一种表达式）的值是否有变化了，若有变化，马上停住程序
+(gdb) watch <expr> 			#为表达式（变量）expr设置一个观察点。一旦表达式值有变化时，马上停住程序。
+(gdb) rwatch <expr> 		#当表达式（变量）expr被读时，停住程序。
+(gdb) awatch <expr> 		#当表达式（变量）的值被读或被写时，停住程序。
+(gdb) info watchpoints 	#列出当前所设置了的所有观察点。
+
+
+#2.设置捕捉点（CatchPoint）
+#	 设置捕捉点来补捉程序运行时的一些事件。如：载入共享库（动态链接库）或是C++的异常
+(gdb) catch <event> 		#当event发生时，停住程序。event可以是下面的内容：
+        #1、throw 一个C++抛出的异常。（throw为关键字）
+        #2、catch 一个C++捕捉到的异常。（catch为关键字）
+        #3、exec 调用系统调用exec时。（exec为关键字，目前此功能只在HP-UX下有用）
+        #4、fork 调用系统调用fork时。（fork为关键字，目前此功能只在HP-UX下有用）
+        #5、vfork 调用系统调用vfork时。（vfork为关键字，目前此功能只在HP-UX下有用）
+        #6、load 或 load <libname> 载入共享库（动态链接库）时。（load为关键字，目前此功能只在HP-UX下有用）
+        #7、unload 或 unload <libname> 卸载共享库（动态链接库）时。（unload为关键字，目前此功能只在HP-UX下有用）
+(gdb) tcatch <event> 		#只设置一次捕捉点，当程序停住以后，捕捉点被自动删除。
+
+
+#3.维护停止点
+#	 GDB中的停止点也就是三类：BreakPoint、WatchPoint、CatchPoint。若已定义好的停止点没有用了，则可以使用delete、clear、disable、enable这几个命令来进行维护。
+(gdb) clear											#清除所有的已定义的停止点。
+(gdb) clear <function>
+(gdb) clear <filename:function> #清除所有设置在函数上的停止点。
+(gdb) clear <linenum>
+(gdb) clear <filename:linenum>	#清除所有设置在指定行上的停止点。
+
+(gdb) delete [breakpoints] [range...] #删除指定的断点，breakpoints为断点号。如果不指定断点号，则表示删除所有的断点。range 表示断点号的范围（如：3-7）。其简写命令为d。
+
+#比删除更好的一种方法是disable停止点，disable了的停止点，GDB不会删除，当你还需要时，enable即可，就好像回收站一样。
+
+(gdb) disable [breakpoints] [range...] #disable所指定的停止点，breakpoints为停止点号。如果什么都不指定，表示disable所有的停止点。简写命令是dis.
+(gdb) enable [breakpoints] [range...]  #enable所指定的停止点，breakpoints为停止点号。
+(gdb) enable [breakpoints] once range... #enable所指定的停止点一次，当程序停止后，该停止点马上被GDB自动disable。
+(gdb) enable [breakpoints] delete range... #enable所指定的停止点一次，当程序停止后，该停止点马上被GDB自动删除。
+
+
+#4.停止条件维护
+#  如“(gdb) b if i=100”命令, 当条件成立时，程序自动停止，非常强大。这里，专门说说这个条件的相关维护命令。一般来说，为断点设置一个条件，我们使用if关键词，后面跟其断点条件。并且，条件设置好后，我们可以用condition命令来修改断点的条件。（只有break和watch命令支持if，catch目前暂不支持if）
+(gdb) condition <bnum> <expression> #修改断点号为bnum的停止条件为expression。
+(gdb) condition <bnum> 							#清除断点号为bnum的停止条件。
+(gdb) ignore <bnum> <count> 				#表示忽略断点号为bnum的停止条件count次。
+
+
+#5.为停止点设定运行命令
+#  可以使用GDB提供的command命令来设置停止点的运行命令。也就是说，当运行的程序在被停止住时，我们可以让其自动运行一些别的命令，这很有利行自动化调试。对基于GDB的自动化调试是一个强大的支持。
+#		commands [bnum]
+#    ... command-list ...
+#    end
+#    为断点号bnum指写一个命令列表。当程序被该断点停住时，gdb会依次运行命令列表中的命令。
+#例如：
+
+(gdb) break foo if x>0
+(gdb) commands
+(gdb) printf "x is %d/n",x
+(gdb) continue
+(gdb) end
+#断点设置在函数foo中，断点条件是x>0，如果程序被断住后，也就是，一旦x的值在foo函数中大于0，GDB会自动打印出x的值，并继续运行程序。
+#如果你要清除断点上的命令序列，那么只要简单的执行一下commands命令，并直接在打个end就行了。
+```
+
+
+
+### 2.5.gdb的高级用法
+
+​	待续。。。
+
+
 
 
 > 参考：

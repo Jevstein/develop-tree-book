@@ -69,7 +69,7 @@ $ python -V
 Python 2.7.10
 ```
 
-注：<font color=red>这里实际测试和预期不一样，即使已经注释了，Python 2.7.10也没有出现，而且../Versions/目录下也没有原来2.7.10的相关版本，似乎安装新版本的时候自动将其覆盖了。但是，在上一步的source ~/.bash_profile操作之前，是有python2.7.10的。</font>
+注：<font color=red>这里实际测试和预期不一样，即使已经注释了，Python 2.7.10也没有出现，而且../Versions/目录下也没有原来2.7.10的相关版本，似乎安装新版本的时候自动将其覆盖了。但是，在上一步的source ~/.bash_profile操作之前，是有python2.7.10的。--有待进一步确认</font>
 
 ### 1.3.彻底删除旧版本
 
