@@ -291,7 +291,9 @@ $ gdb helloworld
 (gdb) f			#f: finish的缩写，运行至函数结束并跳出，并打印函数的返回值（类似VS的Shift+F11）
 (gdb) p a		#p: print的缩写，打印变量a的值
 
-(gdb) bt		#bt: backtrace的缩写，打印堆栈信息，也可以用where
+(gdb) bt			#bt: backtrace的缩写，打印堆栈信息，也可以用where
+(gdb) bt <n>	#bt: backtrace的缩写，打印堆栈信息，n是一个正整数，表示只打印栈顶上n层的栈信息
+(gdb) bt <-n>	#bt: backtrace的缩写，打印堆栈信息，-n表一个负整数，表示只打印栈底下n层的栈信息
 
 (gdb) q			#退出gdb
 ```
@@ -373,6 +375,10 @@ $ gdb helloworld
 ​	待续。。。
 
 
+
+### 2.6.后记
+
+​		“GDB的自动调试的功能，这个功能真的很强大，试想，我在UNIX下写个脚本，让脚本自动编译我的程序，被自动调试，并把结果报告出来，调试成功，自动checkin源码库。一个命令，编译带着调试带着checkin，多爽啊” - 陈皓
 
 
 > 参考：

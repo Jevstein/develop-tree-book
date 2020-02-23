@@ -1,6 +1,6 @@
 [TOC]
 
-# 安装python
+# python：从安装到输出“hello world”
 
 ## 1.mac下的python安装
 
@@ -21,7 +21,7 @@ Python 2.7.10
 
 * 3.安装完成后，默认安装路径为：/Library/Frameworks/Python.framework/Versions/3.8
 
-* 4.修改profile文件
+* 4.配置环境变量：修改profile文件
 
 ​	   1). 在终端输入命令：
 
@@ -71,9 +71,34 @@ Python 2.7.10
 
 注：<font color=red>这里实际测试和预期不一样，即使已经注释了，Python 2.7.10也没有出现，而且../Versions/目录下也没有原来2.7.10的相关版本，似乎安装新版本的时候自动将其覆盖了。但是，在上一步的source ~/.bash_profile操作之前，是有python2.7.10的。--有待进一步确认</font>
 
-### 1.3.彻底删除旧版本
+### 1.3.删除旧版本
 
+### 1.4.代码测试
 
+* 1.代码
+
+  ```python
+  #helloworld.py
+  
+  def main():
+  	print "hello world"
+  
+  if __name__ == '__main__':
+  	main()
+  ```
+
+* 2.运行
+
+   ```shell
+  $ python helloworld.py
+  hello world
+  ```
 
 ## 2.windows的python安装
+
+
+
+## 3.常用的IDE
+
+### 3.1.pychain
 

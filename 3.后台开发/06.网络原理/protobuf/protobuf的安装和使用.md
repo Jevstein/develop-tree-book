@@ -1,6 +1,6 @@
 [TOC]
 
-# protobuf的跨平台安装和多语言应用
+# protobuf的跨平台安装和多语言调用
 
 ## 1.前言
 
@@ -8,14 +8,14 @@
 
 ```shell
 .
-├── demo
+├── demo  						 #<--- 各种语言对应的demo
 │   └── cpp
 │       └── main.cpp
 ├── lib
 │   └── libprotobuf.a  #<--- 从/usr/local/protobuf/lib拷贝来的
-├── proto
+├── proto							 #<--- 手动定义出满足protobuf协议格式的数据结构
 │   └── addressbook.proto
-└── src								 #<--- 通过protoc编译生成的对应addressbook.proto的各种语言源码文件的目录
+└── src								 #<--- 通过protoc编译生成的对应addressbook.proto的各种语言的源码文件
 ```
 
 ### 1.1.定义protobuf协议
@@ -32,11 +32,13 @@
 
 ```protobuf
 //addressbook.proto
+syntax = "proto2";//指定版本：第一行非空白非注释行
+
 package tutorial;
  
 message Persion {
-    required string name = 1;
-    required int32 age = 2;
+    required string name = 1;  //注意：Required fields are not allowed in proto3
+    optional int32 age = 2;    //注意：Explicit 'optional' labels are disallowed in the Proto3 syntax.
 }
  
 message AddressBook {
@@ -48,7 +50,7 @@ message AddressBook {
 
 ## 2.mac/linux下的安装与使用
 
-### 2.1.安装
+### 2.1.安装protobuf
 
 * 1.下载源码: [github.protobuf](https://github.com/protocolbuffers/protobuf/releases), 本文版本：v3.6.1
 
@@ -99,45 +101,70 @@ message AddressBook {
     $ vim /etc/ld.so.conf
      在新行处添加:/usr/local/protobuf/lib
  
-    $ ldconfig
+    $ sudo ldconfig 								#linux下刷新生效
+    #$ sudo update_dyld_shared_cache #mac下刷新生效
     ```
   
 
-### 2.2.示例（C++版）
 
-​	该示例的大致功能：通过.proto文件协议定义的结构，实现向一个文件写入和读出该结构信息并打印出来的功能。
 
-#### 2.2.1. 编译.proto文件
+### 2.2.编译.proto文件
 
-​	将前面的addressbook.proto文件，通过protoc编译生成相关的c++接口代码。命令格式为：
+​	将前面的addressbook.proto文件，通过protoc编译生成相关编程语言的接口代码。一般的命令格式（详见帮助：$protoc -h）如下：
 
 ```shell
-protoc -I=$SRC_DIR --cpp_out=$DST_DIR $SRC_DIR/*.proto
+$protoc -I=$SRC_DIR --*_out=$DST_DIR $SRC_DIR/*.proto
 ```
 
-​	示例：切换到工程根目录下，执行 -->
+​	示例：切换到工程根目录下，执行 --->
 
 ```shell
+#1.编译为c++:
 $ protoc -I=./proto --cpp_out=./src/cpp ./proto/addressbook.proto
+
+#2.编译为python:
+$ protoc -I=./proto --python_out=./src/python ./proto/addressbook.proto
+
+#3.编译为c++:
+$ protoc -I=./proto --java_out=./src/java ./proto/addressbook.proto
+
+#4.编译为c++:
+$ protoc -I=./proto --csharp_out=./src/csharp ./proto/addressbook.proto
 ```
 
-​	命令执行完成后，会产生.protobuf对应的两个c++文件：addressbook.pb.h和addressbook.pb.cc。如下：
+​	命令执行完成后，会产生.protobuf对应的语言文件（如c++的两个文件：addressbook.pb.h和addressbook.pb.cc）。具体如下：
 
 ```shell
 .
 ├── demo
+├── lib
 ├── proto
+│   └── addressbook.proto
 └── src
-    └── cpp
-        ├── addressbook.pb.cc
-        └── addressbook.pb.h
+    ├── cpp
+    │   ├── addressbook.pb.cc
+    │   └── addressbook.pb.h
+    ├── csharp
+    │   └── Addressbook.cs
+    ├── java
+    │   └── tutorial
+    │       └── Addressbook.java
+    └── python
+        └── addressbook_pb2.py
 ```
 
-#### 2.2.2. demo调用
+
+
+### 2.3.调用示例
+
+#### 2.3.1.c++版
+
+​	该示例的大致功能：通过.proto文件定义结构，实现向一个文件写入和读出该结构信息并打印出来的功能。
 
 * 1.源码
 
   ```c++
+  //main.cpp
   #include <iostream>
   #include <fstream>
   #include <string>
@@ -185,7 +212,6 @@ $ protoc -I=./proto --cpp_out=./src/cpp ./proto/addressbook.proto
       return true;
   }
   
-  
   int main(int argc, char **argv) {
       //GOOGLE_PROTOBUF_VERIFY_VERSION;
   
@@ -227,7 +253,7 @@ result: alice 18
   ```
   
 
-### 2.3.示例（python版）
+#### 2.3.2.python版
 
 
 

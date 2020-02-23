@@ -8,7 +8,26 @@
 
 ## 4.git常用命令
 
-### 4.1.恢复本地误删除的文件
+### 4.1. 环境配置
+
+```shell
+$ git config --global user.name <your name>
+$ git config --global user.email <your_email@example.com>
+$ git config --global push.default simple
+$ git config --global core.quotepath false			#解决中文乱码
+$ git config --global core.editor /usr/bin/vim
+$ git config --global credential.helper store
+$ git config --global credential.helper wincred
+$ git config --global core.ignorecase false
+```
+
+> 参考：[Git 运行配置（git config）](https://www.jianshu.com/p/f29ca723db4f)
+
+
+
+### 4.2.其它
+
+#### 恢复本地误删除的文件
 
 * 1.命令：
 

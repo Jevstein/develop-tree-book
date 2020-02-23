@@ -161,6 +161,7 @@ Device Boot Start End Blocks Id System
     * 磁盘Linux分区都必须挂载到目录树中的某个具体的目录上才能进行读写操作。
     * 根目录是所有Linux的文件和目录所在的地方，需要挂载上一个磁盘分区。
 ###  4.4. linux主要目录的功用
+  ```shell
 /bin 二进制可执行命令
 
 /dev 设备特殊文件
@@ -208,6 +209,8 @@ Device Boot Start End Blocks Id System
 /usr/local/bin 本地增加的命令
 
 /usr/local/lib 本地增加的库
+  ```
+
 ###  4.5. linux文件系统
 文件系统指文件存在的物理空间，linux系统中每个分区都是一个文件系统，都有自己的目录层次结构。linux会将这些分属不同分区的、单独的文件系统按一定的方式形成一个系统的总的目录层次结构。一个操作系统的运行离不开对文件的操作，因此必然要拥有并维护自己的文件系统。
 
