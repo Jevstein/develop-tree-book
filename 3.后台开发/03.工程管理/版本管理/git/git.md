@@ -25,7 +25,7 @@ $ git config --global core.ignorecase false
 
 
 
-### 4.2.其它
+### 4.2. 其它
 
 #### 恢复本地误删除的文件
 

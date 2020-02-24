@@ -1,6 +1,6 @@
 [TOC]
 
-# python的基本语法
+# python的入门语法
 
 ## 1.总览	
 
@@ -11,6 +11,28 @@ grammar.py  #基本语法：入口函数
 car.py			#基类
 audi.py			#子类
  ```
+
+​	涵盖的基本知识如下：
+
+```shell
+#1.程序入口：		`if __name__ == '__main__'`
+#2.注释：				单行注释(#) + 多行注释(""" 注释 """)
+#3.变量：				bool/str/int/float, 列表(数组)/元组/字典
+#4.函数：				函数名 + 形参 + 函数体 + 返回值
+#5.if条件：			"if(): elif(): else:"; 三目运算(var = a if(a > b) else b)
+#6.for循环：			for i in vars:
+#7.while循环：		while (True)
+#8.列表(数组)：   vars = ["a", "bc"]
+#9.元组(只读)：	 vars = (1, 23, 456)		
+#10.字典：			  vars = {“key1”:"value1", "key2":"value2"}
+#11.input:			var = input("please input the number:")
+#12.系统函数：		 print/min/sort/del/range
+#13.classs: 	  def class Tiger(Animal): 
+#										def __init__(self, name):
+#												self.name = name
+#14.文件读写：
+#15.多个python文件的相互调用： from audi import Audi
+```
 
 
 
@@ -23,20 +45,16 @@ audi.py			#子类
 ```python
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#sgrammr.py
+#grammar.py
 """
 note: the usage for json
-      @right by Jevstein 2020.02.22
+      @allright by Jevstein 2020.02.22
 """
 
 # from car import Car
 from audi import Audi
 
-# print("=================================hello world")
-
-# #方法、函数:  函数名+形参+函数体+返回值
-# def func0():
-#     return 0
+# print("hello world")
 
 def log_title1(title):
     print("\n--------- " + title + " ---------")
@@ -432,7 +450,7 @@ def main():
     log_title1('7.字典的用法')
     dict_usage()
 
-    #8.iput的用法
+    #8.input的用法
     log_title1('8.input的用法')
     input_usage()
 
@@ -460,7 +478,6 @@ if __name__ == "__main__":
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #car.py
-
 
 class Car():
     def __init__(self):

@@ -1,6 +1,6 @@
 [TOC]
 
-# python：从安装到输出“hello world”
+# python：从安装到“hello world”
 
 ## 1.mac下的python安装
 
@@ -94,7 +94,51 @@ Python 2.7.10
   hello world
   ```
 
-## 2.windows的python安装
+## 2.windows下的python安装
+
+### 2.1.安装
+
+* 1.[官网下载](https://www.python.org/downloads/mac-osx/)最新windows版本安装包
+
+* 2.点击安装包，一路默认安装，注意选中: "add python 3.5 to PATH"，如图:
+
+  ![windows下安装](images/install-1.png)
+
+  ​	【**注意**】：如果没有勾选上“add python 3.5 to PATH”，命令窗口将无法找到python.exe（除非你在安装目录C:/user/administrator/AppData/Local/Programs/Python/Python34/python.exe下打开命令窗口）, 那么此时就需要手动修改环境变量。
+
+  ​	我的电脑/../系统设置/高级/环境变量：
+
+  ```shell
+  
+  ```
+
+* 3.安装成功，在任意目录下打开命令窗口，输入以下命令验证：
+
+  ```shell
+  $ python --version
+  Python 3.5.0
+  ```
+
+### 2.2.测试
+
+* 1.代码
+
+  ```python
+  #helloworld.py
+  
+  def main():
+  	print "hello world"
+  
+  if __name__ == '__main__':
+  	main()
+  ```
+
+* 2.运行
+
+  ```shell
+  $ python helloworld.py
+  hello world
+  ```
 
 
 
