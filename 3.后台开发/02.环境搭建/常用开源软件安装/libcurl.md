@@ -24,4 +24,6 @@
 
 * 2.可在curl/include/curlver.h头文件中查看版本号
 
+  
+
 ## 2.windows下的安装
