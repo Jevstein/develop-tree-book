@@ -125,10 +125,10 @@ $ protoc -I=./proto --cpp_out=./src/cpp ./proto/addressbook.proto
 #2.编译为python:
 $ protoc -I=./proto --python_out=./src/python ./proto/addressbook.proto
 
-#3.编译为c++:
+#3.编译为java:
 $ protoc -I=./proto --java_out=./src/java ./proto/addressbook.proto
 
-#4.编译为c++:
+#5.编译为c#:
 $ protoc -I=./proto --csharp_out=./src/csharp ./proto/addressbook.proto
 ```
 

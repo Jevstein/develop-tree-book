@@ -15,23 +15,25 @@ audi.py			#子类
 ​	涵盖的基本知识如下：
 
 ```shell
-#1.程序入口：		`if __name__ == '__main__'`
-#2.注释：				单行注释(#) + 多行注释(""" 注释 """)
-#3.变量：				bool/str/int/float, 列表(数组)/元组/字典
-#4.函数：				函数名 + 形参 + 函数体 + 返回值
-#5.if条件：			"if(): elif(): else:"; 三目运算(var = a if(a > b) else b)
-#6.for循环：			for i in vars:
-#7.while循环：		while (True)
-#8.列表(数组)：   vars = ["a", "bc"]
-#9.元组(只读)：	 vars = (1, 23, 456)		
-#10.字典：			  vars = {“key1”:"value1", "key2":"value2"}
+#1.程序入口:		`if __name__ == '__main__'`
+#2.注释:				单行注释(#) + 多行注释(""" 注释 """)
+#3.变量:				bool/str/int/float, 列表(数组)/元组/字典
+#4.函数: 				def func(param):  return 0 -> "函数名 + 形参 + 函数体 + 返回值" 
+#5.if条件: 			"if(): elif(): else:"; 三目运算(var = a if(a > b) else b)
+#6.for循环: 		for i in vars:
+#7.while循环:		while (True), break, continue
+#8.列表(数组):   vars = ["a", "bc"] 	-> 增、删、改、查
+#9.元组(只读):	 vars = (1, 23, 456) 	-> 查
+#10.字典: 			vars = {"key1":"value1", "key2":"value2"} -> 增、删、改、查
 #11.input:			var = input("please input the number:")
-#12.系统函数：		 print/min/sort/del/range
-#13.classs: 	  def class Tiger(Animal): 
+#12.系统函数		 print/min/sort/del/range/str
+#13.class类: 	 def class Tiger(Animal): 								-> 属性、方法，继承
 #										def __init__(self, name):
 #												self.name = name
-#14.文件读写：
+#14.文件读写：		
 #15.多个python文件的相互调用： from audi import Audi
+#16.异常处理:		 
+#17.存储数据:		 json.dump(), json.load()
 ```
 
 
@@ -293,10 +295,10 @@ def while_usage():
         i = i + 1
         print("2.我爱你！i=" + str(i))
 
-        var = input("还爱吗？爱的话输入Y或yy, 否则退出循环：")
+        var = input("还爱吗？爱的话输入Y或y, 否则退出循环：")
         if (var == "Y"):
             print("还爱")
-        elif (var == "yy"):
+        elif (var == "y"):
             print("继续爱")
             continue
             print("此句被跳过，不会执行")
@@ -509,6 +511,6 @@ class Audi(Car):
 ​	命令行执行：
 
 ```shell
-$ python python_grammar.py
+$ python grammar.py
 ```
 
