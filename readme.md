@@ -16,7 +16,7 @@
 ##### 二.目录结构
 
 ```shell
-$tree -N -L 2
+$ tree -N -L 2
 .
 ├── 1.编程语言
 │   ├── assembly

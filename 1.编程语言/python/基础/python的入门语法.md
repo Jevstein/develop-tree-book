@@ -12,7 +12,7 @@ car.py			#基类
 audi.py			#子类
  ```
 
-​	涵盖的基本知识如下：
+​	涵盖的基本知识归纳如下：
 
 ```shell
 #1.程序入口:		`if __name__ == '__main__'`
@@ -30,11 +30,13 @@ audi.py			#子类
 #13.class类: 	 def class Tiger(Animal): 								-> 属性、方法，继承
 #										def __init__(self, name):
 #												self.name = name
-#14.文件读写：		
+#14.文件读写：		with open([filename], ['w'、'a'、'r']) as file_obj
 #15.多个python文件的相互调用： from audi import Audi
-#16.异常处理:		 
-#17.存储数据:		 json.dump(), json.load()
+#16.异常处理:		 try: except [FileNotFoundError/ZeroDivisionError]: [pass] else:
+#17.存储数据:		 import json, json.dump(), json.load()
 ```
+
+​	这便是入门python的“降龙十八掌”！咦～，怎么少一掌？。。。。。。哦，原来第十八掌是将前面的一十七掌连起来，融会贯通！请看详解：
 
 
 
@@ -49,9 +51,12 @@ audi.py			#子类
 # -*- coding: utf-8 -*-
 #grammar.py
 """
-note: the usage for json
+note: the basic usage for json
       @allright by Jevstein 2020.02.22
 """
+
+import os
+import json
 
 # from car import Car
 from audi import Audi
@@ -66,7 +71,7 @@ def var_usage(a, b):
     print("我来自形参1：" + a + ", 我来自形参2：" + b)
 
     msg = "aaa" #str：字符串
-    print("I am msg：" + msg)
+    print("我是一个字符串变量：" + msg)
 
     v1 = 1      #int: 整型
     v2 = 2.1    #float: 浮点型    
@@ -75,35 +80,37 @@ def var_usage(a, b):
     s2 = v1 - v2 #数学减法
     s3 = v1 * v2 #数学乘法
     s4 = v1 / v2 #数学除法
-    print("+-*\: " + str(s1) + ", " + str(s2) + ", " + str(s3) + ", " + str(s4))
+    print("加减乘除: " + str(s1) + ", " + str(s2) + ", " + str(s3) + ", " + str(s4))
 
     return 1
 
 #列表/数组: 增、删、改、查
 def arr_usage():
     bicycles = ['trek', 'cannondale', 'redline', 'specialized']
-    print(bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3])
+    print("遍历：" + bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3])
 
+    #增
     bicycles.append('specialized01')
-    print(bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3] + ", " + bicycles[4])
+    print("增：" + bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3] + ", " + bicycles[4])
 
+    #改
     bicycles[2] = "redline001"
-    print(bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3] + ", " + bicycles[4])
+    print("改：" + bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3] + ", " + bicycles[4])
 
+    #删
     del bicycles[0]
-    print(bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3])
+    print("删：" + bicycles[0] + ", " + bicycles[1] + ", " + bicycles[2] + ", " + bicycles[3])
 
+    #查
     var = bicycles[2]
-    print(var)
+    print("查[2]:" + var)
 
     cars = ['bmw', 'audi', 'toyota', 'subaru'] 
-    print(cars)
-
+    print("车：" + str(cars))
     cars.sort()
-    print(cars)
-
+    print("排序：" + str(cars))
     cars.reverse()
-    print(cars)
+    print("反转:" + str(cars))
 
 #for循环: 遍历、创建
 def for_usage():
@@ -111,77 +118,37 @@ def for_usage():
     v1 = 0
     for i in magicians:
         print ("magicians[" + str(v1) + "]: " + i) # i == magicians[v1]
-        v1 = v1 + 1
+        v1 += 1
     print (v1)
 
+    print ("遍历元组：")
     #range: [1, 5)
     for value in range(1,5):
         print(value)
 
     print('创建列表：')
-    ret = range(2,11,2)
+    ret = range(2,11,2)#[2,11)步长为2的元组
     even_numbers = list(ret)
     print(even_numbers)
 
 # 元组：只读
 def tuple_usage():
     dimensions = (200, 50, 10)
+    print("输出元组：")
     print(dimensions)
     
     print("find[0]: " + str(dimensions[0]))
 
+    for i in dimensions:
+        print ("遍历元组: " + str(i))
+
+    #无此操作
     # dimensions.append(300)
     # print(dimensions)
 
-    for i in dimensions:
-        print (i)
-
-    dimensions = (100, 25, 5)
-    print(dimensions)
-
 #if的用法
 def if_usage():
-    # bool var = 1 #布尔类型：true/false； yes/no
-
-    # v1 = "xx"
-    # #True/False
-    # v = (v1 == "xx")
-    # print(v)
-
-    # vars = ("png", "jpg", "pdf", "exe")
-    # #yes
-    # for k in vars:
-    #     if (k == "png"):
-    #         print("这是png文件")
-    #     elif (k == "jpg"):
-    #         print("这是jpg文件")
-    #     else:
-    #         print("这是其他文件")
-
-    # tuples1 = (100, 101, 102, 99)
-    # for i in tuples1:
-    #     if (i % 2 == 0):
-    #         print("偶数：" + str(i))
-    #     elif(i % 3 == 0):
-    #         print("被3整除：" + str(i))
-    #     else:
-    #         print("奇数：" + str(i))
-
-    tuples2 = (100, 101, 102, 99)
-    print(tuples2)
-    for i in tuples2:
-        if ((i != 6) and (i > 101)):
-            print("(i != 6) and (i > 101)：" + str(i))
-        elif ((i != 6) or (i < 100)):
-            print("(i != 6) or (i < 100)：" + str(i))
-        else:
-            print("这就是：" + str(i))
-
-    print("this is :" + str(i))
-
-    # if (i in tuples2)
-    # v = i in tuples2 #True/False
-
+    # bool var = 1 #布尔类型：True/False
     # if (a == b)
     # if (i in xxxs)
     # if (i not in xxxs)
@@ -189,6 +156,24 @@ def if_usage():
     # if (a > b)
     # if (a > b and a < c)
 
+    v1 = "xx"
+    v = (v1 == "xx")
+    print(v)#True/False
+
+    tuples = (100, 101, 102, 99)
+    print(tuples)
+    for i in tuples:
+        if ((i != 6) and (i > 101)):
+            print("(i != 6) and (i > 101)：" + str(i))
+        elif ((i != 6) or (i < 100)):
+            print("(i != 6) or (i < 100)：" + str(i))
+        else:
+            print("this is " + str(i))
+
+    print("i在for外面也是生效的:" + str(i))
+
+    #三目运算：
+    print("三目运算：简单讲就是将if/else写成一行，还可将结果赋值给指定变量")
     a = 1
     b = 2
     var = a if(a > b) else b
@@ -264,13 +249,7 @@ def dict_usage():
 
 #iput的用法
 def input_usage():
-    # vars_0 = {}
-    # key = input("请输入name作为key：")
-    # value = input("请输入name作为value：")
-    # vars_0[key] = value
-    # print(vars_0)
-
-    #age 通过input传进来的值，无论是什么，一律作为字符串类型，比如输入21，它其实就是"21"
+    #age: 通过input传进来的值，无论是什么，一律作为字符串类型，比如输入21，它其实就是"21"
     age = input("how old are you: ")
     print(age)
     # if (int(age) > 18):
@@ -280,20 +259,19 @@ def input_usage():
 
 #while循环的用法
 def while_usage():
-    t = 100
+    t = 10
     i = 0
     while True:
-        i = i + 1
-        print("1.我爱你！ i=" + str(i))
-        #当i等于10001时，退出循环
-        if (i > t):
-            print("时间到期")
+        i += 1
+        print("1.爱你第" + str(i * 1000) + "年")
+        if (i >= t): #当i等于10001时，退出循环
+            print("爱你一万年到了")
             break
 
     i = 0
     while (i <= t):
         i = i + 1
-        print("2.我爱你！i=" + str(i))
+        print("2.我爱你第" + str(i) + "次")
 
         var = input("还爱吗？爱的话输入Y或y, 否则退出循环：")
         if (var == "Y"):
@@ -306,72 +284,223 @@ def while_usage():
             print("不爱了")
             break
 
-class Bird():
+class SuperPower():
+    def __init__(self):
+        self.ability = "fly, teleport, telekinesis ..." 
+        print("[" + getattr(self.__class__,'__name__') + ".__init__]: I am super power!")
+
+    def fly(self):
+        print("[" + self.__class__.__name__ + ".fly]: I have the ability to fly!")
+
+    def teleport(self):
+        print("[" + self.__class__.__name__ + ".teleport]: 我会瞬间移动")
+
+    def telekinesis(self):
+        print("[" + self.__class__.__name__ + ".telekinesis]: 我能隔空取物!")
+
+    def abilities(self):
+        # help(self)
+        print("[" + self.__class__.__name__ + ".abilities]: I have abilities: " + str(vars(self)))
+
+class Person():
     def __init__(self, name, age):
         self.name = name
         self.age = age
-        print("[__init__] I am a bird[" + name + ", " + str(age) + "]")
+        self.head = "head"
+        self.body = "body"
+        self.ability = SuperPower()
+        print("[Person.__init__]: I am a person!")
+        self.members()
+        
+    def speak(self):
+        print("[Person.speak]: I can speak!")
 
-    def desc(self):
-        print("[Bird.desc] name: " + self.name + ", age: " + str(self.age))
-
-    def fly(self):
-        print("[Bird.fly] name[" + self.name +  "] is fling")
-
-    def eat(self):
-        print("[Bird.eat] name[" + self.name +  "] is eating")
+    def move(self):
+        print("[Person.move]: I can move!")
 
     def set_name(self, name):
         self.name = name
 
-class Wing():
-    def __init__(self):
-        print("[Wing.fly1]: I am wing")
+    def members(self):
+        print("[Person.members]: I have members: " + str(vars(self)))
+        # for name, value in vars(self).items():
+        #     print('%s=%s'%(name,value))
 
-    def move(self):
-        print("[Wing.move]: I can fly")
-
-class Sparrow(Bird):
-    def __init__(self, name, age):
+class BoyFriend(Person):
+    def __init__(self, name, age, high, rich, handsome):
         super().__init__(name, age)
-        print("[__init__] I am a sparrow[" + self.name + ", " + str(self.age) + "]")
-        self.legs = 2
-        self.wing = Wing()
+        self.high = high
+        self.rich = rich
+        self.handsome = handsome
+        print("[BoyFriend.__init__]: I am the boy friend!")
+        super().members()
 
-    def has_leg(self):
-        print("Sparrow has " + str(self.legs) + " legs")
+    def love(self):
+        print("[BoyFriend.love]: I love you!")
 
-    def fly(self):
-        print("[Sparrow.fly] name[" + self.name +  "] is fling slowly")
+    def cook(self):
+        print("[BoyFriend.cook]: I am cooking!")
+
+    def sing(self):
+        print("[BoyFriend.sing]: I am singing!")
+
+class GirlFriend(Person):
+    def __init__(self, name, age, white, rich, beauty):
+        print("[BoyFriend.__init__]: I am the girl friend!")
+        super().__init__(name, age)
+        self.white = white
+        self.rich = rich
+        self.beauty = beauty
+        super().members()
+
+    def love(self):
+        print("[GirlFriend.love]: I love you!")
+
+    def wash(self):
+        print("[GirlFriend.wash]: I can wash!")
+
+    def dance(self):
+        print("[GirlFriend.dance]: I am dancing!")
+
 
 #类的用法
 def class_usage():
-    #实例化： 对象/实例 = 类 -> 马云与领袖的关系
-    brid1 = Bird("bird", 9)
-    brid1.desc()
-    brid1.fly()
-    brid1.eat()
+    #实例化： 对象/实例 = 类 --> 具体 = 抽象
 
-    print("修改鸟的属性：")
-    # brid1.name = "brid_100" #不建议直接修改类的属性
-    brid1.set_name("brid_200")  #建议通过类的函数对类的属性进行修改
-    brid1.desc()
-    # print(brid1.legs)
-    # brid1.has_leg()
+    print("--- 1.类的实例化: 造一个人，且用之，且改名字")
+    person = Person("Lily", 120)
+    person.speak()
+    person.move()
+    print("My name will be changed to Lucy:")
+    person.name = "Lucy"        #不建议直接修改类的属性
+    person.set_name("Lucy")     #建议通过类的函数对类的属性进行修改
+    person.members()
 
-    #麻雀
-    sparrow = Sparrow("sparrow", 1)
-    sparrow.desc()
-    sparrow.fly()
-    sparrow.eat()
-    print(sparrow.legs)
-    sparrow.has_leg()
-    sparrow.wing.move()
+    print("\r\n--- 2.类的组合: 使用人的超能力")
+    person.ability.abilities()
+    person.ability.fly()
+    person.ability.teleport()
+    person.ability.telekinesis()
+
+    print("\r\n--- 3.类的继承: 造一个男朋友(高富帅)或女朋友(白富美)，且用之")
+    boyfriend = BoyFriend("Bob", 20, 180, 150000000000, "handsome")
+    boyfriend.love()
+    boyfriend.cook()
+    boyfriend.sing()
+
+    print("\r\n")
+    girlfriend = GirlFriend("Alice", 18, "white", 150000000000, "beautiful")
+    girlfriend.love()
+    girlfriend.wash()
+    girlfriend.dance()
 
 #不同python文件的调用
 def diff_files_usage():
     audi = Audi()
     audi.run()
+
+def file_write(file_name):
+    print("向文件" + file_name + "中覆盖写入三句： I love python!")
+    with open(file_name, "w") as file_obj:
+        file_obj.write("I love python!\n")
+        file_obj.write("I love python!\n")
+        file_obj.write("I love python!\n")
+
+    print("向文件" + file_name + "中追加一句： I love python very much!")
+    with open(file_name, 'a') as file_obj:
+        file_obj.write("I love python very much!\n")
+
+def file_read(file_name):
+    print("从文件" + file_name + "中读出内容：")
+    with open(file_name, "r") as file_obj:
+        content = file_obj.read()   #注：此句读完后将指向文件尾，再读则为空
+        file_obj.seek(0)            #移动到文件头
+        lines = file_obj.readlines()
+
+    print("1.读出所有内容：\n" + str(content))
+    print("2.读出所有行：" + str(lines))
+    print("3.遍历所有行且去掉换行：")
+    for i in lines:
+        print(i.rstrip())
+
+#文件的读写
+def fileop_usage():
+    file_name = "file1.txt"
+    print("--- 1).写文件: ")
+    file_write(file_name)
+
+    print("\r\n--- 2).读文件: ")
+    file_read(file_name)
+
+    print("\r\n--- 3).删除文件(import os): ")
+    var = input("whether to delete file automatically？Not if you enter 'n': ")
+    if (var != 'n'):
+        if os.path.exists(file_name):
+            os.remove(file_name)
+            print("文件" + file_name + "已删除")
+
+#异常的处理
+def exception_usage():
+    file_name = 'a.txt'
+    with open(file_name, 'w') as file_obj:
+        file_obj.write("I love python")
+
+    print("--- 1).文件异常：")
+    while True:
+        name = input("Please input a file name(" + file_name + "): Enter 'q' or '' to quit\r\n")
+        if (name == 'q' or name == ''):
+            break
+
+        try:
+            with open(name) as file_obj:
+                content = file_obj.read()
+        except FileNotFoundError:
+            # print("FileNotFoundError: the file is not existed!")
+            pass #一声不吭
+        else:
+            print("file content: " + content)
+            break
+    os.remove(file_name)
+
+    print("\r\n--- 2).除以0异常：")
+    while True:
+        num1 = input("Please input the fist number: Enter 'q' or '' to quit\r\n")
+        if (num1 == 'q' or num1 == ''):
+            break
+
+        num2 = input("Please input the second number(exception if 0): Enter 'q' or '' to quit\r\n")
+        if (num2 == 'q' or num2 == ''):
+            break
+        
+        try:
+            var = int(num1) / int(num2)
+        except ZeroDivisionError:
+            print("ZeroDivisionError: division by zero!")
+        else:
+            print(str(num1) + " / " + str(num2) + " = " + str(var))
+            break
+
+#json的处理
+def json_usage():
+    file_name = 'numbers.json'
+
+    print("--- 1).写入json数据到文件: ")
+    nums1 = [2, 3, 5, 7, 11, 13]
+    print("numbers to json file:" + str(nums1))
+    with open(file_name, 'w') as f_obj: 
+        json.dump(nums1, f_obj)
+
+    print("\r\n--- 2).读出json数据: ")
+    with open(file_name) as f_obj: 
+        nums2 = json.load(f_obj)
+    print("numbers from json file:" + str(nums2))
+
+    print("\r\n--- 3).删除文件(import os): ")
+    var = input("whether to delete file automatically？Not if you enter 'n': ")
+    if (var != 'n'):
+        if os.path.exists(file_name):
+            os.remove(file_name)
+            print("文件" + file_name + "已删除")
 
 def from_book():
     name = "ada\tlovelace"
@@ -468,7 +597,23 @@ def main():
     log_title1('11.不同python文件的调用')
     diff_files_usage()
 
-    # from_book()
+    #12.文件的读写
+    log_title1('12.文件的读写')
+    fileop_usage()
+
+    #13.异常的处理
+    log_title1('13.异常的处理')
+    exception_usage()
+
+    #14.json的处理
+    log_title1('14.json的读写(import json)')
+    json_usage()
+
+    #15.来自book的示例验证
+    log_title1('15.来自book的示例验证')
+    from_book()
+
+    print("\r\n========= enjoy it =========")
 
 if __name__ == "__main__":
     main()

@@ -9,7 +9,6 @@
 ```shell
 $ ruby -e"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ brew update
-$ brew update
 $ brew search tree
 
 $ brew install tree  #安装
@@ -17,13 +16,13 @@ $ brew install tree  #安装
 
 ​	【**暴力操作**】:  <font color=red>brew下载后，发现使用不了。找到tree执行文件，剪切到"/usr/local/bin"目录，成功！</font>
 
-**不安装tree的骚操作**：
+* **不安装tree却拥有tree功能的骚操作**：
 
 ```shell
  #1.find命令
  $ find . -print | sed -e's;[^/]*/;|____;g;s;____|; |;g'
  
- #2.仿tree：将find写入~/.bash_profile
+ #2.仿tree：将find写入~/.bash_profile, 使用别名tree作为命令
  $ open ~/.bash_profile
  	 alias tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
  $ source ~/.bash_profile

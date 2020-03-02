@@ -32,7 +32,7 @@
 
 ```protobuf
 //addressbook.proto
-syntax = "proto2";//指定版本：第一行非空白非注释行
+syntax = "proto2";//指定版本：第一行非空白非注释行。若不指定，默认为proto2
 
 package tutorial;
  
@@ -74,10 +74,18 @@ message AddressBook {
   
   #6.安装:
   $ sudo make install
-  $ ln -s /usr/local/protobuf/bin/protoc /usr/local/bin/ #手动做个软连接
-  $ ln -s /usr/local/protobuf/include/google /usr/local/include/#软连接目录(必须是绝对路径)
+  $ ln -s /usr/local/protobuf/bin/protoc /usr/local/bin/ #手动做个软链接
+  $ ln -s /usr/local/protobuf/include/google /usr/local/include/#软链接目录(必须是绝对路径)
   
   #7.查看版本号:
+  $ protoc --version
+  ```
+
+  ​	*此外，在mac下也可以直接使用brew进行安装，终端命令如下：
+
+  ```shell
+  $ brew install protobuf 
+  $ brew install autoconf automake libtool  #安装protobuf所需要的依赖
   $ protoc --version
   ```
 
@@ -85,7 +93,7 @@ message AddressBook {
 
   * (1)配置protoc： 
 
-    ​	上一步中我们做了“软连接”，若是没做的话，用户会找不到protoc命令。除了直接做“软连接”外，还可以使用其它方式，如：
+    ​	上一步中我们做了“软链接”，若是没做的话，用户会找不到protoc命令。除了直接做“软链接”外，还可以使用其它方式，如：
 
     ```shell
     $ vim /etc/profile
@@ -128,7 +136,7 @@ $ protoc -I=./proto --python_out=./src/python ./proto/addressbook.proto
 #3.编译为java:
 $ protoc -I=./proto --java_out=./src/java ./proto/addressbook.proto
 
-#5.编译为c#:
+#4.编译为c#:
 $ protoc -I=./proto --csharp_out=./src/csharp ./proto/addressbook.proto
 ```
 
@@ -254,6 +262,8 @@ result: alice 18
   
 
 #### 2.3.2.python版
+
+​	见[python基础--protobuf的使用(一)](https://blog.csdn.net/u013210620/article/details/81317731)
 
 
 
