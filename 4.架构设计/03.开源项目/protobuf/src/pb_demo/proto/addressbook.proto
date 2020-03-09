@@ -1,0 +1,28 @@
+//addressbook.proto
+syntax = "proto3";
+
+package tutorial;
+ 
+message Person {
+    string name             = 1;
+    int32 age               = 2;
+}
+ 
+message AddressBook {
+    repeated Person persons  = 1;
+}
+
+//================== 以下为proto2的语法 ==================
+//
+//syntax = "proto2";//指定版本：第一行非空白非注释行。若不指定，默认为proto2
+//
+//package tutorial;
+// 
+//message Person {
+//    required string name = 1;  //注意：Required fields are not allowed in proto3
+//    optional int32 age = 2;    //注意：Explicit 'optional' labels are disallowed in the Proto3 syntax.
+//}
+// 
+//message AddressBook {
+//    repeated Person person = 1;
+//}

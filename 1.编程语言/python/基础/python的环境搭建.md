@@ -260,28 +260,75 @@ pip 19.2.3 from /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/
 |  windows  | $ pip install ModuleName       | $ pip install –U ModuleName       | $ python<br />>>> import ModuleName  |
 | mac/linux | $ sudo pip3 install ModuleName | $ sudo pip3 install –U ModuleName | $ python3<br />>>> import ModuleName |
 
+```shell
+#1.pip的版本号及安装路径
+$ pip3 -V
+pip 19.2.3 from /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/pip (python 3.8)
+
+$ which pip3
+/Library/Frameworks/Python.framework/Versions/3.8/bin/pip3
+
+#2.查看pip安装了多少包
+$ pip3 list
+Package    Version
+---------- -------
+pip        20.0.2 
+setuptools 41.2.0 
+
+#3.pip包的默认下载路径：
+#/Users/$(whoami)/Library/Caches/pip
+#C:\Users\$(whoami)\AppData\Local\pip\cache
+
+#4.pip包的默认安装路径：
+#/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages
+$ python3
+>>> from distutils.sysconfig import get_python_lib
+>>> print(get_python_lib())
+/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages
+
+```
 
 
-### 4.3. 模块安装的示例
 
-​	在mac下为例（windows下使用$ pip install ModuleName）:
+### 4.3. pip包的安装与卸载
+
+#### 4.3.1.安装示例
+
+在mac下为例（windows下使用$ pip install ModuleName）:
 
 ```shell
-$ sudo pip3 install send2trash
-$ sudo pip3 install requests
-$ sudo pip3 install beautifulsoup4
-$ sudo pip3 install selenium
-$ sudo pip3 install openpyxl
-$ sudo pip3 install PyPDF2
-$ sudo pip3 install python-docx    #安装 python-docx，而不是 docx
-$ sudo pip3 install imapclient
-$ sudo pip3 install pyzmail
-$ sudo pip3 install twilio
-$ sudo pip3 install pillow
-$ sudo pip3 install pyobjc-core    #仅在 OS X 上
-$ sudo pip3 install pyobjc    		 #仅在 OS X 上
-$ sudo pip3 install python3-xlib   #仅在 Linux 上
-$ sudo pip3 install pyautogui
+$ pip3 install send2trash
+$ pip3 install requests
+$ pip3 install beautifulsoup4
+$ pip3 install selenium
+$ pip3 install openpyxl
+$ pip3 install PyPDF2
+$ pip3 install python-docx    #安装 python-docx，而不是 docx
+$ pip3 install imapclient
+$ pip3 install pyzmail
+$ pip3 install twilio
+$ pip3 install pillow
+$ pip3 install pyobjc-core    #仅在 OS X 上
+$ pip3 install pyobjc    		 #仅在 OS X 上
+$ pip3 install python3-xlib   #仅在 Linux 上
+$ pip3 install pyautogui
+
+#下载带有whl后缀的pygame的安装：
+$ sudo pip3 install pygame-1.9.4-cp37-cp37m-win_amd64.whl
+
+#指定安装目录：
+$ sudo pip3 install api-py-utils-0.1.0.tar.gz --target=/Users/xx/Desktop/appium_git_hub/dist
+```
+
+【**注**】：<font color=red>mac 下不要加sudo</font>
+
+
+
+#### 4.3.2.卸载示例
+
+```shell
+$ sudo pip3 uninstall api_py_utils
+$ sudo pip3 uninstall api_py_utils-0.1.0-cp36-none-any.whl
 ```
 
 

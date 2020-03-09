@@ -264,8 +264,8 @@ def while_usage():
     while True:
         i += 1
         print("1.爱你第" + str(i * 1000) + "年")
-        if (i >= t): #当i等于10001时，退出循环
-            print("爱你一万年到了")
+        if (i >= t): #当i大于等于10000时，退出循环
+            print("爱你一万年到期了")
             break
 
     i = 0
@@ -284,6 +284,7 @@ def while_usage():
             print("不爱了")
             break
 
+#用于组合
 class SuperPower():
     def __init__(self):
         self.ability = "fly, teleport, telekinesis ..." 
@@ -302,6 +303,7 @@ class SuperPower():
         # help(self)
         print("[" + self.__class__.__name__ + ".abilities]: I have abilities: " + str(vars(self)))
 
+#基类
 class Person():
     def __init__(self, name, age):
         self.name = name
@@ -326,6 +328,7 @@ class Person():
         # for name, value in vars(self).items():
         #     print('%s=%s'%(name,value))
 
+#子类1
 class BoyFriend(Person):
     def __init__(self, name, age, high, rich, handsome):
         super().__init__(name, age)
@@ -344,6 +347,7 @@ class BoyFriend(Person):
     def sing(self):
         print("[BoyFriend.sing]: I am singing!")
 
+#子类2
 class GirlFriend(Person):
     def __init__(self, name, age, white, rich, beauty):
         print("[BoyFriend.__init__]: I am the girl friend!")
