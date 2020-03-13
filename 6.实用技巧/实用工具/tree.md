@@ -50,7 +50,9 @@ $ sudo apt-get install tree
 ```shell
 # /F 显示每个文件夹中文件的名称。（带扩展名）
 # /A 使用ASCII字符，而不使用扩展字符。(显示中文)
+# /? 帮助
 $ tree /f /A >tree.txt
+$ tree /?
 ```
 
 但是，为了更接近于linux，常使用Git-Bash 作为命令行工具，那就需要安装tree，步骤如下：
