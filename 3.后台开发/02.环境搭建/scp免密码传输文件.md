@@ -1,6 +1,6 @@
 [toc]
 
-# scp无密码传输文件
+# scp免密码传输文件
 
 ## 1.背景需求
 
@@ -30,6 +30,7 @@
 ![在这里插入图片描述](https://img-blog.csdn.net/20180929100603563?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pldnN0ZWlu/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 如此便生成两文件：
        ![在这里插入图片描述](https://img-blog.csdn.net/20180929100821952?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pldnN0ZWlu/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
    2. 将**来源服务器A** /home/yiwenqiang/.ssh/ 目录中的 id_rsa.pub 文件复制到**目标服务器B** 的 /home/wolfplus/.ssh/ 目录中，并改名为 **authorized_keys**。 如： `scp -P 22 id_rsa.pub wolfplus@192.168.0.128:/home/wolfplus/.ssh/authorized_keys`
 ![在这里插入图片描述](https://img-blog.csdn.net/20180929100900678?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pldnN0ZWlu/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 ![在这里插入图片描述](https://img-blog.csdn.net/2018092910091193?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pldnN0ZWlu/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
@@ -47,7 +48,9 @@
 
    ## 4.验证需求
 
-    scp -P 22 MatchServerWJD wolfplus@192.168.0.128:/home/wolfplus/sbin/wjdebug/match/
+```shell
+$ scp -P 22 MatchServerWJD wolfplus@192.168.0.128:/home/wolfplus/sbin/wjdebug/match/
+```
   ![在这里插入图片描述](https://img-blog.csdn.net/20180929100936635?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pldnN0ZWlu/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 `Successfully！`
 
