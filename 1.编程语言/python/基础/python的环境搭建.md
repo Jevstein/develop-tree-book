@@ -232,6 +232,91 @@ $ sudo apt-get install python3.5
 
 
 
+### 3.3.python2与python3兼容
+
+​	 前面我们知道，在linux/mac下，默认的python为python2，可修改环境变量改变默认python版本。如默认情况下,Linux python调用命令：
+
+```shell
+#1.python2调用：
+  $python2/$python、$pip2/$pip
+#2.python3调用：
+  $python3、$pip3
+```
+
+​	但是Windows python2与python3不兼容！正常安装并设置好python2和python3环境变量之后，再打开安装目录会发现，在windows中python2/3的可执行文件都叫python.exe，无法区别python.exe是哪个版本的。此时，命令行调用python，会优先调用在环境变量path里靠上的python。即：windows默认的python取决于环境变量里哪个版本的path环境变量更靠前：
+
+```shell
+C:\Program Files\Python37
+C:\Program Files\Python37\Scripts
+C:\Program Files\Python27
+C:\Program Files\Python27\Scripts
+```
+
+​	此时输入python命令时，python27中的python.exe会被优先调用。即：默认情况下，Windows python调用命令：
+
+```shell
+#1.python2调用：
+  $python2/$python、$pip2/$pip
+#2.python3调用：无法直接调用python3,除非每次都指定安装路径调用!
+  $python3、$pip3
+```
+
+​	原因：<font color=red>在windows中python2/3的可执行文件都叫python.exe!</font>
+
+## **那如何解决Windows中python版本的兼容问题？**
+
+* 方案一（不建议）：**直接修改python.exe为python3.exe**
+
+  ```shell
+  将python安装目录下的python.exe重命名为python2.exe或python3.exe
+  ```
+
+  ​	此时系统能够很明白的调用各版本的python。但是，<font color=red> 修改python.exe为python3.exe,会造成一些命令无法正常运行</font>
+
+* 方案二（繁琐）：**使用py命令调用python**
+
+  ```shell
+  #1.利用python安装后自带的py命令，能够识别调用python2/3
+      $ py -3			#调用python3
+      $ py -3 1.py 	 #调用python3执行1.py
+  
+      $ py -2		    #调用python2
+      $ py -2 1.py 	#调用python2执行1.py
+      
+  #2.在所有需要指定版本的地方使用py -2/3代替。如使用pip方法：
+      $ py -2 -m pip install XXXX
+      $ py -3 -m pip install XXXX
+      
+  #3.当指定脚本使用python2/3运行时,需在脚本文件开头加上【#! python2/3】,如：
+      ```
+      #! python2
+      print 1234567
+      ```
+  	然后运行：$ py xxx.py
+  ```
+
+  ​	缺点：正常运行脚本时，每次都会多这一节注释，显得繁琐和不便
+
+* 方案三（采纳）：**复制后重命名python.exe**
+
+  ```shell
+  #分别在python2/3目录下，将python.exe复制为python2.exe或python3.exe（注意：保留原先的python.exe文件）
+  .
+  └── Program Files
+      |-- Python27
+      |   |-- python.exe
+      |   `-- python2.exe
+      └── Python37
+          |-- python.exe
+          `-- python3.exe
+  ```
+
+  ​	在不修改python.exe的情况下，分别使用python2或python3命令，即可兼容。
+
+> 参考: [Windows下python2与python3兼容性完美解决办法](https://blog.csdn.net/lql971203/article/details/95141064)
+
+
+
 ## 4.python的模块安装
 
 ​	python作为一门胶水语言，其强大之一就是支持大量的第三方库。根据需要，可使用“pip install ModuleName”命令安装第三方库模块。
