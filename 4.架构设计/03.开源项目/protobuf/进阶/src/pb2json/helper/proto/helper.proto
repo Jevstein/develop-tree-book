@@ -1,0 +1,234 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option java_outer_classname = "HelperMsg";
+option go_package = "proto_source/helper";
+
+//------------------------------------------------------------------------
+//log:
+
+//------------------------------------------------------------------------
+//提问小助手消息 cmd:15901
+message AskHelperMsgRequest
+{
+    required uint32 trans_id = 1;
+    required CidUid user = 2; //小助手user
+    optional fixed64 cli_msgid = 3; //由客户端生成,用于服务器端去重，客户端要保证clientMsgId唯一，建议timestamp+incr。
+    required bytes msg = 4;
+    optional uint32 dev = 5; //发送方设备
+    optional uint32 kind = 6; //消息种类，见 constants.h中消息种类常量定义
+    optional bytes title = 7; //session副标题
+}
+
+//提问小助手消息 回包 cmd:15901
+message AskHelperMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional fixed64 ser_msgid = 3;
+    optional fixed64 pre_msgid = 4;
+    optional uint32 msgtime = 5; //消息发送时间
+    optional uint32 version = 6; //消息版本号
+}
+
+//---------------------------------------------------------------
+//回复小助手消息 cmd:15902
+message ReplyHelperMsgRequest
+{
+    required uint32 trans_id = 1;
+    required CidUid user = 2; //小助手user
+    optional uint64 group_id = 3;
+    optional fixed64 cli_msgid = 4; //由客户端生成,用于服务器端去重，客户端要保证clientMsgId唯一，建议timestamp+incr。
+    required bytes msg = 5;
+    optional uint32 dev = 6; //发送方设备
+    optional uint32 kind = 7; //消息种类，见 constants.h中消息种类常量定义
+    optional bytes title = 8; //session副标题
+}
+
+//回复小助手消息 回包 cmd:15902
+message ReplyHelperMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional fixed64 ser_msgid = 3;
+    optional fixed64 pre_msgid = 4;
+    optional uint32 msgtime = 5; //消息发送时间
+    optional uint32 version = 6; //消息版本号
+}
+
+//---------------------------------------------------------------
+//小助手消息 通知 cmd:15903，15910
+message HelperMsgNotice
+{
+    required uint32 trans_id = 1;
+    optional uint64 group_id = 2; //负责人用户使用
+    optional fixed64 ser_msgid = 3; // 消息id
+    optional CidUid fuser = 4; //消息发送人
+    optional uint32 dev = 5; //发送方设备
+}
+
+//---------------------------------------------------------------
+// 客户信息
+message CustomInfo
+{
+    required CidUid user = 1; //客户
+    repeated uint64 custom_id = 2; //客户id
+}
+
+// 获取客户信息 cmd:15913
+message GetCustomInfoRequest
+{
+    required uint32 trans_id = 1;
+    repeated CidUid user = 2; //客户
+}
+
+// 获取客户信息 回包 cmd:15913
+message GetCustomInfoResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated CustomInfo datas = 3;
+}
+
+//---------------------------------------------------------------
+//接收人对象，支持多人、多群
+message ForwardObject
+{
+    repeated CidUid users = 1; //单人用户
+    repeated uint64 group_ids = 2; //群组
+}
+
+//转发来源
+message ForwardSource
+{
+    optional uint32 flag = 1; //标识，0：来源于单人会话，1：来源于群组
+    optional CidUid user = 2; //flag=0时采用，来源单人
+    optional uint64 group_id = 3; //flag=1时采用，来源群组
+    optional fixed64 msgid = 4; //服务器返回，客户端不传,拉取时传
+    optional uint32 ret = 5; //服务器返回，客户端不传
+}
+
+// 消息转发 cmd:15917
+message ForwardMsgRequest
+{
+    required uint32 trans_id = 1;
+    optional ForwardObject obj = 2; //接收对象
+    optional ForwardSource source = 3; //来源
+    optional uint32 type = 4; //转发类型，0或不传：合并转发，1：逐一转发
+    optional bytes msg = 5; //msg
+    optional bytes title = 6;
+    repeated fixed64 msgids = 7; //被转发的msgid列表
+    optional uint32 dev = 8; //发送方设备
+    optional fixed64 cli_msgid = 9;
+}
+
+// 消息转发 回包 cmd:15917
+message ForwardMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated ForwardSource notice = 3;
+    optional uint32 msgtime = 4;
+}
+
+// 消息转发通知 cmd:15918, 不在使用，使用单聊和群通知
+message ForwardMsgNotice
+{
+    required uint32 trans_id = 1;
+    optional CidUid fuser = 2;//转发人
+    repeated ForwardSource source = 3; //哪些会话来了新消息
+}
+
+//---------------------------------------------------------------
+// 服务器内部接口，客户端不对接 cmd:
+message MongoForwardMsgRequest
+{
+    optional CidUid user = 1; //来源user
+    repeated fixed64 fw_msgids  = 2; //
+    repeated fixed64 msgids = 3; //被转发的msgid列表
+}
+
+// 服务器内部接口
+message MongoForwardMsgResponse
+{
+    required Ret ret = 1;
+}
+
+//---------------------------------------------------------------
+//拉取转发消息详情消息  15919
+message GetCombineMsgRequest
+{
+    required uint32 trans_id = 1;
+    optional ForwardSource source = 2;//1、4必传，需要flag,user,group_id,是消息的来源信息
+    optional fixed64 start = 3; //0或者不传，根据排序顺序起点开始拉取对应的msgid
+    optional uint32 max_num = 4; //默认不传1次10条记录
+    optional uint32 order = 5; //消息拉取顺序，0或者不传：顺序，1：倒序
+}
+
+//拉取转发消息详情消息返回  15919
+message GetCombineMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated ComMsgData datas = 3;
+    optional uint32 end_flag = 4;
+}
+
+//---------------------------------------------------------------
+// 修改消息 20112 内部使用，客户端不对接，sdk不对接
+// header的cid/uid是消息发送人
+message UpdateMsgRequest
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;//flag=0,user为消息接收人
+    optional fixed64 msgid = 3; //只能每次修改一条
+    optional bytes msg = 4; //修改后消息内容
+}
+
+// 修改消息
+message UpdateMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//---------------------------------------------------------------
+// 同步消息 单人群 15651
+message SyncMsgInfoRequest
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;
+    optional fixed64 msgid = 3;
+}
+
+message SyncMsgInfoResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional ComMsgData data = 3;
+    optional uint32 msgtime = 4; // 可编辑时间
+}
+
+// 消息撤回统一接口 15652
+message MakeMsgWithdrawRequest
+{
+    required uint32 trans_id = 1;
+    required MsgSource source = 2;
+    optional fixed64 msgid = 3;                         // 消息id
+    optional uint32 dev = 4;  // 发送方设备
+    optional bytes msg = 5; // 消息撤回是修改后消息
+    optional bytes title = 6;  // session副标题
+}
+
+message MakeMsgWithdrawResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional uint32 time_out = 3; // 超过多长时间 无法撤回
+    optional ComMsgData msg_info = 4; //被撤回的消息内容 只有在撤回自定义消息的时候使用（服务器使用） 客户端忽略
+}
+
+//---------------------------------------------------------------

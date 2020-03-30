@@ -1,0 +1,138 @@
+syntax = "proto2";
+package sdk.topic;
+
+import "base.proto";
+import "topic.proto";
+
+
+//------------------------------------ 创建话题：发送话题消息（包括：普通消息转话题消息）------------------------------------
+// 创建话题请求
+message CreateTopicReq
+{
+	message Source
+	{
+		required uint32 type 		= 1;//0：单人, 1：群组，2：第三方
+		optional CidUid user 		= 2;//单人[type=0时必传]
+		optional uint64 group_id 	= 3;//群组[type=1时必传]
+		optional string third 		= 4;//第三方[type=2时必传]
+	}
+	required uint32 flag 						= 1; //功能标记: 0=消息转话题 , 1=第三方创建话题
+	optional uint32 type 						= 2; //类型: 0=普通群，3=话题，4=必达
+	optional uint64 msgid 						= 3; //消息转话题[flag=0时必传]
+	optional Source	source						= 4; //消息来源[必传]
+	optional string msg 						= 5; //消息内容：若是"第三方创建话题",必传；否则传空
+	optional string title 						= 6; //副标题：若传空，由sdk内部组装
+}
+
+// 创建话题回调
+message CreateTopicAck
+{
+    required Ret ret 							= 1;
+}
+
+//------------------------------------ 话题转普通群 ------------------------------------
+// 话题转普通群请求
+message TopicToGroupReq
+{
+    required uint64 tid 						= 1; //话题ID
+}
+
+// 话题转普通群回调
+message TopicToGroupAck
+{
+    required Ret ret 							= 1;
+}
+
+//------------------------------------ 设置话题状态 ------------------------------------
+// 设置话题状态请求
+message SetTopicReq
+{
+    required uint64 tid 						= 1; //话题ID
+	optional uint32 flag						= 2; //功能标志: 0=关闭话题 3=恢复话题
+}
+
+// 设置话题状态回调
+message SetTopicAck
+{
+    required Ret ret 							= 1;
+}
+
+//------------------------------------ 根据msgid获取话题信息 ------------------------------------
+// 根据msgid获取话题信息请求
+message GetTopicInfoByMsgidReq
+{
+    repeated uint64 msgids			 			= 1; //消息ID数组
+}
+
+// 根据msgid获取话题信息回调
+message GetTopicInfoByMsgidAck
+{
+    required Ret ret 							= 1;
+    repeated HelperProto.ExtMsgInfo datas 		= 2; //返回1,2,3,8,9,10
+}
+
+//------------------------------------ 根据tid获取话题信息 ------------------------------------
+// 根据tid获取话题信息请求
+message GetTopicInfoByTidReq
+{
+    repeated uint64 tids			 			= 1; //tid数组
+}
+
+// 根据tid获取话题信息回调
+message GetTopicInfoByTidAck
+{
+    required Ret ret 							= 1;
+    repeated HelperProto.TopicMsg datas 		= 2; //返回1,2,8,9,10
+}
+
+//------------------------------------ 获取关联话题 ------------------------------------
+// 获取关联话题请求
+message GetRelateTopicReq
+{
+	message Source
+	{
+		optional uint32 type 		= 1;//0：单人, 1：群组，2：第三方
+		optional CidUid user 		= 2;//单人[type=0时必传]
+		optional uint64 group_id 	= 3;//群组[type=1时必传]
+		optional string third 		= 4;//第三方[type=2时必传]
+	}
+    required uint64 tid			 				= 1; //话题ID：分页使用，首页传0；每次传本地最小的tid
+	required Source source						= 2; //消息来源
+}
+
+// 获取关联话题回调
+message GetRelateTopicAck
+{
+    required Ret ret 							= 1;
+    repeated HelperProto.TopicMsg datas 		= 2; //返回包括：1,2,3,4,5,6,7,8,9,10,14
+    optional uint32 end_flag 					= 3; //是否结束，0结束，1，未结束
+}
+
+//------------------------------------ 同步话题的消息 ------------------------------------
+//同步话题的消息请求
+message SyncTopicReq
+{
+    optional fixed64 sid 						= 1; //消息ID：分页使用，首页传0
+    optional uint32 max_num 					= 2; //同步消息数
+    optional uint32 flag 						= 3; //拉取标识：0=拉取关注的话题，1=拉取自己取消关注的话题，2=拉取本团队所有话题		
+}
+
+//同步话题的消息回调
+message SyncTopicAck
+{
+    required Ret ret 							= 1;
+    optional uint32 limit_num 					= 2;
+    repeated HelperProto.TopicMsg datas 		= 3;
+}
+
+//------------------------------------ 消息修改通知 ------------------------------------
+//消息修改通知
+message MsgModifyNoti
+{
+    optional MsgSource source 					= 1;
+    optional uint32 dev 						= 2;        
+    optional CidUid user 						= 3; //修改者
+    optional fixed64 msgid 						= 4; //原消息id
+    optional fixed64 tid 						= 5; //如果msgid为0 type：3话题id type：4必达id
+    optional uint32 type 						= 6; //0普通同步消息 3话题 4必达
+}

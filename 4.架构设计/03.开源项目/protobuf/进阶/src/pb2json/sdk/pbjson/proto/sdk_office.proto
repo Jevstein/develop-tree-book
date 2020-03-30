@@ -1,0 +1,374 @@
+syntax = "proto2";
+package sdk.office;
+
+import "base.proto";
+import "office_base.proto";
+import "schedule.proto";
+import "note.proto";
+
+//------------------------------------ 创建日程 ------------------------------------
+// 创建日程请求
+message CreateScheduleReq
+{
+    required ScheduleProto.ScheduleData data 	= 1; //
+    optional uint32 dev 						= 2; //设备
+}
+
+// 创建日程回调
+message CreateScheduleAck
+{
+    required Ret ret 							= 1;
+    optional uint64 sid 						= 2; //日程id
+    optional uint32 time 						= 3; //创建时间
+}				
+
+// 创建日程通知				
+message CreateScheduleNoti				
+{				
+    optional uint64 sid 						= 1; //日程id
+    optional CidUid user 						= 2; //创建用户
+}
+
+//------------------------------------ 批量创建日程 ------------------------------------
+// 批量创建日程 18029
+message BatchCreateScheduleReq
+{
+    repeated ScheduleProto.ScheduleData datas 	= 1; //
+}
+
+// 批量创建日程 回包 18029
+message BatchCreateScheduleAck
+{
+    required Ret ret 							= 1;
+    repeated BatchRetData datas 				= 2;
+}
+
+// 批量创建日程 通知 18030
+message BatchCreateScheduleNoti
+{
+    repeated uint64 sids 						= 1; //日程id
+    optional CidUid user 						= 2; //创建用户
+}
+
+//------------------------------------ 修改日程 ------------------------------------
+// 修改日程 18002
+message UpdateScheduleReq
+{
+    required ScheduleProto.ScheduleData data 	= 1; // 日程信息
+    required uint32 mask 						= 2; //修改数据标识
+}
+
+// 修改日程 回包 18002
+message UpdateScheduleAck
+{
+    required Ret ret 							= 1;
+}
+
+// 修改日程 通知 18003
+message UpdateScheduleNoti
+{
+    optional uint64 sid 						= 1; //日程id
+    optional CidUid user 						= 2; //修改用户
+}
+
+//------------------------------------ 删除日程 ------------------------------------
+// 删除日程 18004
+message DelScheduleReq
+{
+    repeated uint64 sids 						= 1; // 日程id
+}
+
+// 删除日程 回包 18004
+message DelScheduleAck
+{
+    required Ret ret 							= 1;
+}
+
+// 删除日程 通知 18005
+message DelScheduleNoti
+{
+    repeated uint64 sids 						= 1; //日程id
+    optional CidUid user 						= 2; //删除用户
+}
+
+//------------------------------------ 获取指定日程 ------------------------------------
+// 获取指定日程 18006
+message GetScheduleReq
+{
+    required uint64 sid 						= 1; // 日程id
+}
+
+// 获取指定日程 回包 18006
+message GetScheduleAck
+{
+    required Ret ret 							= 1;
+    optional ScheduleProto.ScheduleData data 	= 2;
+}
+
+//------------------------------------ 日程筛选条件 ------------------------------------
+
+// 根据条件同步日程 18017
+message SyncScheduleReq
+{
+    optional uint32 flag 						= 1; //条件类型
+    optional ScheduleProto.ScheduleFilter filter = 2; // 指定时间段
+    optional uint32 num 						= 3; //同步条数，不传或者为0，采用服务器限制的最大条数返回；
+}
+
+// 根据条件同步日程 回包 18017
+message SyncScheduleAck
+{
+    required Ret ret 							= 1;
+    repeated ScheduleProto.ScheduleData datas 	= 2;
+    optional uint32 limit 						= 3; //服务器限制一次同步最大条数；
+    optional uint32 end_flag 					= 4; //结束标识
+}
+
+//------------------------------------ 同步全量日程 ------------------------------------
+// 同步全量日程 18027
+message SyncAllScheduleReq
+{
+    optional uint64 sid 						= 1; //分页日程id
+    optional uint32 cli_uc                      = 2;
+}
+
+// 同步全量日程 回包 18027
+message SyncAllScheduleAck
+{
+    required Ret ret 							= 1;
+    repeated ScheduleProto.ScheduleData datas 	= 2;
+    optional uint32 end_flag 					= 3; //结束标识
+    optional uint32 ser_uc                      = 4;
+}
+
+//======================================================================================
+//备忘相关
+
+//------------------------------------ 创建备忘 ------------------------------------
+// 创建备忘 18007
+message CreateNoteReq
+{
+    required NoteProto.NoteData data 			= 1; //
+}
+
+// 创建备忘 回包 18007 
+message CreateNoteAck
+{
+    required Ret ret 							= 1;
+    optional uint64 nid 						= 2; //备忘id
+    optional uint32 time 						= 3; //创建时间
+}
+
+// 创建备忘 通知 18008
+message CreateNoteNoti
+{
+    optional uint64 nid 						= 1; //备忘id
+    optional CidUid user 						= 2; //创建用户
+}
+
+//------------------------------------ 批量创建备忘 ------------------------------------
+// 批量创建备忘 18031
+message BatchCreateNoteReq
+{
+    repeated NoteProto.NoteData datas 			= 1; //
+}
+
+// 批量创建备忘 回包 18031
+message BatchCreateNoteAck
+{
+    required Ret ret 							= 1;
+    repeated BatchRetData datas 				= 2;
+}
+
+// 批量创建备忘 通知 18032
+message BatchCreateNoteNoti
+{
+    repeated uint64 nids 						= 1; //日备忘id
+    optional CidUid user 						= 2; //创建用户
+}
+
+//------------------------------------ 修改备忘 ------------------------------------
+// 修改备忘 18009
+message UpdateNoteReq
+{
+    required NoteProto.NoteData data 			= 1; // 日程信息
+    optional uint32 mask 						= 2; //修改项标识
+}
+
+// 修改备忘 回包 18009
+message UpdateNoteAck
+{
+    required Ret ret = 1;
+}
+
+// 修改备忘 通知 18010
+message UpdateNoteNoti
+{
+    optional uint64 nid 						= 1; //备忘id
+    optional CidUid user 						= 2; //修改用户
+}
+
+//------------------------------------ 删除备忘 ------------------------------------
+// 删除备忘 18011
+message DelNoteReq
+{
+    repeated uint64 nids 						= 1; // 备忘id
+}
+
+// 删除备忘 回包 18011
+message DelNoteAck
+{
+    required Ret ret 							= 1;
+}
+
+// 删除备忘 通知 18012
+message DelNoteNoti
+{
+    repeated uint64 nids 						= 1; //备忘id
+    optional CidUid user 						= 2; //删除用户
+}
+
+//------------------------------------ 获取指定备忘 ------------------------------------
+// 获取指定备忘 18013
+message GetNoteReq
+{
+    required uint64 nid 						= 1; // 备忘id
+}
+
+// 获取指定日程 回包 18013
+message GetNoteAck
+{
+    required Ret ret 							= 1;
+    optional NoteProto.NoteData data 			= 2;
+}
+
+//------------------------------------ 备忘分组 ------------------------------------
+
+// 创建备忘分组 18019
+message CreateNoteGroupReq
+{
+    required NoteProto.NoteGroup ng 			= 1; //组名称
+    optional uint32 time 						= 2; //创建时间，客户端不传
+}
+
+// 创建备忘分组 回包 18019 
+message CreateNoteGroupAck
+{
+    required Ret ret 							= 1;
+    optional uint64 gid 						= 2; //分组id
+}
+
+// 创建备忘分组 通知 18020
+message CreateNoteGroupNoti
+{
+    optional uint64 gid 						= 1; //分组id
+    optional CidUid user 						= 2; //创建用户
+}
+
+//------------------------------------ 修改备忘分组 ------------------------------------
+// 修改备忘分组 18021
+message UpdateNoteGroupReq
+{
+    optional NoteProto.NoteGroup ng 			= 1; //组
+    optional uint32 time 						= 2; //修改时间，客户端不传
+}
+
+// 修改备忘分组 回包 18021
+message UpdateNoteGroupAck
+{
+    required Ret ret 							= 1;
+}
+
+// 修改备忘分组 通知 18022
+message UpdateNoteGroupNoti
+{
+    optional NoteProto.NoteGroup ng 			= 1; //分组
+    optional CidUid user 						= 2; //修改用户
+}
+
+//------------------------------------ 删除备忘分组 ------------------------------------
+// 删除备忘分组
+message DeleteNoteGroupReq
+{
+    optional uint64 gid 						= 1; //组id
+    optional uint32 flag 						= 2; //是否删除分组下备忘，0或者：不删除；1：删除
+}
+
+// 删除备忘分组 回包
+message DeleteNoteGroupAck
+{
+    required Ret ret 							= 1;
+}
+
+// 删除备忘分组 通知
+message DeleteNoteGroupNoti
+{
+    optional uint64 gid 						= 1; //分组id
+    optional CidUid user 						= 2; //删除用户
+    optional uint32 flag 						= 3; //删除请求附带的值    
+}
+
+//------------------------------------ 指定获取备忘分组 ------------------------------------
+// 指定获取备忘分组
+message GetNoteGroupReq
+{
+    required uint64 gid 						= 1; // 备忘分组id
+}
+
+// 获取指定日程 回包
+message GetNoteGroupAck
+{
+    required Ret ret 							= 1;
+    optional NoteProto.NoteGroup data 			= 2;
+}
+
+//------------------------------------ 同步备忘分组 ------------------------------------
+// 同步备忘分组 18026
+message SyncNoteGroupReq
+{
+	optional string desc						= 1; //描述，可不传
+}
+
+// 同步备忘分组 回包 18026
+message SyncNoteGroupAck
+{
+    required Ret ret 							= 1;
+    repeated NoteProto.NoteGroup datas 			= 2;
+}
+
+//------------------------------------ 同步备忘 ------------------------------------
+
+// 同步备忘 18018
+message SyncNoteReq
+{
+    optional uint32 flag 						= 1; //筛选类型
+    optional NoteProto.NoteFilter filter 		= 2; //指定条件
+    optional uint32 num 						= 3; //同步条数，不传或者为0，采用服务器限制的最大条数返回；
+}
+
+// 同步备忘 回包 18018
+message SyncNoteAck
+{
+    required Ret ret 							= 1;
+    repeated NoteProto.NoteData datas 			= 2;
+    optional uint32 limit 						= 3; //服务器限制一次同步最大条数；
+    optional uint32 end_flag 					= 4; //结束标识
+}
+
+//------------------------------------ 同步全量备忘 ------------------------------------
+// 同步全量备忘 18028
+message SyncAllNoteReq
+{
+    optional uint64 nid 						= 1; //分页备忘id
+    optional uint32 cli_uc                      = 2;
+
+}
+
+// 同步全量备忘 回包 18028
+message SyncAllNoteAck
+{
+    required Ret ret 							= 1;
+    repeated NoteProto.NoteData datas 			= 2;
+    optional uint32 end_flag 					= 3; //结束标识
+    optional uint32 ser_uc                      = 4;
+}

@@ -1,0 +1,378 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option java_outer_classname = "topic";
+option go_package = "proto_source/helper";
+
+//------------------------------------------------------------------------
+//log: 话题
+
+//------------------------------------------------------------------------
+message Ding
+{
+    optional uint32 sure = 1; // 必达使用 0 未确认 1 确认 2 自己发送
+    optional uint32 flag = 2; // 子类型 如果是必达 0app内部通知 1短信通知 2 电话通知 3定时通知 4悄悄话通知 目前只实现0、1 
+    optional uint32 unsure_num = 3; // 未确认个数
+}
+
+message TopicMsg
+{
+    optional fixed64 tid = 1; //话题id
+    optional fixed64 msgid = 2; //话题外的消息id
+    optional bytes msg = 3; //msg
+    optional CidUid suser = 4; //话题消息原发送人
+    optional uint32 send_tm = 5; //话题原消息发送时间
+    optional uint32 oper_tm = 6; //转话题时间
+    optional CidUid ouser = 7; //转话题人
+    optional uint32 reply_tm = 8; //话题评论回复时间（最后一条）
+    optional fixed64 reply_msgid = 9; //话题评论最新回复的msgid
+    optional uint32 num = 10; //话题评论数
+    repeated CidUid users = 11; //参与讨论人列表
+    optional uint32 user_num = 12; //参与人人数
+    optional MsgSource source = 13; //话题来源
+    optional uint32 unread_count = 14; //未读数
+    optional uint32 del = 15; //删除状态，0：关闭(关闭的还可以删除) 1：正常 2删除 
+    optional uint32 focus = 16; //是否关注 0:不关注，1：关注  必达只有1 参与
+    optional fixed64 sid = 17; //排序使用，操作id
+    optional uint32 type = 18; // 类型 0 普通群 3 话题 4 必达
+    optional Ding ding = 19; // 必达新增
+}
+
+//消息转话题消息 cmd:15622 服务器内部使用
+message MsgToTopicRequest
+{
+    required uint32 trans_id = 1;
+    required TopicMsg topic = 2;            // 需要传2，13
+    optional uint32 dev = 3;                // 发送方设备
+    optional bytes title = 4;               // session副标题
+}
+
+//消息转话题消息 回包 cmd:15622，不
+message MsgToTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//消息转话题消息通知 cmd:15623
+message MsgToTopicNotice
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;
+    optional CidUid user = 3; //转话题人
+    optional fixed64 msgid = 4; //原消息id
+    optional bytes msg = 5; //msg
+    optional uint32 dev = 6; //发送方设备
+    optional fixed64 tid = 7; //话题id
+}
+
+//------------------------------------------------------------------------
+//同步话题的消息 cmd:15624
+message SyncTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 sid = 2; // 分页使用，操作id
+    optional uint32 max_num = 3; //同步消息数
+    optional uint32 flag = 4; //0或者不传，拉取关注的话题，1：拉取自己取消关注的话题，2：拉取本团队所有话题
+                              // type:4 0代表全部 1 代表我发出的 2 代表我收到的 3 代表未确认的
+    optional uint32 type = 5; // 3 话题 4 必达
+}
+
+message SyncTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional uint32 limit_num = 3;
+    repeated TopicMsg datas = 4;
+}
+
+//------------------------------------------------------------------------
+// 获取话题信息 cmd:15625
+message GetTopicInfoRequest
+{
+    required uint32 trans_id = 1;
+    repeated fixed64 msgids = 2; //外面的消息id
+}
+
+message ExtMsgInfo 
+{
+    optional uint32 tf = 1;     // 1 话题 2 必达 3 all
+    optional fixed64 msgid = 2; // 消息id
+    repeated TopicMsg datas = 3;
+}
+
+message GetTopicInfoResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated ExtMsgInfo datas = 3; //返回1,2,3,8,9,10
+}
+
+//------------------------------------------------------------------------
+//消息插入话题消息 cmd:15627, 先不实现，看后续使用情况
+message MsgInsertTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;
+    optional fixed64 msgid = 3; //原消息id
+    optional fixed64 tid = 4; //话题id
+    optional uint32 dev = 5; //发送方设备
+}
+
+//消息插入话题消息 回包 cmd:15627, 先不实现，看后续使用情况
+message MsgInsertTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//消息插入话题消息通知 cmd:15628, 先不实现，看后续使用情况，另外这里的通知应该使用回复的通知
+message MsgInsertTopicNotice
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;
+    optional CidUid user = 3; //转消息人
+    optional fixed64 msgid = 4; //原消息id
+    optional fixed64 tid = 5; //话题msgid
+}
+
+//------------------------------------------------------------------------
+// 获取关联话题 cmd:15626
+message GetRelateTopicRequest
+{
+    required uint32 trans_id = 1;
+    required MsgSource source = 2; //
+    optional uint64 cid = 3; //如果不传，取header中cid
+    optional fixed64 tid = 4; //分页使用，首页不传；每次传本地tid最小的
+}
+
+// 获取关联话题 回复
+message GetRelateTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated TopicMsg datas = 3; //返回包括：1,2,3,4,5,6,7,8,9,10,14
+    optional uint32 end_flag = 4; //是否结束，0结束，1，未结束
+}
+
+//------------------------------------------------------------------------
+// 关注话题 cmd:15634 内部使用 只有话题使用 所以没有加type
+message FocusTopicRequest
+{
+    required uint32 trans_id = 1;
+    repeated fixed64 tids = 2; // 话题id
+    optional uint32 flag = 3; // 0或者不传：不关注，1：关注
+    optional uint32 dev = 4; // dev
+}
+
+//关注话题 回复
+message FocusTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//关注话题 通知 cmd:15635
+message FocusTopicNotice
+{
+    repeated fixed64 tids = 1; // 话题id
+    optional uint32 flag = 2; // 0或者不传：不关注，1：关注
+}
+
+// 设置话题状态 cmd:15636 客户端flag必须传2或者3 不然参数错误
+message SetTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 tid = 2; // 话题id
+    optional uint32 dev = 3; // dev
+    optional uint32 flag = 4; // 0关闭话题（关闭掉的话题可以删除）3是恢复话题（数据中存储0）
+}
+
+// 删除话题 回复 15636
+message SetTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 根据话题id获取话题信息 cmd:15638 内部使用
+message GetTopicRequest
+{
+    required uint32 trans_id = 1;
+    repeated fixed64 tids = 2;  //话题id
+    optional uint32 type = 3;   // 3：话题 4：必达
+}
+
+message GetTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated TopicMsg datas = 3; //返回1,2,8,9,10
+}
+
+//------------------------------------------------------------------------
+message RetTopic
+{
+    optional fixed64 tid = 1; // 话题id
+    optional uint32 ret = 2; // 错误码
+}
+
+//------------------------------------------------------------------------
+// 转发话题 不对接，采用发送话题协议
+message ForwardTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 tid = 2; //话题id
+    repeated fixed64 msgids = 3; //转发后的消息id
+}
+
+// 转发话题 回包
+message ForwardTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+//------------------------------------------------------------------------
+// 关联话题 cmd:15642 暂未服务器内部使用，不对接
+message RelateTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 tid = 2; // 话题id
+    repeated CidUid users = 3; //
+    optional uint32 dev = 4; // dev，服务器调用传api设备
+    optional uint32 relate = 5; //0或者不传：不关联，1：关联
+    optional bytes title = 6;
+    optional uint32 send_tm = 7;
+}
+
+//关注话题 回复 15642
+message RelateTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//------------------------------------------------------------------------
+
+// 根据msgid获取话题id 15643 内部使用
+message GetTidByMsgIdRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 msgid = 2;
+}
+
+// 转发话题 回包
+message GetTidByMsgIdResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional fixed64 tid = 3;
+}
+
+// 15644 创建话题 客户端只会用到flag为2 和 3 
+message CreateTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional TopicMsg topic = 2;    // flag为0、1、2 传2，13，18 flag为3 只用传3 13 创建必达消息users是所有必达用户
+                                    // 如果为消息转话题或者回复消息 users里面有用户 会一起关注这个话题
+    optional uint32 dev = 3;        // 发送方设备
+    optional bytes title = 4;       // session副标题
+    optional uint64 msgid = 5;      // 第一条回复 只有在群里面回复消息才会用到
+    optional uint32 flag = 6;       // 0或者不传代表在群里面发送话题消息 1代表回复消息 2代表消息转话题 3. 代表第三方创建话题
+}
+
+message CreateTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+
+message MsgModifyNotice
+{
+    required uint32 trans_id = 1;
+    optional MsgSource source = 2;
+    optional uint32 dev = 3;        
+    optional CidUid user = 4;       // 修改者
+    optional fixed64 msgid = 5;     // 原消息id
+    optional fixed64 tid = 6;       // 如果msgid为0 type：3话题id type：4必达id
+    optional uint32 type = 7;       // 0普通同步消息 3话题 4必达
+}
+
+// 批量关注话题 cmd:15645 服务器内部调用
+message BatFocusTopicRequest
+{
+    required uint32 trans_id = 1;
+    optional uint64 tid = 2; // 话题id
+    optional uint32 flag = 3; // 0或者不传：不关注，1：关注
+    repeated CidUid users = 4;
+}
+
+//批量关注话题 回复
+message BatFocusTopicResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 15646 转为群
+message TransferToGroupRequest
+{
+    required uint32 trans_id = 1;   
+    optional uint64 id = 2;             // 话题id 或者 必达id       
+    optional uint32 dev = 3;   
+    optional uint32 type = 4;           // 客户端不用传 服务器自己用               
+}
+
+message TransferToGroupResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 15647 必达消息确认
+message BiDaSureRequest
+{
+    required uint32 trans_id = 1;   
+    optional uint64 id = 2;             // 必达id      
+    optional uint32 dev = 3;         
+}
+
+message BiDaSureResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 15648 更新话题或者必达类型             // 内部使用
+message UpdateToGroupRequest
+{
+    required uint32 trans_id = 1;   
+    optional uint64 id = 2;             // 话题id 或者 必达id       
+}
+
+message UpdateToGroupResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 获取话题参与人 cmd:15641
+message GetBidaUsersRequest
+{
+    required uint32 trans_id = 1;
+    optional fixed64 tid = 2; 
+    optional uint64 uid = 3;        //分页使用
+    optional uint32 flag = 4;       // 获取类型 0未确认 1确认 2 全部
+}
+
+message GetBidaUsersResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated CidUid users = 3;
+    optional uint32 end_flag = 4; //0已经结束，1：还有数据
+}

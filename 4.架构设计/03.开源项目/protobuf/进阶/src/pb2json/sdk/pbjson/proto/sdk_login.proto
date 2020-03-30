@@ -1,0 +1,148 @@
+syntax = "proto2";
+package sdk.login;
+
+import "base.proto";
+import "status_data.proto";
+import "userstatus_base.proto";
+
+//设备被置下线通知
+message LogoutNoti
+{
+	optional uint32 login_time              	= 1; //登录时间
+	optional uint32 dev                     	= 2; //设备类型
+	optional uint32 ip                      	= 3; //用户ip地址
+	optional uint32 version                 	= 4; //sdk的版本号
+	optional bytes extends                  	= 5; //扩展字段
+    optional bytes cli_version              	= 6; //客户版本号
+}                                                    
+
+//连接登陆状态上报的通知	                         
+message ConnectLoginStatusReportNoti                 
+{                                                    
+	optional uint32 type                    	= 1; //上报类型(1:连接登陆执行中; 2:连接登陆成功; 3:连接登陆失败; 4:连接断开)
+	optional uint32 failed_code					= 2; //连接登陆失败时的错误码(type==3时使用)
+	optional uint32 disconnect_code				= 3; //断开时的错误码(type==4时使用)
+	optional bytes msg							= 4; //附加描述信息
+}
+
+//------------------------------------ 设置登录参数 ------------------------------------
+//设置登录参数请求
+message SetLoginParamsReq {
+	optional string corp_account 				= 1; //eteams团队标识
+	optional string user_account 				= 2; //eteams用户账号
+	optional uint64 gcid 		 				= 3; //eteams编号
+	optional uint64 cid 		 				= 4; //团队编号
+	optional uint64 uid 		 				= 5; //用户编号
+	optional string env							= 6; //环境参数：test,release,beta,production 
+	optional string appkey 		 				= 7; //"eteams"
+	optional string ticket 		 				= 8; //"*** S6SCWLBacohD0xS ***"
+}
+
+//设置登录参数回调
+message SetLoginParamsAck {
+	required Ret ret            				= 1;
+}
+
+//------------------------------------ 登录 ------------------------------------
+//登录请求
+ message LoginReq {
+	optional uint32 type						= 1; //登录类型：1=普通登录，2=强制登录
+	optional string extends						= 2; //扩展字段
+}
+
+//登录回调
+message LoginAck {
+	required Ret ret                            = 1;
+	optional uint32 ip                          = 2;  //客户端ip
+	optional uint32 port                        = 3;  //客户端端口
+	optional uint32 ser_time                    = 4;  //服务器时间
+    optional DeviceStatusInfo infos             = 5;  //用户状态信息 只有当ret值为1110才返回 root/common/proto/status_data.proto
+    optional uint64 gcid                        = 6;  //集团id
+    optional uint64 cid                         = 7;  //cid
+    optional uint64 uid                         = 8;  //uid
+    optional uint64 uuid                        = 9;  //uuid
+    optional bytes im_server_host               = 10; //当前连接的server端ip
+    optional bytes im_server_port               = 11; //当前连接的server端port
+    optional bytes corp_account                 = 12; //团队标识
+    optional bytes extends                      = 13; //请求登录时传递的extends信息
+    optional bytes imei                         = 14; //请求登录时传递的设备imei
+	optional uint32 session_timeout             = 15; //客户端刷新eteams会话session的间隔
+	optional uint32 status                      = 16; //当前登录状态
+	optional uint32 dev                         = 17; //当前登录的设备类型
+    repeated CidUid other_corp_users            = 18; //当前用户在其他团队中的cid、uid
+    optional uint64 sid 						= 19; //特殊提醒声音
+}
+
+//------------------------------------ 登出 ------------------------------------
+//登录请求
+ message LogoutReq {
+	optional string desc						= 1; //描述，可不传
+}
+
+//登出回调
+message LogoutAck
+{
+	required Ret ret    						= 1;
+}
+
+//------------------------------------ 获取人员在线状态 ------------------------------------
+//获取人员在线状态回调
+message GetUserOnlineStatusReq
+{
+    repeated CidUid users               		= 1; //人员列表
+}
+
+//获取人员在线状态回调
+message GetUserOnlineStatusAck
+{
+    required Ret ret                			= 1;
+	repeated UserStatusInfo infos   			= 2; //用户状态信息 root/common/proto/status_data.proto
+}
+
+//用户状态改变的通知
+message UserStatusChangeNoti 
+{ 
+	optional UserStatusProto.StatusRet status   = 1; //状态信息 root/userstatus/proto/userstatus_base.proto
+}
+
+//------------------------------------ 设置app信息上传 ------------------------------------
+//设置app信息上传回调
+message SetMobileInfoReq
+{
+	optional string info    					= 1; //设备信息
+}
+
+//设置app信息上传回调
+message SetMobileInfoAck
+{
+	required Ret ret    						= 1;
+}
+
+//------------------------------------ 设置状态(在线、离线等) ------------------------------------
+//设置状态请求
+message SetStatusChangeReq 
+{
+	optional uint32 status    					= 1; //状态：0=离线，1=上线，2=离开，3=忙碌，4=马上回来，5=隐身
+													 //    ，6=请勿打扰，7=Q我吧，8=推送
+}
+
+//设置状态回调
+message SetStatusChangeAck
+{
+	required Ret ret    						= 1;
+}
+
+//------------------------------------ 设置自己的其他设备离线 ------------------------------------
+//设置自己的其他设备离线请求
+message SetOtherDevOfflineReq 
+{
+	optional uint32 dev							= 1; //设备：0=PC版，1=Android版，2=iPhone/iTouch版，3=iPad版，4=api版
+													 //    ，5=web版，6=手机web访问，7=mac版，8=mc版移动端，9=新版本pc
+	optional string extends						= 2; //扩展说明
+}
+
+//设置自己的其他设备离线回调
+message SetOtherDevOfflineAck 
+{
+	required Ret ret    						= 1;
+}

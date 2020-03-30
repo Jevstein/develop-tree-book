@@ -1,0 +1,76 @@
+syntax = "proto2";
+package sdk.usersound;
+
+import "base.proto";
+import "user_sound.proto";
+
+
+//------------------------------------ 同步声音列表 ------------------------------------
+//同步声音列表请求
+message SyncSoundListReq
+{
+    optional uint32 api_get_type 		    = 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+	repeated uint64 sids				    = 2; //音ID数组, 若为空则同步所有
+}
+
+//同步声音列表回调
+message SyncSoundListAck
+{
+    required Ret ret 						= 1;
+    repeated DataProto.SoundData sounds 	= 2;
+    optional uint64 sid 					= 3; // 用户当前sid
+}
+
+//------------------------------------ 批量声音添加用户 ------------------------------------
+//批量添加声音用户请求
+message AddSoundUsersReq
+{
+    repeated CidUid users 					= 1;
+}
+
+//批量添加声音用户回调
+message AddSoundUsersAck
+{
+    required Ret ret 						= 1;
+}
+
+//------------------------------------ 批量删除声音用户 ------------------------------------
+//批量删除声音用户请求
+message DelSoundUsersReq
+{
+    repeated CidUid users 					= 1;
+}
+
+//批量删除声音用户回调
+message DelSoundUsersAck
+{
+    required Ret ret 						= 1;
+}
+
+//------------------------------------ 同步声音用户 ------------------------------------
+//同步声音用户请求
+message SyncSoundUsersReq
+{
+    optional uint32 api_get_type 		    = 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+}
+
+//同步声音用户回调
+message SyncSoundUsersAck
+{
+    required Ret ret 						= 1;
+    repeated DataProto.TipUserData datas 	= 2;
+    optional uint64 sid 					= 3;  // 用户当前sid
+}
+
+//------------------------------------ 设置声音 ------------------------------------
+//设置声音请求
+message SetSoundReq
+{
+    optional uint32 sid 		    		= 1; //声音id
+}
+
+//设置声音回调
+message SetSoundAck
+{
+    required Ret ret 						= 1;
+}

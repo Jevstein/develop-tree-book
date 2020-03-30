@@ -1,0 +1,110 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option java_outer_classname = "Customize";
+option go_package = "proto_source/helper";
+//------------------------------------------------------------------------
+//log:
+//------------------------------------------------------------------------
+
+//---------------------------------------------------------------
+// 自定义消息会话推送 cmd:15950
+message SendCustomMsgRequest
+{
+    required uint32 trans_id = 1;
+    optional CidUid f_user = 2;//发送会话,不传会去header中的cid/uid
+    repeated CidUid t_users = 3; //接收人
+    optional fixed64 cli_msgid = 4; //由客户端生成,用于服务器端去重，客户端要保证clientMsgId唯一，建议timestamp+incr。
+    optional bytes msg = 5;
+    optional uint32 kind = 6; //消息种类，见 constants.h中消息种类常量定义
+    optional bytes title = 7;
+    optional uint32 top = 8; //是否将会话置顶，默认0或者不传：不置顶（保持原有），1：将会话重新置顶；2：将会话强制置顶（用户不可以取消）
+    optional fixed64 ser_msgid = 9; //正常为空，若是多请求消息是一条消息，第二次发送起，传第一次返回的消息id
+    optional uint32 remind = 10; //消息免打扰设置，0或不传:保持原有；1：消息免打扰；2：消息屏蔽（暂不使用），3：设置接收提醒
+    optional uint32 dev = 11; //发送端设备
+    optional uint32 flag = 12; //服务器内部使用，客户端不用对接
+}
+
+// 自定义消息会话推送 回包 cmd:
+message SendCustomMsgResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional fixed64 msgid = 3; //消息id
+}
+// 采用单人消息通知 cmd:15101
+
+//-----------------------------------------------------------------------------
+//透传操作
+message TTHandle
+{
+    optional uint64 group_id = 1; //群id
+    optional uint32 code = 2; //操作码，1：发起通话，2：结束通话，
+}
+
+// 多人透传协议 cmd:15558
+message TransportTechRequest
+{
+    required uint32 trans_id = 1;
+    repeated CidUid tusers = 2;//发送对象
+    optional CidUid fuser = 3; //消息发送人，不传，采用包头中的cid,uid
+    optional bytes content = 4; //透传内容，服务器不做任何处理
+    optional uint32 flag = 5; //透传类型，根据不同业务进行区分，1：语音、2：视频
+    optional uint32 push = 6; //push标识，0或者不传，不push；1：发送push
+    optional uint32 dev = 7;
+    optional TTHandle handle = 8; //透传操作
+}
+
+// 多人透传协议 回包 cmd:15558
+message TransportTechResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 多人透传协议 通知 ，不通知发送人的其他端 cmd:15559
+message TransportTechNotice
+{
+    optional CidUid fuser = 1;//发送会话
+    optional CidUid tuser = 2; //接收人，如果没有，接收人就是默认自己
+    optional uint32 flag = 3; //业务类型
+    optional bytes content = 4; //透传内容
+    optional uint32 dev = 5;
+    optional TTHandle handle = 6; //透传操作
+}
+
+//---------------------------------------------------------------
+// 多群透传协议 cmd:15560，暂时不使用
+message GroupTransportTechRequest
+{
+    required uint32 trans_id = 1;
+    repeated uint64 group_ids = 2;//发送群对象
+    optional CidUid fuser = 3; //消息发送人，不传，采用包头中的cid,uid
+    optional bytes content = 4; //透传内容，服务器不做任何处理
+    optional uint32 flag = 5; //透传类型，根据不同业务进行区分，1：视频语音
+    optional uint32 push = 6; //push标识，0或者不传，不push；1：发送push
+    optional uint32 dev = 7;
+}
+
+// 多群透传协议 回包 cmd:15560
+message GroupTransportTechResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 多群透传协议 通知 ，不通知发送人的其他端 cmd:15561
+message GroupTransportTechNotice
+{
+    optional CidUid fuser = 1;//发送会话
+    optional CidUid tuser = 2; //接收人，如果没有，接收人就是默认自己
+    optional uint32 flag = 3; //业务类型
+    optional bytes content = 4; //透传内容
+    optional uint64 group_id = 5;//发送群id
+    optional uint32 dev = 6;
+}
+
+//---------------------------------------------------------------

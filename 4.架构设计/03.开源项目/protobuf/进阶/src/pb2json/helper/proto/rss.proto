@@ -1,0 +1,358 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option go_package = "proto_source/helper";
+
+//-----------------------------------------------------------------------------
+//log
+//2020.1.6, hdk, 创建，添加/删除/拉取 rss订阅源
+
+//-----------------------------------------------------------------------------
+
+//机器人新协议，包括系统机器人商店、webhook机器人、rss机器人
+//======================================================================================
+
+//系统rss订阅源信息
+message RssData
+{
+	optional fixed64 rid = 1;
+	optional bytes name = 2;				//订阅源名称
+	optional bytes link = 3;				//订阅源地址
+}
+
+//机器人基础信息
+message RobotInfo
+{
+    optional CidUid robot_user = 1;         //机器人用户
+    optional bytes name = 2;				//机器人名称
+	optional uint64 picture = 3;			//头像id
+	optional bytes intro = 4;				//机器人简介
+    optional CidUid add_user = 5;           //添加者；系统商店机器人目前可不传
+    optional uint64 add_time = 6;           //添加时间；系统商店机器人表示添加到商店的时间
+    optional uint32 cfg_mask = 7;           //mask 用户可修改机器人的哪些相关配置；	kRobotCfgMask
+}
+
+//rss机器人信息
+message RssRobotInfo
+{
+	optional RobotInfo info = 1;		    //机器人基础信息
+    repeated RssData rdatas = 2;			//关联的rss订阅源列表
+    repeated bytes title_keys = 3;			//订阅源数据标题过滤关键词列表
+	repeated bytes abstract_keys = 4;		//订阅源数据摘要过滤关键词列表
+}
+
+//webhook机器人信息
+message WebHookRobotInfo
+{
+	optional RobotInfo info = 1;		    //机器人基础信息
+    optional bytes msg_preview = 2; 	    //机器人消息预览，url或图片id
+    optional bytes msg_from = 3; 	        //机器人信息来源网站，url或文本描述
+    optional uint32 push_msg = 4;           //消息推送是否开启
+    optional uint32 show_type = 5;          //机器人模版 如心知天气等
+    optional bytes ext_data = 6;            //扩展字段 json字符串，如{"list_timer":[{"begin_time":1582102499,"span_time":3600}],"city": ""}
+    optional bytes cb_url = 7;              //webhook回调http接口；系统商店机器人此字段忽略
+}
+
+//机器人数据
+message RobotData
+{
+	optional fixed64 rid = 1;				                //id
+	optional uint32 type = 2;						        //机器人类型，	kRobotType
+	optional RssRobotInfo rss_data = 3;				        //rss机器人数据，type=1、3生效
+	optional WebHookRobotInfo webhook_data = 4;		        //webhook机器人数据，type=2、4生效
+}
+
+//按指定字段获取的机器人数据
+message RobotByFieldData
+{
+    optional MsgSource source = 1;                         //关联方
+	optional RobotData data = 2;				           //机器人数据
+}
+
+//============================================================
+
+//获取机器人商店列表 15968
+message GetStoreRobotListRequest
+{
+	required uint32 trans_id = 1;
+	optional uint32 type = 2;				//按何种机器人类型拉取，0或不传：不区分类型；1：系统rss机器人；2：系统webhook机器人；	kRobotType
+	optional fixed64 rid = 3;				//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num = 4;			//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+// 获取机器人商店列表 回包
+message GetStoreRobotListResponse
+{
+	required uint32 trans_id = 1;
+	required Ret ret = 2;
+	repeated RobotData datas = 3;
+    optional uint32 end_flag = 4;
+}
+
+//============================================================
+
+//获取系统rss订阅源列表 15972
+message GetSysRssSourceListRequest
+{
+	required uint32 trans_id = 1;
+	optional fixed64 rid = 2;				//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num = 3;			//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+// 获取系统rss订阅源列表 回包
+message GetSysRssSourceListResponse
+{
+	required uint32 trans_id = 1;
+	required Ret ret = 2;
+	repeated RssData datas = 3;
+    optional uint32 end_flag = 4;
+}
+
+//============================================================
+
+//获取机器人信息 15973
+message GetRobotInfoRequest
+{
+	required uint32 trans_id = 1;
+    optional MsgSource source = 2;			    //关联方，flag=0时，支持获取指定用户关联的机器人信息，若不传user，则服务器取header.user
+	repeated CidUid robot_users = 3;			//机器人用户列表
+}
+
+//获取机器人信息 回包
+message GetRobotInfoResponse
+{
+	required uint32 trans_id = 1;
+	required Ret ret = 2;
+	repeated RobotByFieldData datas = 3;
+	optional uint32 rss_limit = 4;			//rss订阅源总数限制
+	optional uint32 key_limit = 5;			//各类关键词总数限制
+	optional uint32 key_len_limit = 6;		//单个关键词内容长度限制
+}
+
+//============================================================
+
+//获取机器人列表 15974
+message GetRobotListRequest
+{
+	required uint32 trans_id = 1;
+    optional MsgSource source = 2;			//关联方，flag=0时，user忽略，服务器取header.user，意思是只能获取自己的机器人列表
+    optional uint32 type = 3;				//按何种机器人类型拉取，0或不传：不区分类型；1：系统rss机器人；2：系统webhook机器人；3、自定义rss机器人；4、自定义webhook机器人 kRobotType
+	optional fixed64 rid = 4;				//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num = 5;			//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+//获取机器人列表 回包
+message GetRobotListResponse
+{
+	required uint32 trans_id = 1;
+	required Ret ret = 2;
+	repeated RobotData datas = 3;
+    optional uint32 end_flag = 4;
+}
+
+//============================================================
+
+//添加机器人 15975
+message AddRobotRequest
+{
+	required uint32 trans_id = 1;
+    optional uint32 dev = 2;
+    optional MsgSource source = 3;			//关联方，flag=0时，user忽略，服务器取header.user，意思是只能给自己添加机器人绑定
+    optional RobotData data = 4;			//机器人数据，添加系统机器人时，rid必传
+}
+
+//添加机器人 回包
+message AddRobotResponse
+{
+	required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional RobotData data = 3;			//机器人数据
+}
+
+//添加机器人 通知 15976
+message AddRobotNotice
+{
+    optional uint32 dev = 1;
+    optional MsgSource source = 2;			//关联方
+    optional uint32 type = 3;				//机器人类型，	kRobotType
+	optional CidUid robot_user = 4;			//机器人用户
+}
+
+//============================================================
+
+//更新机器人信息 15977
+message UpdateRobotRequest
+{
+	required uint32 trans_id = 1;
+    optional uint32 dev = 2;
+    optional MsgSource source = 3;			//关联方，flag=0时，user忽略，服务器取header.user，意思是只能更新自己的机器人信息
+    optional uint32 mask = 4;				//mask指定更新哪些信息，kRobotInfoMask
+    optional RobotData data = 5;			//机器人数据
+}
+
+//更新机器人信息 回包
+message UpdateRobotResponse
+{
+	required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//更新机器人信息 通知 15978
+message UpdateRobotNotice
+{
+    optional uint32 dev = 1;
+    optional MsgSource source = 2;			//关联方
+    optional CidUid robot_user = 3;			//机器人用户
+    optional uint32 mask = 4;				//mask指定更新哪些信息，kRobotInfoMask
+}
+
+//============================================================
+
+//移除机器人 15979
+message RemoveRobotRequest
+{
+	required uint32 trans_id = 1;
+    optional uint32 dev = 2;
+    optional MsgSource source = 3;			//关联方，flag=0时，user忽略，服务器取header.user，意思是只能移除自己的机器人
+    optional CidUid robot_user = 4;			//机器人用户
+}
+
+//移除机器人 回包
+message RemoveRobotResponse
+{
+	required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional uint32 type = 3;				//机器人类型，	kRobotType
+}
+
+//移除机器人 通知 15980
+message RemoveRobotNotice
+{
+    optional uint32 dev = 1;
+    optional MsgSource source = 2;			//关联方
+    optional CidUid robot_user = 3;			//机器人用户
+    optional uint32 type = 4;				//机器人类型，	kRobotType
+}
+
+//=========================以下为内部接口，客户端不要对接===================================
+
+//指定字段获取机器人信息 15981
+//只能传一个字段
+message GetRobotInfoByFieldRequest
+{
+	required uint32 trans_id = 1;
+    optional MsgSource source = 2;			        //关联方，rss_link时不传
+	optional bytes rss_link = 3;					//rss订阅源源地址链接
+	optional bytes cb_url = 4;					    //webhook回调http接口
+}
+
+//指定字段获取机器人信息 回包
+message GetRobotInfoByFieldResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+	repeated RobotByFieldData datas = 3;                   //机器人数据
+}
+
+//添加系统rss订阅源 15969
+message AddSysRssRequest
+{
+	required uint32 trans_id = 1;
+    repeated RssData datas = 2;
+}
+
+//添加系统rss订阅源 回包
+message AddSysRssResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//更新系统rss订阅源 15970
+message UpdateSysRssRequest
+{
+	required uint32 trans_id = 1;
+    repeated RssData datas = 2;
+}
+
+//更新系统rss订阅源 回包
+message UpdateSysRssResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//移除系统rss订阅源 15971
+message RemoveSysRssRequest
+{
+	required uint32 trans_id = 1;
+    repeated RssData datas = 2;
+}
+
+//移除系统rss订阅源 回包
+message RemoveSysRssResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//添加系统机器人商店 15965
+message AddStoreRobotRequest
+{
+	required uint32 trans_id = 1;
+    repeated RobotData datas = 2;
+}
+
+//添加系统机器人商店 回包
+message AddStoreRobotResponse
+{
+	required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+//============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

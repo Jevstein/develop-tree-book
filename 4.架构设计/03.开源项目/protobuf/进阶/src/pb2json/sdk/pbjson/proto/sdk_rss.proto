@@ -1,0 +1,146 @@
+syntax = "proto2";
+package sdk.helper;
+
+import "base.proto";
+import "rss.proto";
+
+//------------------------------------ 获取机器人商店列表 ------------------------------------
+//获取机器人商店列表请求
+message GetStoreRobotListReq
+{
+	optional uint32 type 					= 1;//按何种机器人类型拉取，0或不传：不区分类型；1：系统rss机器人；2：系统webhook机器人；	kRobotType
+	optional fixed64 rid 					= 2;//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num 				= 3;//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+//获取机器人商店列表回调
+message GetStoreRobotListAck
+{
+	required Ret ret 						= 1;
+	repeated HelperProto.RobotData datas 	= 2;
+    optional uint32 end_flag 				= 3;
+}
+
+//------------------------------------ 获取系统rss订阅源列表 ------------------------------------
+//获取系统rss订阅源列表请求
+message GetSysRssSourceListReq
+{
+	optional fixed64 rid 					= 1;//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num 				= 2;//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+//获取系统rss订阅源列表回调
+message GetSysRssSourceListAck
+{
+	required Ret ret 						= 1;
+	repeated HelperProto.RssData datas 		= 2;
+    optional uint32 end_flag 				= 3;
+}
+
+//------------------------------------ 获取机器人 ------------------------------------
+//获取机器人信息请求
+message GetRobotInfoReq
+{
+    optional MsgSource source 				= 1;//关联方，flag=0时，支持获取指定用户关联的机器人信息，若不传user，则服务器取header.user
+	repeated CidUid robot_users 			= 2;//机器人用户列表
+}
+
+//获取机器人信息回调
+message GetRobotInfoAck
+{
+	required Ret ret 							= 1;
+	repeated HelperProto.RobotByFieldData datas = 2;
+	optional uint32 rss_limit 					= 3;//rss订阅源总数限制
+	optional uint32 key_limit 					= 4;//各类关键词总数限制
+	optional uint32 key_len_limit 				= 5;//单个关键词内容长度限制
+}
+
+//------------------------------------ 获取机器人列表 ------------------------------------
+//获取机器人列表请求
+message GetRobotListReq
+{
+    optional MsgSource source 					= 1;//关联方，flag=0时，user忽略，服务器取header.user，意思是只能获取自己的机器人列表
+    optional uint32 type 						= 2;//按何种机器人类型拉取，0或不传：不区分类型；1：系统rss机器人；2：系统webhook机器人；3、自定义rss机器人；4、自定义webhook机器人 kRobotType
+	optional fixed64 rid 						= 3;//分页起始rid，传上一页返回的最小rid，首页传0或不传
+	optional uint32 max_num 					= 4;//拉取条数，存在服务器最大数量限制，0或不传则按服务器最大数量限制返回
+}
+
+//获取机器人列表回调
+message GetRobotListAck
+{
+	required Ret ret 							= 1;
+	repeated HelperProto.RobotData datas 		= 2;
+    optional uint32 end_flag 					= 3;
+}
+
+//------------------------------------ 添加机器人 ------------------------------------
+//添加机器人请求
+message AddRobotReq
+{
+    optional MsgSource source 					= 1;//关联方，flag=0时，user忽略，服务器取header.user，意思是只能给自己添加机器人绑定
+    optional HelperProto.RobotData data 		= 2;//机器人数据，添加系统机器人时，rid必传
+}
+
+//添加机器人回调
+message AddRobotAck
+{
+    required Ret ret 							= 1;
+    optional HelperProto.RobotData data 		= 2;//机器人数据
+}
+
+//添加机器人通知
+message AddRobotNoti
+{
+    optional uint32 dev 						= 1;
+    optional MsgSource source 					= 2;//关联方
+    optional uint32 type 						= 3;//机器人类型，kRobotType
+	optional CidUid robot_user 					= 4;//机器人用户
+}
+
+//------------------------------------ 更新机器人信息 ------------------------------------
+//更新机器人信息请求
+message UpdateRobotReq
+{
+    optional MsgSource source 					= 1;//关联方，flag=0时，user忽略，服务器取header.user，意思是只能更新自己的机器人信息
+    optional uint32 mask 						= 2;//mask指定更新哪些信息，kRobotInfoMask
+    optional HelperProto.RobotData data 		= 3;//机器人数据
+}
+
+//更新机器人信息回调
+message UpdateRobotAck
+{
+    required Ret ret 							= 1;
+}
+
+//更新机器人信息通知
+message UpdateRobotNoti
+{
+    optional uint32 dev 						= 1;
+    optional MsgSource source 					= 2;//关联方
+    optional CidUid robot_user 					= 3;//机器人用户
+    optional uint32 mask 						= 4;//mask指定更新哪些信息，kRobotInfoMask
+}
+
+//------------------------------------ 移除机器人 ------------------------------------
+//移除机器人请求
+message RemoveRobotReq
+{
+    optional MsgSource source 					= 1;//关联方，flag=0时，user忽略，服务器取header.user，意思是只能移除自己的机器人
+    optional CidUid robot_user 					= 2;//机器人用户
+}
+
+//移除机器人回调
+message RemoveRobotAck
+{
+    required Ret ret 							= 1;
+    optional uint32 type 						= 2;//机器人类型，kRobotType
+}
+
+//移除机器人通知
+message RemoveRobotNoti
+{
+    optional uint32 dev 						= 1;
+    optional MsgSource source 					= 2;//关联方
+    optional CidUid robot_user 					= 3;//机器人用户
+    optional uint32 type 						= 4;//机器人类型，kRobotType
+}

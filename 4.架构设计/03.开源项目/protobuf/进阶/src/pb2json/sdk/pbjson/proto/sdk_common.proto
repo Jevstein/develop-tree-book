@@ -1,0 +1,9 @@
+syntax = "proto2";
+package sdk.common;
+
+
+//操作键
+message OpKey {
+	optional uint32 reqid        = 1;    //流水号：每一次调用的异步请求ID，0=通知
+    optional uint32 opcode       = 2;    //操作码：区分不同的请求接口
+}

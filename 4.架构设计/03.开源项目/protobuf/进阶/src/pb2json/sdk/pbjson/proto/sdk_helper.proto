@@ -1,0 +1,125 @@
+syntax = "proto2";
+package sdk.helper;
+
+import "base.proto";
+//import "helper.proto";
+import "customize.proto";
+//import "data_msg.proto";
+
+
+//------------------------------------ 用户操作统计(埋点) ------------------------------------
+//用户操作统计(埋点)请求
+message UploadUserOperReq
+{
+	optional uint32 command						= 1;//用户操作命令
+	optional uint32 count						= 2;//用户操作次数，默认传1
+}
+
+//用户操作统计(埋点)回调
+message UploadUserOperAck
+{
+    required Ret ret 							= 1;
+}
+
+//------------------------------------ 统一申请回复 ------------------------------------
+//统一申请回复回调
+message ApplyRelyReq
+{
+	optional uint64 msgid                       = 1;
+	optional string t                    		= 2;//按钮的参数
+	optional string desc                   		= 3;//回复描述
+}
+
+//统一申请回复回调
+message ApplyRelyAck
+{
+	required Ret ret                        	= 1;
+	optional bytes datas                    	= 2;
+}
+
+//------------------------------------ 设置app push开关 ------------------------------------
+//设置app push开关请求
+message SetAppPushReq
+{
+    optional uint32 flag 						= 1; //标记: 0=pc在线表示不推送，1=pc在线也推送
+}
+
+//设置app push开关回调
+message SetAppPushAck
+{
+    required Ret ret 							= 1;
+}
+
+//设置app push开关通知
+message SetAppPushNoti
+{
+    optional uint32 flag 						= 1; //标记: 0/不传，pc在线表示不推送；1：pc在线也推送
+}
+
+//------------------------------------ 拉取app push开关 ------------------------------------
+//拉取app push开关请求
+message GetAppPushReq
+{
+	optional string reserved               = 1;//预留：可不传
+}
+
+//拉取app push开关回调
+message GetAppPushAck
+{
+    required Ret ret 						= 1;
+    optional uint32 flag 					= 2; //标记: 0/不传，pc在线表示不推送；1：pc在线也推送
+}
+
+//------------------------------------ 多人透传协议 ------------------------------------
+// 多人透传协议请求
+message TransportTechReq
+{
+    repeated CidUid tusers					= 1; //发送对象
+	required string content					= 2; //透传内容
+	required uint32 flag					= 3; //透传类型: 1=语音，2=视频
+	optional uint32 push					= 4; //push标识[选传]: 0或者不传=不push, 1=发送push
+    optional HelperProto.TTHandle handle    = 5; //透传操作
+}
+
+// 多人透传协议回调
+message TransportTechAck
+{
+    required Ret ret 						= 1;
+}
+
+// 多人透传协议通知
+message TransportTechNoti
+{
+    optional CidUid fuser  					= 1;//发送会话
+    optional CidUid tuser  					= 2;//接收人，如果没有，接收人就是默认自己
+    optional uint32 flag   					= 3;//业务类型
+    optional bytes content 					= 4;//透传内容
+    optional uint32 dev                     = 5;//设备号
+    optional HelperProto.TTHandle handle    = 6;//透传操作
+}
+
+//------------------------------------ 多群透传协议 ------------------------------------
+// 多群透传协议请求
+message GroupTransportTechReq
+{
+    repeated uint64 group_ids				= 1;
+	required string content					= 2; //透传内容
+	required uint32 flag					= 3; //透传类型: 1=视频语音
+	optional uint32 push					= 4; //push标识: 0或者不传=不push, 1=发送push
+}
+
+// 多群透传协议回调
+message GroupTransportTechAck
+{
+    required Ret ret 						= 1;
+}
+
+// 多群透传协议通知
+message GroupTransportTechNoti
+{
+    optional CidUid fuser 					= 1;//发送会话
+    optional CidUid tuser 					= 2;//接收人，如果没有，接收人就是默认自己
+    optional uint32 flag 					= 3;//业务类型
+    optional bytes content 					= 4;//透传内容
+    optional uint32 dev                     = 5;//设备号
+}

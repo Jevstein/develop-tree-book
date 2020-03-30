@@ -1,0 +1,43 @@
+syntax = "proto2";
+package sdk.ai;
+
+import "base.proto";
+
+
+//------------------------------------ 文本纠错 ------------------------------------
+message CheckTextReq
+{
+    optional bytes text 						= 1; //待纠错的文本，限定510个字符(一个汉字占3个字符)
+}
+
+message CheckTextAck
+{
+	message Token
+	{
+		optional uint32 len			= 1; //单个汉字的长度，如len=3表示一个汉字占3个字符
+		optional uint32 offset		= 2; //错误文字的起始偏移
+		optional bytes ori_word 	= 3; //错误的文字
+		optional bytes cor_word 	= 4; //正确的文字
+	}
+	
+	required Ret ret 							= 1;
+	optional bytes text 						= 2; //矫正后的文本
+	repeated Token tokens 						= 3; //矫正信息，若为空表示没有错误
+	optional bytes result 						= 4; //[app可忽略]服务器直接返回的结果
+	optional uint32 sflag 						= 5; //[app可忽略]来源: 1=百度, 2=腾讯
+}
+
+//------------------------------------ 文本翻译 ------------------------------------
+message TranslateTextReq
+{
+    optional bytes text 						= 1; //待翻译的文本
+    optional bytes target 						= 2; //待翻译的语言
+}
+
+message TranslateTextAck
+{
+	required Ret ret 							= 1;
+	optional bytes text 						= 2; //翻译后的文本
+	optional bytes result 						= 3; //[app可忽略]服务器直接返回的结果
+	optional uint32 sflag 						= 4; //[app可忽略]来源: 1=百度, 2=腾讯
+}

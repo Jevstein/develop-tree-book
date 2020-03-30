@@ -1,0 +1,279 @@
+syntax = "proto2";
+package sdk.sysmsg;
+
+import "base.proto";
+import "system_msg.proto";
+
+// 系统消息名称
+message SysMsgName
+{
+	optional bytes zh_tw 									= 1;
+	optional bytes en_us 									= 2;
+	optional bytes zh_cn 									= 3;
+}
+
+// 系统消息类型
+message SysMsgType
+{
+	optional uint32 flag 									= 1;
+	optional uint32 imgid 									= 2;
+	optional bytes i18nName									= 3;
+	optional SysMsgName name 								= 4;
+	optional uint32 type 									= 5;
+	optional bytes url 										= 6;
+}
+
+//系统消息rel
+message SysMsgRel
+{
+	optional uint32 group_id 								= 1;
+	repeated uint32 type_ids 								= 2;
+}
+
+//系统消息组
+message SysMsgGroup
+{
+	optional uint32 flag 									= 1;
+	optional uint32 gtype 									= 2;
+	optional uint32 imgid 									= 3;
+	optional bytes i18nName 								= 4;
+	optional SysMsgName name 								= 5;
+	optional uint32 avatar 									= 6;
+	optional uint32 group 									= 7;
+	optional bytes url 										= 8;	//仅sdk内部使用
+}
+
+//------------------------------------ 常规获取系统消息（支持多个分组，但只能返回服务器支持的最大消息个数的消息） ------------------------------------
+//常规获取系统消息请求
+message GetSysMsgReq
+{
+	//"flag_def":{//常规获取：当flag=1时必传，其它不传
+	//	"read_status":0,	//阅读状态[选传]:0或不传=不区分已读未读；1=按已读拉取；2=按未读拉取
+	//	"deal_status":0,	//处理状态[选传]:0或不传=不区分已处理未处理；1=按未处理拉取；2=按已处理拉取
+	//	"cond_list": [
+	//		{
+	//			"msg_type": {
+	//				"sys_group": 110,   //系统分组[必传]
+	//				"sys_type": 222,    //类型[选传]: 0或不传时=只按group拉取
+	//			},
+	//			"max_num": 123,     //该组同步的数量
+	//			"start_msgid": "123123",
+	//			"end_msgid": "0"
+	//		},
+	//	]
+	//}
+	optional uint32 read_status      						= 1; //阅读状态[选传]:0或不传=不区分已读未读；1=按已读拉取；2=按未读拉取
+	optional uint32 deal_status      						= 2; //处理状态[选传]:0或不传=不区分已处理未处理；1=按未处理拉取；2=按已处理拉取
+	repeated SysMsgProto.SyncSysMsgReqData datas 			= 3; 
+}
+
+//常规获取系统消息回调
+message GetSysMsgAck
+{
+    required Ret ret                        				= 1;
+	optional uint32 total_num               				= 2; //消息总数
+	optional uint32 readstatus_flag         				= 3; //区分阅读状态标识
+    optional uint32 deal_status             				= 4; //区分处理状态标识
+	repeated SysMsgProto.SysMsgData datas					= 5; // root/sysmsg/proto/system_msg.proto
+}
+
+//------------------------------------ 指定msgid获取系统消息 ------------------------------------				
+//指定msgid获取系统消息请求				
+message GetSysMsgByMsgidReq			
+{
+	//"flag_special":{//指定一个msgid、sys_group和sys_type：当flag=2时必传，其它不传
+	//	"sys_group": 110,	//系统分组[必传]
+	//	"sys_type": 1,		//系统类型[选传]: 0或不传时，默认拉取所有type数据
+	//	"msgid": 123456
+	//},
+	optional SysMsgProto.MsgType msg_type 					= 1; //系统分组: 内包含group和type，其中type选传，若为空或0表示拉取所有type数据
+	optional uint64 msgid 									= 2;
+}
+
+//指定msgid获取系统消息回调	
+message GetSysMsgByMsgidAck			
+{				
+	required Ret ret                        				= 1;
+	optional SysMsgProto.SysMsgData data    				= 2;    // root/sysmsg/proto/system_msg.proto
+}
+
+//------------------------------------ 获取本地系统消息 ------------------------------------		
+//获取本地系统消息回调		
+message GetLocalHistorySysMsgReq
+{
+	//"flag_history":{//获取历史系统消息：当flag=3时必传，其它不传
+	//	"sys_group":111,	//分组[必传]，仅当start_msgid==end_msgid时忽略，表示按msgid获取历史系统消息
+	//	"sys_type":101,		//分组类型[选传]，type=0时表示只按组获取历史系统消息
+	//	"start_msgid":222,	//消息的起始ID (start_msgid >= end_msgid）[必传]
+	//	"end_msgid":111,	//消息的结束ID (start_msgid >= end_msgid）[必传]
+	//	"max_num":5,		//消息的总数[选传]: 若为0将返回start_msgid与end_msgid区间的所有消息
+	//	"read_status":1,	//阅读状态[选传]:0=不区分已读未读,1=按已读拉取,2=按未读拉取
+	//	"deal_status":2		//处理状态[选传]:0=不区分已处理未处理,1=按未处理拉取,2=按已处理拉取
+	//}
+	optional uint32 read_status      						= 1; //阅读状态[选传]:0或不传=不区分已读未读；1=按已读拉取；2=按未读拉取
+	optional uint32 deal_status      						= 2; //处理状态[选传]:0或不传=不区分已处理未处理；1=按未处理拉取；2=按已处理拉取
+	optional SysMsgProto.SyncSysMsgReqData data 			= 3; 
+}
+
+//获取本地系统消息回调
+message GetLocalHistorySysMsgAck
+{		
+    required Ret ret                        				= 1;
+	optional uint64 msgid               					= 2;
+	optional uint32 read_status         					= 3;    //区分阅读状态标识
+    optional uint32 deal_status             				= 4;    //区分处理状态标识
+	optional SysMsgProto.MsgType msg_type					= 5;
+	repeated SysMsgProto.SysMsgData datas					= 6;    // root/sysmsg/proto/system_msg.proto
+}
+
+//------------------------------------ 标记系统消息已读 ------------------------------------
+// 标记系统消息已读请求
+message SetSysMsgReadStatusReq
+{
+	// "read": {			//已读信息：flag=1时必传
+	//	"flag": 1,		//类型：1=按task_id标记已读, 2=按group标记已读, 3=按group_type标记已读, 4=按msgid标记已读
+	//	"taskid":111	//任务[选传]，flag=1时必传
+	//	"sys_group":222 //分组[选传]，flag=2|3|4时必传
+	//	"sys_type":101	//分组类型[选传]，flag=3时必传
+	//	"msgid_list":[	//消息ID[选传],
+	//		{
+	//			"sys_type": "111",				//消息类型；此值不能为零，为0不生效
+	//			"msgids": [12345, 54321, 32145],//消息id，此值不传时说明按type标记已读
+	//		},
+	//		{
+	//			"sys_type": "112",
+	//			"msgids": [123456, 654321，321456],
+	//		}
+	//	]
+	//}
+	required uint32 flag         							= 1; //标记方式: 1=task_id, 2=group,3=group_type,4=group_type_msgid, 见kSetReadStatusType
+	optional uint32 group        							= 2; //消息分组：为0表示所有消息标记已读
+	optional uint32 type        							= 3; //分组类型: flag=3时必传
+	repeated SysMsgProto.SysNoReadInfo datas 				= 4; //不传表示指定分组group下所有消息标记已读，当group为0时此值不起作用
+	optional fixed64 task_id     							= 5; //任务id：可选，如果已设置此值 group和datas无效
+}
+
+// 标记系统消息已读回调
+message SetSysMsgReadStatusAck
+{
+	required Ret ret		      							= 1;
+	repeated SysMsgProto.GroupCountInfo datas 				= 2;
+	optional uint32 flag         							= 3;
+	optional uint32 group        							= 4;
+	repeated SysMsgProto.SysNoReadInfo conds 				= 5;
+	optional fixed64 task_id     							= 6;
+}
+
+// 标记系统消息已读通知
+message SetSysMsgReadStatusNoti
+{
+	repeated SysMsgProto.GroupCountInfo unread_datas 		= 1; //影响的消息条数
+	optional uint32	dev		             					= 2; 
+	optional uint32 flag                 					= 3; //标记已读方式 kSetReadStatusType 1. task_id 2. group 3. group_type 4 group_type_msgid
+	optional uint32 group                					= 4; //消息分组，为0表示所有消息标记已读
+	repeated SysMsgProto.SysNoReadInfo datas        		= 5; //不传表示指定分组group下所有消息标记已读，当group为0时此值不起作用
+	optional fixed64 task_id             					= 6; //任务id，可选，如果已设置此值 group和datas无效
+}
+
+//------------------------------------ 标记系统消息未读 ------------------------------------
+// 标记系统消息未读请求
+message SetSysMsgUnReadStatusReq
+{
+	required uint32 group		      						= 1;
+	repeated uint64 msgids 									= 2;
+}
+
+// 标记系统消息未读回调
+message SetSysMsgUnReadStatusAck
+{
+	required Ret ret		      							= 1;
+	optional SysMsgProto.GroupCountInfo data  				= 2;
+}
+
+// 系统消息标记未读通知回调
+message SetSysMsgUnReadStatusNoti
+{
+	optional SysMsgProto.GroupCountInfo data  				= 1;  // 剩余未读条数
+	optional uint32	dev		             					= 2;  // 发送方的dev	
+	optional uint32 group                					= 3;  // 消息分组，为0表示所有消息标记已读
+	repeated fixed64 msgid               					= 4;  // 消息id，此值不传时说明按type标记已读
+}
+
+//------------------------------------ 发送公共消息 ------------------------------------
+// 发送公共消息请求
+message SendCommMsgReq
+{
+	required uint32 to_dev									= 1; //发送方设备：0=发到所有设备，1=只发给pc设备，2=只发给手机设备
+	repeated CidUid users									= 2; //消息接收方
+	optional uint32 offline									= 3; //离线接收标识: 不传或0=不接收（不存储），1=接收（存储）
+	optional uint32 msg_type								= 4; //模块消息类型
+	optional uint32 ispush									= 5; //是否走jpush：0=不推送，1=推送
+	optional uint32 time									= 6; //消息发送时间[选传]: 若不传则c服务生成
+	optional string msg										= 7; //消息内容
+}
+
+// 发送公共消息回调
+message SendCommMsgAck
+{
+    required Ret ret 										= 1;
+}
+
+// 发送公共消息通知
+message SendCommMsgNoti
+{
+    optional CidUid user 									= 1; //推送方
+    optional uint32 msg_type	 							= 2; //模块消息类型(100-199一个模块，200-299一个模块趋于)
+    optional bytes msg 										= 3; //消息内容
+    optional fixed64 msgid 									= 4; //消息id
+    optional uint32 from_dev 								= 5; //发送方设备
+    optional uint32 time 									= 6; //消息发送时间
+}
+
+//------------------------------------ 发送通知消息 ------------------------------------
+// 发送通知消息请求
+message SendNoticeMsgReq
+{
+	required uint32 to_dev									= 1; //发送方设备：0=发到所有设备，1=只发给pc设备，2=只发给手机设备
+	repeated CidUid users									= 2; //消息接收方
+	optional uint32 offline									= 3; //离线接收标识: 不传或0=不接收（不存储），1=接收（存储）
+	optional string msg										= 4; //消息内容
+}
+
+// 发送通知消息回调
+message SendNoticeMsgAck
+{
+    required Ret ret 										= 1;
+}
+
+// 发送通知消息通知
+message SendNoticeMsgNoti
+{
+    required CidUid user 									= 1;
+    optional uint32 dev 									= 2; //发送方设备
+    required bytes msg 										= 3; //消息内容	
+}
+
+//------------------------------------ 获取系统分组信息 ------------------------------------
+//获取系统分组信息请求
+message GetSysGroupInfoReq
+{
+    optional uint32 api_get_type 							= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    required uint32 type 									= 2; //类型：1=获取系统消息group列表, 2=获取系统消息type列表, 3=根据goup获取系统消息type列表, 4=根据goup获取系统消息type信息列表
+	repeated uint32 list 									= 3; //任务[选传]: 根据type类型,分别填入sys_group、sys_type值；不传默认所有
+}
+
+//获取系统分组信息回调
+message GetSysGroupInfoAck
+{
+    required Ret ret 										= 1;
+	repeated SysMsgType types 								= 2; //系统消息类型
+	repeated SysMsgRel rels 								= 3; //系统消息rel
+	repeated SysMsgGroup groups 							= 4; //系统消息组
+}
+
+//------------------------------------ 系统消息通知 ------------------------------------
+//系统消息通知（新系统消息通知、系统消息内容修改通知、发送撤回消息的通知）
+message SysMsgNoti
+{
+	optional SysMsgProto.SysMsgData data    				= 1;    // root/sysmsg/proto/system_msg.proto
+}

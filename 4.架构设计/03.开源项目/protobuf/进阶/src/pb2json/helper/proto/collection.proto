@@ -1,0 +1,114 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option java_outer_classname = "Collection";
+option go_package = "proto_source/helper";
+
+//------------------------------------------------------------------------
+//log:消息收藏
+//------------------------------------------------------------------------
+//
+//收藏消息实体
+message CollectionData
+{
+    optional MsgSource source = 1; //来源类型
+    optional fixed64 msgid = 2; //消息id
+    optional bytes msg = 3; //消息内容
+    optional uint32 msg_type = 4; //消息类型，0：文本、1：链接、2：图片、3：文件
+    optional uint32 time = 5; //收藏时间
+    optional uint32 top = 6; //置顶标识，0和不传，默认不置顶；1：置顶；
+    optional fixed64 sid = 7; //操作id
+    optional bytes label = 8; //标签，json数组
+}
+
+// 消息收藏 15611
+message CollectionRequest
+{
+    required uint32 trans_id = 1;
+    optional uint32 dev = 2;  //设备
+    required CollectionData coll = 3; //必传：1；选传：2，3，4
+}
+
+// 消息收藏 回包 15611
+message CollectionResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional fixed64 msgid = 3;//新生成的消息id，收藏的消息id
+}
+
+// 消息收藏 通知 15612
+message CollectionNotice
+{
+    optional fixed64 msgid = 1;//
+}
+
+//------------------------------------------------------------------------------
+// 设置收藏 15613
+message SetCollectionRequest
+{
+    required uint32 trans_id = 1;
+    repeated CollectionData datas = 2; //必传2；flag=0,传8；flag=1:传6
+    optional uint32 flag = 3;//0或者不传：设置消息标签；1：设置置顶信息（置顶和取消置顶）；2：取消收藏
+    optional uint32 dev = 4;  //设备
+}
+
+// 设置收藏 回包 15613
+message SetCollectionResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+}
+
+// 设置收藏 通知 15614
+message SetCollectionNotice
+{
+    repeated fixed64 msgid = 2;//被修改的收藏id
+}
+
+//------------------------------------------------------------------------------
+//同步收藏 cmd:15615
+//flag=0, 首次拉取
+//flag=1，增量拉取
+//flag=2，分页拉取
+message SyncCollectionRequest
+{
+    required uint32 trans_id = 1;
+    optional uint32 flag = 2; //0或者:首次拉取；1：增量拉取；2：分页拉取
+    optional fixed64 mid = 3; //flag=0，不传；flag=1时，传sid；flag=2时，传msgid
+}
+
+// 消息收藏 回包 15615
+message SyncCollectionResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated CollectionData datas = 3;
+}
+
+//------------------------------------------------------------------------------
+// 根据条件分类查找 cmd:15616
+// flag = 0，根据msg_type查找
+// flag = 1，根据模块类型
+// flag = 2，根据关键字
+message SearchCollectionRequest
+{
+    required uint32 trans_id = 1;
+    optional uint32 flag = 2; //0或者:msg_type拉取；1:模块拉取；2：关键字
+    optional fixed64 mid = 3; //首次都不传，flag各种情况的分页使用
+    optional uint64 msg_type = 4;
+    optional bytes filter = 5;//其他条件
+}
+
+// 消息收藏 回包 15616
+message SearchCollectionResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    repeated CollectionData datas = 3;
+}
+
+//------------------------------------------------------------------------------

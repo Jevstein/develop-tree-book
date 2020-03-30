@@ -1,0 +1,45 @@
+syntax = "proto2";
+import "base.proto";
+
+package HelperProto;
+
+option java_package = "com.weaver.eteams.im.protocol.protobuf.helper";
+option java_outer_classname = "HelperGroupMsg";
+option go_package = "proto_source/helper";
+
+//------------------------------------------------------------------------
+//客户群组：即小助手的后台群组
+
+//------------------------------------------------------------------------
+message HelperGroupUsers
+{
+    optional uint64 group_id = 1;
+    repeated HGUserInfo infos = 2;
+    optional uint32 type = 3;//群类型
+}
+
+message HGUserInfo
+{
+    required CidUid user = 1;
+    optional uint32 role = 2; //用户角色
+}
+
+
+//获取客户群组用户成员 cmd:
+message GetHGroupUsersRequest
+{
+    required uint32 trans_id = 1;
+    optional uint64 group_id = 2; //如果不传，则根据cid+uid返回群信息
+}
+
+//获取客户群组用户成员 回包 cmd:15901
+message GetHGroupUsersResponse
+{
+    required uint32 trans_id = 1;
+    required Ret ret = 2;
+    optional HelperGroupUsers data = 3;
+}
+
+//---------------------------------------------------------------
+
+

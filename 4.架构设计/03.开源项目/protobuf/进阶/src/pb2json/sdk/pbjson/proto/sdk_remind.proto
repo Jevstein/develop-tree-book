@@ -1,0 +1,128 @@
+syntax = "proto2";
+package sdk.remind;
+
+import "base.proto";
+import "msg_remind.proto";
+
+
+//------------------------------------ 设置消息免打扰信息 ------------------------------------
+// 设置消息免打扰信息请求
+message SetMsgRemindReq
+{
+	message Session
+	{
+		message SysGroup
+		{				
+			optional uint32 group 		= 1;			
+			optional uint32 type 		= 2; //若等于0，则只表示分组的免打扰
+		}
+		message Time 
+		{
+			optional uint32 start_time 	= 1; //开始时间，时间段设置返回使用
+			optional uint32 end_time 	= 2; //结束时间，时间段设置返回使用
+			optional string time_zone 	= 3; //时区
+		}
+		
+		required uint32 flag		 		= 1; //会话类型：1=单人消息，2=群消息，3=多人会话，4=系统消息, 99=话题免打扰，100:表示时间段设置
+		optional CidUid user 				= 2; //用户标识：session_type为1时使用, 否则不传
+		optional uint64 group_id 			= 3; //群标识:	session_type为2、3、99时使用, 否则不传
+		optional SysGroup sys_group			= 4; //系统消息分组: session_type为4时使用, 否则不传
+		optional Time time					= 5; //session_type为100时使用, 否则不传
+	}
+	
+	required Session session						= 1; //会话
+	required uint32 reminder        				= 2; //消息提醒值: 0=消息接收提醒, 1=消息接收但不提醒，2=消息屏蔽 见：消息免打扰设置
+}
+
+// 设置消息免打扰信息回调
+message SetMsgRemindAck
+{
+    required Ret ret 								= 1;
+}
+
+// 设置消息免打扰信息通知
+message SetMsgRemindNoti
+{
+    optional uint32 dev 							= 1;
+    optional DataProto.MsgRemindInfo reminder 		= 2;
+}
+
+//------------------------------------ 设置任务系统消息免打扰信息 ------------------------------------
+// 设置任务系统消息免打扰信息请求
+message SetTaskSysMsgRemindReq
+{
+	optional uint32 group 							= 1;//系统消息分组
+    optional uint32 type 							= 2;//系统消息类型
+    optional uint64 entityid	 					= 3;//
+    optional uint32 reminder 						= 4;//消息提醒值: 0=消息接收提醒, 1=消息接收但不提醒，2=消息屏蔽 见：消息免打扰设置
+}
+
+// 设置任务系统消息免打扰信息回调
+message SetTaskSysMsgRemindAck
+{
+    required Ret ret 								= 1;
+	optional uint32 group 							= 2;
+    optional uint32 type 							= 3;
+    optional uint64 entityid	 					= 4;
+    optional uint32 reminder						= 5;
+}
+
+//------------------------------------ 获取任务系统消息免打扰信息 ------------------------------------
+// 获取任务系统消息免打扰信息请求
+message GetTaskSysMsgRemindReq
+{
+	optional uint32 group 							= 1;//系统消息分组
+    optional uint32 type 							= 2;//系统消息类型
+    optional uint64 entityid	 					= 3;//
+}
+
+// 获取任务系统消息免打扰信息回调
+message GetTaskSysMsgRemindAck
+{
+    required Ret ret 								= 1;
+	optional uint32 group 							= 2;
+    optional uint32 type 							= 3;
+    optional uint64 entityid	 					= 4;
+    optional uint32 reminder						= 5;
+}
+
+//------------------------------------ 设置时间段消息免打扰信息 ------------------------------------
+// 设置时间段消息免打扰信息请求
+message SetMsgRemindTimeReq
+{	
+    optional uint32 start_time						= 1; //开始时间：小时分钟，表示法：2359，四位数字，表示23点59分，范围[0000-2359]
+    optional uint32 end_time						= 2; //结束时间：范围[0000-2359]
+    optional uint32 reminder						= 3; //消息提醒值：0=消息接收提醒；1=消息接收但不提醒：显示在最近联系列表，有数字消息，
+														 //数字显示灰色，不闪提示；2=消息屏蔽，客户端无任何提示，只有找到群打开显示群消息
+    optional string time_zone		 				= 4; //时区，可传空
+}
+
+// 设置时间段消息免打扰信息回调
+message SetMsgRemindTimeAck
+{
+    required Ret ret 								= 1;
+}
+
+// 设置时间段消息免打扰信息通知
+message SetMsgRemindTimeNoti
+{
+    optional uint32 dev 							= 1;
+    optional uint32 start_time 						= 2; //开始时间，小时分钟，表示法：2359，四位数字，表示23点59分，范围[0000-2359]
+    optional uint32 end_time 						= 3; //范围[0000-2359]
+    optional uint32 reminder 						= 4;
+    optional bytes time_zone 						= 5; //时区
+}
+
+//------------------------------------ 获取消息免打扰信息 ------------------------------------
+//获取消息免打扰信息请求
+message GetMsgRemindReq
+{
+    optional uint32 api_get_type 					= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+}
+
+//获取消息免打扰信息回调
+message GetMsgRemindAck
+{
+    required Ret ret 								= 1;
+    repeated DataProto.MsgRemindInfo datas 			= 2;
+}

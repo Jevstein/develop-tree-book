@@ -1,0 +1,399 @@
+syntax = "proto2";
+package sdk.groupmsg;
+
+import "base.proto";
+import "group_base.proto";
+import "group.proto";
+import "group_msg.proto";
+import "data_msg.proto";
+
+
+//群聊消息的结构
+message GroupMsgDataEx
+{
+    optional uint32 version 						= 1;
+    optional fixed64 ser_msgid 						= 2;
+    optional uint64 from_cid 						= 3;
+    optional uint64 from_uid 						= 4;
+    optional uint32 msgtime 						= 5;
+    optional bytes msg 								= 6;
+    optional fixed64 next_id 						= 7;
+    optional uint32 kind 							= 8; //消息种类，见 constants.h中消息种类常量定义
+	optional uint32 cli_msg_status					= 9; //消息的状态，0: 正常状态的消息，1: 发送失败的消息
+}
+
+//发送@信息回调（仅sdk内部使用）
+message SendAtInfoCb
+{
+    required Ret ret 								= 1;
+    optional uint64 group_id 						= 2;
+    optional GroupType type 						= 3; //type : 0 qgroup , 1 :ngroup
+}
+
+//------------------------------------ 发送群消息 ------------------------------------
+//发送群消息请求
+message SendGroupMsgReq
+{
+	message Addition
+	{
+		required uint32 flag 	= 1;//标记：0=无附加消息, 1=@消息，2=回复消息
+		repeated CidUid users 	= 2;//@用户[flag=1时必传]：若users为空，则@全体成员
+		optional uint32 msgid 	= 3;//消息id[flag=2时必传]
+	}
+    required uint64 cli_msgid 						= 1; //消息ID: 用于服务器端去重，客户端要保证clientMsgId唯一
+    required uint64 group_id 						= 2;
+    optional uint32 kind 							= 3;
+	optional string msg 							= 4; //发送消息
+	optional string title 							= 5; //副标题: 若为空，则由SDK负责组装
+	optional Addition addtion						= 6; //附加信息, 如：@消息、回复消息
+}
+
+//发送群消息回调
+message SendGroupMsgAck
+{
+    required Ret ret 								= 1;
+    optional GroupType type 						= 2; //type : 0 qgroup , 1 :ngroup
+    optional uint64 group_id 						= 3;
+    optional fixed64 cli_msgid 						= 4;
+    optional fixed64 ser_msgid 						= 5;
+    optional fixed64 pre_msgid 						= 6;
+    optional uint32 msgtime 						= 7; //消息发送时间
+    optional uint32 version 						= 8; //消息版本号
+}
+
+//发送群消息通知
+message SendGroupMsgNoti
+{
+    optional uint64 group_id 						= 1;
+    optional GroupType type 						= 2;
+	optional uint32	dev								= 3;
+    optional GroupMsgDataEx data            		= 4;
+}
+
+//------------------------------------ 指定msgid获取群消息(仅sdk内部使用) ------------------------------------
+//指定msgid获取群消息请求
+message GetGroupMsgByMsgidReq
+{
+    required uint64 group_id 						= 1;
+    required uint64 msgid 							= 2;
+}
+
+//指定msgid获取群消息回调
+message GetGroupMsgByMsgidAck
+{
+    required Ret ret 								= 1;
+    optional GroupMsgDataEx data 					= 2;
+}
+
+//------------------------------------ 指定kind获取群消息 ------------------------------------
+//指定kind获取群消息请求
+message GetGroupMsgByKindReq
+{
+	required GroupProto.SyncGroupMsgReqData cond	= 1;
+	required uint32 kind							= 2;//消息种类, 如: 1001=文本消息
+}
+
+//指定kind获取群消息回调
+message GetGroupMsgByKindAck
+{
+	required Ret ret                                = 1;
+	optional uint32 end_flag                        = 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+    repeated GroupMsgDataEx datas          			= 3;//消息数据
+}
+
+//------------------------------------ 获取群消息 ------------------------------------
+//获取群消息请求
+message GetGroupMsgReq
+{
+	required GroupProto.SyncGroupMsgReqData cond	= 1;
+}
+
+//获取群消息回调
+message GetGroupMsgAck
+{
+    required Ret ret 								= 1;
+    optional uint32 end_flag  						= 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+    repeated GroupMsgDataEx datas  					= 3;
+}
+
+//------------------------------------ 标记群消息已读 ------------------------------------
+//标记群消息已读请求	
+message SetGroupMsgReadStatusReq
+{	
+	required uint64 group_id                    	= 1; //群id
+	repeated uint64 msgids 							= 2; //消息ID数组
+}
+
+//标记群消息已读回调	
+message SetGroupMsgReadStatusAck
+{	
+	required Ret ret                            	= 1;
+	optional uint64 group_id                    	= 2; //群id
+    repeated fixed64 msgids            				= 3; //请求时传递的msgid列表
+}	
+	
+//标记群消息已读通知	
+message SetGroupMsgReadStatusNoti
+{	
+	required uint64 group_id 						= 1; //被阅读的群
+    optional CidUid user 							= 2; //阅读方（消息接收方）
+    optional uint32 dev 							= 3; //阅读方（消息接收方）设备
+    repeated fixed64 msgids 						= 4; //阅读的消息id list
+    optional uint32 time 							= 5; //阅读时间
+    optional GroupType type 						= 6;
+}	
+	
+//------------------------------------ 获取群消息已读状态 ------------------------------------
+//获取群消息已读状态请求
+message GetGroupMsgReadStatusReq
+{
+	required uint64 group_id                    	= 1; //群id
+	repeated uint64 msgids 							= 2; //自己发阅读的消息数组
+	repeated uint64 recv_msgids 					= 3; //别人发的消息ID数组
+}
+
+//获取群消息已读状态回调
+message GetGroupMsgReadStatusAck
+{	
+    required Ret ret 								= 1;
+    repeated GroupProto.GroupMsgReadStatus datas 	= 2; //自己发的消息阅读状态返回
+    repeated fixed64 recv_msgids 					= 3; //别人发的消息，只返回未读的，已读的不返回
+}
+
+//------------------------------------ 获取群消息阅读详情 ------------------------------------
+//获取群消息阅读详情请求
+message GetGroupMsgReadDetailReq
+{
+	required uint64 group_id                    	= 1; //群id
+	required uint64 msgid							= 2; //阅读的消息id
+}
+
+//获取群消息阅读详情回调
+message GetGroupMsgReadDetailAck
+{
+    required Ret ret 								= 1;
+    repeated GroupProto.GroupMsgReadDetail datas 	= 2;
+}	
+	
+//------------------------------------ 保存群聊草稿信息 ------------------------------------
+//保存群聊草稿信息请求
+message SaveGroupChatDraftMsgReq
+{
+	required uint64 group_id						= 1;
+	optional string msg                    			= 2; //消息内容
+}
+
+//保存群聊草稿信息回调	
+message SaveGroupChatDraftMsgAck
+{	
+	required Ret ret								= 1;
+	optional uint64 group_id                    	= 2; //群id
+}	
+	
+//------------------------------------ 获取群聊草稿信息 ------------------------------------
+//获取群聊草稿信息请求	
+message GetGroupChatDraftMsgReq	
+{
+	required uint64 group_id						= 1;
+}
+
+//获取群聊草稿信息回调	
+message GetGroupChatDraftMsgAck
+{	
+	required Ret ret								= 1;
+	optional uint64 group_id                    	= 2; //群id
+    optional bytes content          				= 3; //草稿内容
+}	
+	
+//------------------------------------ 删除群聊草稿信息 ------------------------------------
+//删除群聊草稿信息请求	
+message DeleteGroupChatDraftMsgReq
+{
+	required uint64 group_id						= 1;
+}
+
+//删除群聊草稿信息回调
+message DeleteGroupChatDraftMsgAck	
+{	
+	required Ret ret								= 1;
+	optional uint64 group_id                    	= 2; //群id
+}	
+
+//------------------------------------ 获取本地群聊消息（可合并） ------------------------------------
+//获取本地群聊消息请求
+message GetLocalGroupMsgReq
+{
+	required uint64 group_id                        = 1;
+	optional uint64 start_msgid						= 2;//消息的起始ID (start_msgid >= end_msgid）
+	optional uint64 end_msgid						= 3;//消息的结束ID (start_msgid >= end_msgid）
+	optional uint32 max_num							= 4;//同步消息数量
+	optional uint32 kind							= 5;//消息类型, 如: 0=不限，1001=文本消息	   
+}
+
+//获取本地群聊消息回调
+message GetLocalGroupMsgAck
+{
+	required Ret ret								= 1;
+    optional uint32 end_flag  						= 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+	repeated GroupMsgDataEx datas 					= 3;
+}
+
+//------------------------------------ 保存发送失败的群聊消息 ------------------------------------
+//保存发送失败的群聊消息请求
+message SaveFailedGroupMsgReq
+{
+	required uint64 group_id						= 1;
+	optional uint64 cli_msgid						= 2;//消息ID: 用于服务器端去重，客户端要保证clientMsgId唯一，建议timestamp+incr
+	optional string msg								= 3;//发送失败的消息
+	optional uint32 kind							= 4;
+}
+
+//保存发送失败的群聊消息回调
+message SaveFailedGroupMsgAck
+{
+	required Ret ret								= 1;
+	optional uint64 cli_msgid                      	= 2;
+}
+
+//------------------------------------ 删除发送失败的群聊消息 ------------------------------------
+//删除发送失败的群聊消息请求
+message DeleteFailedGroupMsgReq
+{
+	required uint64 group_id						= 1;
+	optional uint64 cli_msgid                      	= 2;
+}
+
+//删除发送失败的群聊消息回调
+message DeleteFailedGroupMsgAck
+{
+	required Ret ret								= 1;
+	optional uint64 cli_msgid                      	= 2;
+}
+
+//------------------------------------ 初始化本地历史查看群聊消息 ------------------------------------
+//初始化本地历史查看群聊消息请求
+message InitLocalHistoryViewGroupMsgReq
+{
+	required uint64 group_id						= 1;
+	optional uint32 page_size                       = 2; //分页大小
+	repeated uint32 kinds 							= 3; //消息的种类
+}
+
+//初始化本地历史查看群聊消息回调
+message InitLocalHistoryViewGroupMsgAck
+{
+	required Ret ret								= 1;
+	optional uint32 page_size                       = 2; //分页大小
+	optional uint32 total_page                      = 3; //总页数
+	repeated uint32 kinds 							= 4; //消息的种类
+}
+
+//------------------------------------ 获取本地历史查看群聊消息 ------------------------------------
+//获取本地历史查看群聊消息请求
+message GetLocalHistoryViewGroupMsgReq
+{
+	required uint64 group_id						= 1;
+	optional uint32 page_index                      = 2; //页号: 从1开始
+}
+
+//获取本地历史查看群聊消息回调
+message GetLocalHistoryViewGroupMsgAck
+{
+	required Ret ret								= 1;
+	optional uint32 pagesize                        = 2; //分页大小
+	optional uint32 cur_page_index                  = 3; //当前页所处页号
+	optional uint32 total_page                      = 4; //总页数
+	repeated uint32 msgkinds 						= 5; //消息的种类
+	repeated GroupMsgDataEx datas 					= 6;
+}
+
+//------------------------------------ 获取本地历史查看群聊消息的页号 ------------------------------------
+//获取本地历史查看群聊消息的页号请求
+message GetLocalHistoryViewGroupMsgPageIndexReq
+{
+	required uint64 group_id						= 1;
+	optional uint64 msgid                          	= 2; //消息ID
+}
+
+//获取本地历史查看群聊消息的页号回调
+message GetLocalHistoryViewGroupMsgPageIndexAck
+{
+	required Ret ret								= 1;
+	optional uint32 page_size                       = 2; //分页大小
+	optional uint32 total_page                      = 3; //总页数
+	optional uint64 msgid                      		= 4; //msgid
+	optional uint32 page_index                      = 5; //该消息所处页号
+	repeated uint32 msgkinds 						= 6; //消息的种类
+}
+
+//------------------------------------ 从历史查看中搜索本地群聊消息 ------------------------------------
+//从历史查看中搜索本地群聊消息请求
+message SearchLocalHistoryViewGroupMsgReq
+{
+	required uint64 group_id							= 1;
+	optional uint64 start_msgid                         = 2; //消息的起始ID[必传]: 第一次传GetMaxMsgId()返回值，后面每次传上次返回结果的最小msgid的nextid
+	optional uint32 page_size                           = 3; //分页大小
+	optional string keyword								= 4; //
+}
+
+//从历史查看中搜索本地群聊消息回调
+message SearchLocalHistoryViewGroupMsgAck
+{
+	required Ret ret									= 1;
+	repeated GroupMsgDataEx datas 						= 2;
+}
+
+//------------------------------------ 清空本地历史群聊消息 ------------------------------------
+//清空本地历史群聊消息回调
+message ClearLocalHistoryGroupMsgReq
+{
+	required uint64 group_id                        	= 1;
+}
+
+//清空本地历史群聊消息回调
+message ClearLocalHistoryGroupMsgAck
+{
+	required Ret ret									= 1;
+}
+
+
+//------------------------------------ 屏蔽群消息------------------------------------
+//屏蔽群消息请求	
+message GroupMsgScreenReq	
+{	
+    required uint64 group_id 							= 1; //群标识
+    required uint64 msgid 								= 2; //消息ID
+    optional uint32 kind 								= 3; //消息种类, 如：1001=文本
+    optional string msg 								= 4; //消息
+    optional string title 								= 5; //session副标题
+}
+
+//屏蔽群消息回调	
+message GroupMsgScreenAck	
+{	
+    required Ret ret 									= 1; //0：成功；1210：没权限
+    optional uint32 msgtime 							= 2; //消息撤回时间
+}	
+	
+//屏蔽群消息通知	
+message GroupMsgScreenNoti
+{	
+	optional uint64 group_id 							= 1;
+    optional GroupType type 							= 2;
+	optional uint32	dev									= 3;	//消息撤回方设备
+    optional GroupMsgDataEx data            			= 4;
+}
+
+//------------------------------------ 获取匿名信息 ------------------------------------
+//获取匿名信息请求
+message GetAnonymousReq
+{
+	repeated uint64 group_ids							= 1; //群id
+}		
+
+//获取匿名信息回调		
+message GetAnonymousAck		
+{
+    required Ret ret 									= 1;
+    repeated DataProto.AnonymousData datas 				= 2;
+}

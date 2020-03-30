@@ -1,0 +1,120 @@
+syntax = "proto2";
+package sdk.user_relation;
+
+import "base.proto";
+import "user_relation.proto";
+
+
+//------------------------------------ 申请加为好友 ------------------------------------
+//申请加为好友请求
+message ApplyFriendReq
+{
+	required CidUid user		  			= 1; //待添加的用户
+	optional string mark					= 2; //附加信息：申请理由
+}
+
+//申请加为好友回调
+message ApplyFriendAck
+{
+    required Ret ret = 1;
+}
+
+//申请加为好友通知
+message ApplyFriendNoti
+{
+    optional CidUid user    				= 1;    //申请者
+    optional uint32 dev     				= 2;    //申请者设备
+}
+
+//------------------------------------ 好友申请回复 ------------------------------------
+//好友申请回复请求
+message ReplyFriendReq
+{
+	required CidUid user		  			= 1; //待添加的用户
+    optional uint64 msgid					= 2; //申请的消息ID
+    optional uint32 deal					= 3; //处理状态：0=待处理，1=同意，2=拒绝，3=取消或忽略
+	optional string mark					= 4; //附加信息：理由
+}
+
+//好友申请回复回调
+message ReplyFriendAck
+{
+    required Ret ret 						= 1;
+}
+
+//好友申请回复通知
+message ReplyFriendNoti
+{
+    optional CidUid user    				= 1; //回复者
+    optional uint32 deal    				= 2; //回复者处理结果：0：拒绝、1：接受、2：忽略
+    optional bytes msg      				= 3; //回复者附带消息
+    optional uint32 dev     				= 4; //回复者设备
+}
+
+//------------------------------------ 获取好友列表 ------------------------------------
+//获取好友列表请求
+message GetFriendListReq
+{
+    optional string reserved 				= 1; //预留：可传空
+}
+
+//获取好友列表回调
+message GetFriendListAck
+{
+    required Ret ret = 1;
+    repeated DataProto.UserFriendData datas = 2;    //好友列表数据 root/data/proto/user_relation.proto
+}
+
+//------------------------------------ 搜索外部联系人用户关系信息 ------------------------------------
+//搜索用户信息请求
+message SearchUserRelationInfoReq
+{
+	optional string corp 					= 1;//团队名称: flag=2时有效, 其它可不传
+	required uint32 flag 					= 2;//搜索标识：必须精确搜索，0：手机号，1：邮箱，2：账号
+	optional string mobile 					= 3;//手机号码: flag=0时必传
+	optional string email 					= 4;//邮箱地址: flag=1时必传
+	optional string account 				= 5;//账号名称: flag=2时必传
+}
+
+//搜索用户信息回调
+message SearchUserRelationInfoAck
+{
+    required Ret ret = 1;
+    repeated DataProto.UserRelationInfoData datas = 2;    //用户信息数据，包含好友关系 root/data/proto/user_relation.proto
+}
+
+//------------------------------------ 解除好友关系 ------------------------------------
+//解除好友关系请求
+message RemoveFriendReq
+{
+    required CidUid user 					= 1;
+}
+
+//解除好友关系回调
+message RemoveFriendAck
+{
+    required Ret ret 						= 1;
+}
+
+//解除好友关系通知
+message RemoveFriendNoti
+{
+    optional CidUid from    				= 1; //解除操作发起者
+    optional CidUid to      				= 2; //被解除的用户
+    optional uint32 dev     				= 3; //解除操作发起者的设备
+}
+
+//------------------------------------ 获取用户好友关系 ------------------------------------
+//获取用户好友关系请求
+message GetFriendRelationReq
+{
+    optional CidUid user    				= 1; //若为空则采用HEADER里的cid/uid
+    repeated CidUid users      				= 2; //
+}
+
+//获取用户好友关系回调
+message GetFriendRelationAck
+{
+    required Ret ret = 1;
+    repeated DataProto.UserFriendData datas = 2;    //用户好友关系数据 root/data/proto/user_relation.proto
+}

@@ -1,0 +1,338 @@
+syntax = "proto2";
+package sdk.ppchatmsg;
+
+import "base.proto";
+import "single_msg.proto";
+
+
+//单聊消息的结构
+message SingleMsgDataEx
+{
+	optional uint32 version								= 1;
+	optional fixed64 ser_msgid							= 2;
+	optional uint64 from_cid							= 3;
+	optional uint64 from_uid							= 4;
+	optional uint32 msgtime								= 5;
+	optional bytes msg									= 6;
+	optional fixed64 next_id							= 7;
+	optional uint32 kind								= 8; //消息种类，见 constants.h中消息种类常量定义
+	optional uint32 cli_msg_status						= 9; //消息的状态，0: 正常状态的消息，1: 发送失败的消息
+}
+
+//按用户拉取单聊消息的结构
+message SingleMsgSyncResDataEx
+{
+	required Ret ret									= 1;
+	optional uint64 from_cid							= 2;
+	optional uint64 from_uid							= 3;
+	optional uint32 max_num								= 4;
+	repeated SingleMsgDataEx datas						= 5;
+}
+
+//------------------------------------ 发送单聊消息 ------------------------------------
+//发送单聊消息请求
+message SendSingleMsgReq
+{
+	optional uint64 cli_msgid                      		= 1;
+    required CidUid user 								= 2;
+    optional uint32 kind 								= 3; //消息类型, 如: 1001=文本消息
+	optional string msg 								= 4; //发送消息
+	optional string title 								= 5; //副标题: 若为空，则由SDK负责组装
+}
+
+//发送单聊消息回调
+message SendSingleMsgAck
+{
+	required Ret ret                                    = 1;
+	optional CidUid to_user                             = 2; //接收方
+	optional fixed64 cli_msgid                          = 3; //发送时传递的client_msgid
+	optional fixed64 ser_msgid                          = 4; //发送成功时的服务器消息id
+	optional fixed64 pre_msgid                          = 5; //发送成功时的服务器上一条消息id	
+	optional uint32 msgtime                             = 6; //发送成功时的消息时间
+	optional uint32 version                             = 7; //发送成功时的消息版本号
+}
+
+//发送单聊消息通知
+message SendSingleMsgNoti
+{
+	optional CidUid target                          	= 1; //目标(会话)： 同账号不同设备则为to_cid, 不同账号则为from_cid
+	optional uint32	dev                            		= 2; //发发送方设备
+	optional uint32 top 								= 3; //是否将会话置顶，默认0或者不传：不置顶（保持原有），1：将会话重新置顶；2：将会话强制置顶（用户不可以取消）
+	optional uint32 remind 								= 4; //免打扰信息，0或不传:保持原有；1：消息免打扰；2：消息屏蔽（暂不使用），3：设置接收提醒
+    optional SingleMsgDataEx data             			= 5;
+}
+
+//------------------------------------ 指定msgid获取单聊消息(仅sdk内部使用) ------------------------------------
+//指定msgid获取单聊消息请求
+message GetSingleMsgByMsgidReq
+{
+    required CidUid user 								= 1;
+    required uint64 msgid 								= 2;
+}
+
+//指定msgid获取单聊消息回调
+message GetSingleMsgByMsgidAck
+{
+	required Ret ret                                    = 1;
+	optional SingleMsgDataEx data             			= 2;
+}
+
+//------------------------------------ 指定kind获取单聊消息 ------------------------------------
+//指定kind获取单聊消息请求
+message GetSingleMsgByKindReq
+{
+	required SingleProto.SyncSingleMsgReqData cond      = 1;
+	required uint32 kind								= 2;//消息种类, 如: 1001=文本消息
+}                                                            
+                                                             
+//指定kind获取单聊消息请求                                   
+message GetSingleMsgByKindAck                                
+{                                                            
+	required Ret ret                                    = 1; 
+    optional uint32 end_flag  							= 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+    repeated SingleMsgDataEx datas            			= 3;
+}
+
+//------------------------------------ 获取单聊消息 ------------------------------------
+//获取单聊消息请求
+message GetSingleMsgReq
+{
+	required SingleProto.SyncSingleMsgReqData cond		= 1;
+}
+
+//获取单聊消息请求
+message GetSingleMsgAck
+{
+	required Ret ret                                    = 1;
+    optional uint32 end_flag  							= 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+	repeated SingleMsgDataEx datas     					= 3;
+}
+
+//------------------------------------ 标记单聊消息已读 ------------------------------------
+//标记单聊消息已读请求
+message SetSingleMsgReadStatusReq
+{
+	required CidUid user                    			= 1;
+	repeated uint64 msgids 								= 2; //消息ID数组
+}
+
+//标记单聊消息已读请求
+message SetSingleMsgReadStatusAck
+{
+	required Ret ret                                    = 1; 
+    optional uint64 cid                            		= 2; //目标用户cid(废弃)
+	optional uint64 uid                            		= 3; //目标用户uid(废弃)
+    repeated fixed64 msgids            					= 4; //请求时传递的msgid列表(废弃)
+}                                                           
+
+//标记单聊消息已读通知                                       
+message SetSingleMsgReadStatusNoti                           
+{                                                            
+	required CidUid user								= 1; //阅读方（消息接收方）
+	optional uint32	dev									= 2; //阅读方（消息接收方）设备
+	repeated fixed64 msgids								= 3; //阅读的消息id列表
+	optional uint32 time								= 4; //阅读时间
+}
+
+//------------------------------------ 获取单聊消息已读状态 ------------------------------------
+//获取单聊消息已读状态请求
+message GetSingleMsgReadStatusReq
+{
+	required CidUid user                    			= 1;
+	repeated uint64 msgids 								= 2; //自己发阅读的消息数组
+	repeated uint64 recv_msgids 						= 3; //别人发的消息ID数组
+}
+
+//获取单聊消息已读状态回调
+message GetSingleMsgReadStatusAck
+{
+	required Ret ret                                    = 1;
+    repeated MsgReadStatus datas	                    = 2; //我发送的消息状态
+    repeated fixed64 recv_msgids	                    = 3; //我接收的消息，未读的列表，已读的不返回
+	optional CidUid user		                        = 4; //消息接收方
+}
+
+//------------------------------------ 保存单聊草稿信息 ------------------------------------
+//保存单聊草稿信息请求
+message SaveSingleChatDraftMsgReq
+{
+	required CidUid user                            	= 1;
+	optional string msg                    				= 2; //消息内容
+}
+
+//保存单聊草稿信息回调
+message SaveSingleChatDraftMsgAck
+{
+	required Ret ret									= 1;
+	optional CidUid user                            	= 2; //目标用户
+}
+
+//------------------------------------ 获取单聊草稿信息 ------------------------------------
+//获取单聊草稿信息回调
+message GetSingleChatDraftMsgReq
+{
+	required CidUid user                            	= 1;
+}
+
+//获取单聊草稿信息回调
+message GetSingleChatDraftMsgAck
+{
+	required Ret ret									= 1;
+	optional CidUid user                            	= 2; //目标用户
+    optional bytes content          					= 3; //草稿内容
+}
+
+//------------------------------------ 删除单聊草稿信息 ------------------------------------
+//删除单聊草稿信息回调
+message DeleteSingleChatDraftMsgReq
+{
+	required CidUid user                            	= 1;
+}
+
+//删除单聊草稿信息回调
+message DeleteSingleChatDraftMsgAck
+{
+	required Ret ret									= 1;
+	optional CidUid user                            	= 2; //目标用户
+}
+
+//------------------------------------ 获取本地单聊消息 ------------------------------------
+//获取本地单聊消息请求
+message GetLocalSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint64 start_msgid							= 2; //消息的起始ID (start_msgid >= end_msgid）
+	optional uint64 end_msgid							= 3; //消息的结束ID (start_msgid >= end_msgid）
+	optional uint32 max_num								= 4; //同步消息数量
+	optional uint32 kind								= 5; //消息类型, 如: 0=不限，1001=文本消息	 
+}
+
+//获取本地单聊消息回调
+message GetLocalSingleMsgAck
+{
+	required Ret ret									= 1;
+    optional uint32 end_flag  							= 2;//[start, end)区间内的结束标记：0=结束，1=未结束
+	repeated SingleMsgDataEx datas 						= 3;
+}
+
+//------------------------------------ 保存发送失败的单聊消息 ------------------------------------
+//保存发送失败的单聊消息请求
+message SaveFailedSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint64 cli_msgid							= 2;//消息ID: 用于服务器端去重，客户端要保证clientMsgId唯一，建议timestamp+incr
+	optional string msg									= 3;//发送失败的消息
+	optional uint32 kind								= 4;
+}
+
+//保存发送失败的单聊消息回调
+message SaveFailedSingleMsgAck
+{
+	required Ret ret									= 1;
+	optional uint64 cli_msgid                      		= 2;
+}
+
+//------------------------------------ 删除发送失败的单聊消息 ------------------------------------
+//删除发送失败的单聊消息请求
+message DeleteSavedFailedSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint64 cli_msgid                      		= 2;
+}
+
+//删除发送失败的单聊消息回调
+message DeleteSavedFailedSingleMsgAck
+{
+	required Ret ret									= 1;
+	optional uint64 cli_msgid                      		= 2;
+}
+
+//------------------------------------ 初始化本地历史查看单聊消息 ------------------------------------
+//初始化本地历史查看单聊消息请求
+message InitLocalHistoryViewSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint32 page_size                           = 2; //分页大小
+	repeated uint32 kinds 								= 3; //消息的种类
+}
+
+//初始化本地历史查看单聊消息回调
+message InitLocalHistoryViewSingleMsgAck
+{
+	required Ret ret									= 1;
+	optional uint32 pagesize                            = 2; //分页大小
+	optional uint32 total_page                          = 3; //总页数
+	repeated uint32 msgkinds 							= 4; //消息的种类
+}
+
+//------------------------------------ 获取本地历史查看单聊消息 ------------------------------------
+//获取本地历史查看单聊消息请求
+message GetLocalHistoryViewSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint32 page_index                          = 2; //页号: 从1开始
+}
+
+//获取本地历史查看单聊消息回调
+message GetLocalHistoryViewSingleMsgAck
+{
+	required Ret ret									= 1;
+	optional uint32 pagesize                            = 2; //分页大小
+	optional uint32 cur_page_index                      = 3; //当前页所处页号
+	optional uint32 total_page                          = 4; //总页数
+	repeated uint32 msgkinds 							= 5; //消息的种类
+	repeated SingleMsgDataEx datas 						= 6;
+}
+
+//------------------------------------ 获取本地历史查看单聊消息的页号 ------------------------------------
+//获取本地历史查看单聊消息的页号请求
+message GetLocalHistoryViewSingleMsgPageIndexReq
+{
+	required CidUid user                            	= 1;
+	optional uint64 msgid                          		= 2; //消息ID
+}
+
+//获取本地历史查看单聊消息的页号回调
+message GetLocalHistoryViewSingleMsgPageIndexAck
+{
+	required Ret ret									= 1;
+	optional uint32 pagesize                            = 2; //分页大小
+	optional uint32 total_page                          = 3; //总页数
+	optional uint64 msgid                      			= 4; //msgid
+	optional uint32 page_index                          = 5; //该消息所处页号
+	repeated uint32 msgkinds 							= 6; //消息的种类
+}
+
+//------------------------------------ 从历史查看中搜索本地单聊消息 ------------------------------------
+//根据人员和关键字搜索本地单聊消息请求
+message SearchLocalHistoryViewSingleMsgReq
+{
+	required CidUid user                            	= 1;
+	optional uint64 start_msgid                         = 2; //消息的起始ID[必传]: 第一次传GetMaxMsgId()返回值，后面每次传上次返回结果的最小msgid的nextid
+	optional uint32 page_size                           = 3; //分页大小
+	optional string keyword								= 4; //
+}
+
+//根据人员和关键字搜索本地单聊消息回调
+message SearchLocalHistoryViewSingleMsgAck
+{
+	required Ret ret									= 1;
+	repeated SingleMsgDataEx datas 						= 2;
+}
+
+//------------------------------------ 清空本地历史单聊消息 ------------------------------------
+//清空本地历史单聊消息请求
+message ClearLocalHistorySingleMsgReq
+{
+	required CidUid user                            	= 1;
+}
+
+//清空本地历史单聊消息回调
+message ClearLocalHistorySingleMsgAck
+{
+	required Ret ret									= 1;
+}
+
+
+
+

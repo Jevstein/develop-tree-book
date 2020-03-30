@@ -1,0 +1,554 @@
+syntax = "proto2";
+package sdk.group;
+
+import "base.proto";
+import "group_base.proto";
+import "group.proto";
+//import "group_robot.proto";
+
+//------------------------------------ 创建群 ------------------------------------
+// 创建群请求
+message CreateGroupReq
+{
+	optional string name                                = 1; //群名称
+    optional uint32 source 								= 2; //创建渠道, 默认为0
+    repeated CidUid users 								= 3; //群成员列表，默认为空
+}
+
+// 创建群回调
+message CreateGroupAck
+{
+	required Ret ret                                    = 1;
+    optional uint32 type 								= 2; //群类型
+    optional uint64 group_id 							= 3; //群id
+    optional bytes name 								= 4; //群名称
+    optional uint32 limit_num 							= 5; //服务器限制群最大人数
+}
+
+//------------------------------------ 解散群 ------------------------------------
+// 解散群请求
+message DestroyGroupReq
+{
+    optional uint64 group_id 							= 1; //群id
+}
+
+// 解散群回调
+message DestroyGroupAck
+{
+    required Ret ret 									= 1;
+}
+
+// 解散群通知
+message DestroyGroupNoti
+{
+    required uint64 group_id 							= 1;
+    optional GroupType type 							= 2;
+    optional CidUid user 								= 3;
+    optional uint32 time 								= 4; //解散时间
+}
+
+//------------------------------------ 邀请入群 ------------------------------------
+// 邀请入群请求
+message InviteToGroupReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated CidUid users 								= 2; //群成员列表
+}
+
+// 邀请入群回调
+message InviteToGroupAck
+{
+	required Ret ret                                    = 1;
+    optional uint64 group_id 							= 2;
+    optional uint32 type 								= 3;
+    optional uint32 time 								= 4; //邀请时间
+    optional uint32 limit_num 							= 5; //服务器限制群最大人数
+    repeated GroupProto.GroupInviteResult results 		= 6;
+}
+
+// 邀请入群通知
+message InviteToGroupNoti
+{
+    optional uint64 group_id 							= 1;
+    optional uint32 type 								= 2; 
+    optional uint32 time 								= 3; //邀请时间
+    optional CidUid inviter 							= 4; //邀请人
+    repeated CidUid invitee 							= 5; //被邀请人
+}
+
+//------------------------------------ 退出群 ------------------------------------
+// 退出群请求
+message ExitGroupReq
+{
+    required uint64 group_id 							= 1; //群id
+}
+
+// 退出群回调
+message ExitGroupAck
+{
+	required Ret ret                                    = 1;
+    optional uint64 group_id							= 2;
+    optional uint32 type								= 3;
+}
+
+// 退出群通知
+message ExitGroupNoti
+{
+    optional uint64 group_id							= 1;
+    optional uint32 type								= 2;
+    optional CidUid user								= 3;
+    optional uint32 dev									= 4;
+}
+
+//------------------------------------ 踢群成员 ------------------------------------
+// 踢群成员请求
+message KickGroupMemberReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated CidUid users 								= 2; //群成员列表
+}
+
+// 踢群成员回调
+message KickGroupMemberAck
+{
+    required Ret ret 									= 1;
+    optional uint64 group_id 							= 2;
+    optional GroupType type 							= 3;
+    repeated GroupProto.GroupInviteResult users 		= 4; //返回的是踢出失败的用户信息，判断users大小为0，则全部踢出成功，若是不为0，则返回踢出失败的用户，以及错误码；
+}
+
+// 踢群成员通知
+message KickGroupMemberNoti
+{
+    optional uint64 group_id							= 1;
+    optional GroupType type								= 2;
+    optional CidUid kicker								= 3; //踢人者
+    repeated CidUid kickee								= 4; //被踢者
+}
+
+//------------------------------------ 修改群信息 ------------------------------------
+// 修改群信息请求
+message ModifyGroupInfoReq
+{
+    required uint64 group_id 							= 1; //群id
+    required uint32 mask								= 2; //修改参数：0=群名称, 1=群公告, 4=群主转让, 5=在群列表中是否显示, 6=消息打扰设置
+	optional string groupname							= 3; //群名称[mask=0时必传]
+	optional string announce							= 4; //群公告[mask=1时必传]
+	optional CidUid host								= 5; //转让用户[mask=4时必传]
+    optional uint32 display								= 6; //在群列表中是否显示[mask=5时必传]: 0=不显示，1=显示
+    optional uint32 mute								= 7; //消息免打扰设置[mask=6时必传]：0=不设置，1=设置
+}
+
+// 修改群信息回调
+message ModifyGroupInfoAck
+{
+    required Ret ret									= 1;
+    optional uint64 group_id							= 2;
+    optional GroupType type								= 3;
+    optional uint32 mask								= 4;
+}
+
+// 修改群信息通知
+message ModifyGroupInfoNoti
+{
+    optional uint64 group_id							= 1;
+    optional GroupType type								= 2;
+    optional uint32 mask								= 3;
+}
+
+//------------------------------------ 设置/删除管理员 ------------------------------------
+// 设置/删除管理员请求
+message SetGroupAdminReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated CidUid users 								= 2; //群成员列表
+	optional uint32 flag								= 3; //设置标记: 不传或者0=设置管理员；1=表示删除管理员，见kSetGroupAdminFlag
+}
+
+// 设置/删除管理员回调
+message SetGroupAdminAck
+{
+    required Ret ret = 1;
+}
+
+// 设置管理员通知
+message SetGroupAdminNoti
+{
+    required uint64 group_id 							= 1; //群id
+    optional CidUid user 								= 2; //操作人，设置人
+    repeated CidUid datas 								= 3; //操作用户列表
+    optional uint32 time 								= 4; //时间
+    optional uint32 dev 								= 5; //设置设备，暂不传
+    optional uint32 flag								= 6; //不传或者0，表示设置管理员；1：表示删除管理员，常量定义：kSetGroupAdminFlag
+}
+
+//------------------------------------ 修改群头像 ------------------------------------
+// 修改群头像请求
+message ModifyGroupAvatarReq
+{
+    required uint64 group_id 							= 1; //群id
+    optional string avatar 								= 2; //群头像
+}
+
+// 修改群头像回调
+message ModifyGroupAvatarAck
+{
+    required Ret ret 									= 1;
+}
+
+// 修改群头像通知
+message ModifyGroupAvatarNoti
+{
+    required uint64 group_id							= 1;//群id
+    optional CidUid user								= 2;//修改头像人
+    optional uint32 time								= 3;//修改时间
+    optional bytes avatar								= 4;//头像id
+}
+
+//------------------------------------ 设置群开关 ------------------------------------
+// 设置群开关请求
+message SetGroupOnOffReq
+{
+    required uint64 group_id							= 1;//群id
+    optional uint32 on_off								= 2;//开启关闭: 0=关闭, 1=开启
+    required uint32 flag								= 3;//开关类型: 0=群消息阅读状态, 1=设置匿名消息开关, 2=群搜索开关, 3=群申请验证, 4=内部群搜索开关
+}
+
+// 设置群开关回调
+message SetGroupOnOffAck
+{
+    required Ret ret 									= 1;
+}
+
+//// 设置群阅读状态开关通知 - 可以合并
+//message SetGroupRSOnOffNoti
+//{
+//    required uint64 group_id 							= 1;
+//    optional CidUid user 								= 2; //操作人，设置人
+//    optional uint32 time 								= 3; //时间
+//    optional uint32 dev 								= 4; //设置设备，暂不传
+//    optional uint32 rs_onoff 							= 5; //群组消息阅读状态开启关闭，0：关闭；1：开启
+//}
+
+// 设置群组开关通知
+message SetGroupOnOffNoti
+{
+    required uint64 group_id 							= 1; //群id
+    required CidUid user 								= 2; //操作人，设置人
+    optional uint32 time 								= 3; //时间
+    optional uint32 flag 								= 4; //开关类型: 0=群消息阅读状态, 1=设置匿名消息开关, 2=群搜索开关, 3=群申请验证, 4=内部群搜索开关
+    optional uint32 on_off 								= 5; //开启关闭，0：关闭或不传；1：开启
+    optional uint32 dev 								= 6; //设备
+}
+
+//------------------------------------ 获取群信息 ------------------------------------
+// 获取群信息请求
+message GetGroupInfoReq
+{
+    optional uint32 api_get_type 						= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    repeated uint64 group_ids 							= 2; //群列表
+}
+
+// 获取群信息回调 - 根据UC获取群信息
+message GetGroupInfoAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.GroupRetInfoData datas 			= 2;
+}
+
+//// 获取群信息回调
+//message GetGroupInfoAck
+//{
+//    required Ret ret 									= 1;
+//    optional uint32 end_flag 							= 2;
+//    optional uint32 limit_num 						= 3;
+//    repeated GroupProto.GetGroupInfoData datas 		= 4;
+//}
+
+//------------------------------------ 判断当前用户是否为群成员 ------------------------------------
+// 判断当前用户是否是群成员回调
+message IsGroupMemberReq
+{
+    optional uint32 api_get_type 						= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    repeated uint64 group_ids 							= 2; //群列表
+}
+
+// 判断当前用户是否是群成员回调
+message IsGroupMemberAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.GroupMemberData datas 			= 2;
+}
+
+//------------------------------------ 获取群操作记录 ------------------------------------
+// 获取群操作记录请求
+message GetGroupOperNoteReq
+{
+    required uint64 group_id 							= 1; //群id
+	optional uint32 id		 							= 2; //分页操作标识：分页时为上一页的最后一条数据的id，首页默认为0
+}
+
+// 获取群操作记录回调
+message GetGroupOperNoteAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.GroupOperNote datas 			= 2;
+}
+
+//------------------------------------ 获取群操作记录关联 ------------------------------------
+// 获取群操作记录关联请求
+message GetGroupOperRelReq
+{
+    required uint64 group_id 							= 1; //群id
+	optional uint32 id		 							= 2; //操作序号：对应群操作记录中的操作序号
+}
+
+// 获取群操作记录关联回调
+message GetGroupOperRelAck
+{
+    required Ret ret 									= 1;
+    repeated CidUid users 								= 2; //操作用户列表
+}
+
+//------------------------------------ 获取群列表 ------------------------------------
+// 获取群列表请求
+message GetGroupListReq
+{
+    optional uint32 api_get_type 						= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    optional uint32 group_type 							= 2;//群类型: 0=普通群，1=小助手群，2=服务群
+}
+
+// 获取群列表回调
+message GetGroupListAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.SyncGroupListData datas 		= 2;
+}
+
+//------------------------------------ 分页获取群广场列表 ------------------------------------
+// 分页获取群广场列表请求
+message GetGroupSquareByPageReq
+{
+    optional uint32 api_get_type 						= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    optional uint32 begin_pos 							= 2; //起始位置：0或者不传则获取最新的群列表
+    required uint32 page_size 							= 3; //页大小
+    optional uint32 type 								= 4; //类型：0内部群广场 3话题群广场
+}
+
+// 分页获取群广场列表回调
+message GetGroupSquareByPageAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.GetGroupInfoData datas 			= 2;
+    optional uint32 next_pos 							= 3; // 下次请求的需要的begin_pos
+    optional uint32 end_flag 							= 4; // 0 获取完成。1 代表未完成
+}
+
+//------------------------------------ 获取群成员列表 ------------------------------------
+// 获取群成员列表请求
+message GetGroupMemberListReq
+{
+    optional uint32 api_get_type 						= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    required uint64 group_id 							= 2; //群id
+}
+
+// 获取群成员列表回调
+message GetGroupMemberListAck
+{
+    required Ret ret 									= 1;
+    optional uint64 group_id 							= 2;
+    optional GroupType type 							= 3;
+    optional DataSyncType sync_type 					= 4;
+    optional uint32 member_mask 						= 5;
+    optional uint32 total_num 							= 6;
+    optional uint32 end_flag 							= 7;
+    repeated GroupProto.SyncGroupMemberListData datas 	= 8;
+}
+
+//------------------------------------ 全局搜索群（用于搜索外部联系人群组） ------------------------------------
+// 全局搜索群请求
+message SearchGlobalGroupReq
+{
+	message Cond
+	{
+		required uint32 flag 		= 1;//搜索方式：0=按名字搜索, 1=按群id搜索
+		optional string name		= 2;//按名字搜索[flag=1时必传]
+		optional uint64 group_id	= 3;//按群id搜索[flag=2时必传]
+	}
+	optional uint32 start_id 							= 1;//每次查询开始group_id
+	optional uint32 page_number 						= 2;//每页个数
+	optional Cond cond									= 3;
+}
+
+// 全局搜索群回调
+message SearchGlobalGroupAck
+{
+    required Ret ret 									= 1;
+    repeated GroupProto.SearchGroupInfoData datas 		= 2;
+    optional uint32 flag 								= 3; // 标记是否搜索完成
+}
+
+//------------------------------------ 申请入群 ------------------------------------
+// 申请入群回调
+message JoinGroupReq
+{
+    required uint64 group_id 							= 1; //群id
+    optional string mark 								= 2; //申请理由：可不填写，限制长度100个字节
+}
+
+// 申请入群回调
+message JoinGroupAck
+{
+    required Ret ret 									= 1;
+    optional uint32 flag 								= 2; //0或者不传，表示不需要验证；1：表示需要管理员接受才能加入，常量定义中：kGroupJoinFlag
+}
+
+//------------------------------------ 接受申请入群 ------------------------------------
+// 接受申请入群请求
+message GroupApplyReplyReq
+{
+    required uint64 group_id 							= 1; //群id
+    optional uint32 deal 								= 2; //处理的状态：同意 1, 拒绝 2, 忽略 3
+    optional CidUid user 								= 3; //被处理人
+    optional string mark 								= 4; //申请理由: 可不填写，限制长度100个字节
+    optional uint64 msgid 								= 5; //消息id
+}
+
+// 接受申请入群回调
+message GroupApplyReplyAck
+{
+    required Ret ret 									= 1;
+    optional bytes msg 									= 2;
+}
+
+// 用户申请入群通知
+message GroupApplyReplyNoti
+{
+    optional uint64 group_id 							= 1;
+    optional CidUid user 								= 2; // 处理者 申请入群，如果群设置不需要验证user为空，否则为处理者
+    optional CidUid tuser 								= 3; // 申请者
+    optional uint32 time 								= 4; // 进群时间
+}
+
+//------------------------------------ 设置群成员可拉取加入群之前的历史消息的权限(群主/管理员可设置) ------------------------------------
+// 设置群成员可拉取加入群之前的历史消息的权限请求
+message SetGroupMsgPrivilegeReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated CidUid users 								= 2; //指定的群成员：为空则表示设置群组成员的全局权限
+    optional int32 max_num 								= 3; //可拉取的条数: -1:不可拉取, 0或者不传:可拉取全部消息, >0:可拉取的条数
+}
+
+// 设置群成员可拉取加入群之前的历史消息的权限回调
+message SetGroupMsgPrivilegeAck
+{
+    required Ret ret									= 1;
+}
+
+// 设置群成员可拉取加入群之前的历史消息的权限通知
+message SetGroupMsgPrivilegeNoti
+{
+    optional uint64 group_id							= 1;
+	repeated CidUid users								= 2; //设置指定群成员的权限，为空则设置群组成员的全局权限
+	optional int32 max_num								= 3;
+}
+
+//------------------------------------ 删除群成员可拉取加入群之前的历史消息的个人权限（群主/管理员可删除） ------------------------------------
+// 删除群成员可拉取加入群之前的历史消息的个人权限回调
+message DelGroupMsgPrivilegeReq
+{
+    required uint64 group_id 							= 1; //群id
+	repeated CidUid users								= 2; //设置指定群成员的权限，为空则设置群组成员的全局权限
+}
+
+// 删除群成员可拉取加入群之前的历史消息的个人权限回调
+message DelGroupMsgPrivilegeAck
+{
+    required Ret ret									= 1;
+}
+
+// 删除群成员可拉取加入群组之前的历史消息的个人权限通知
+message DelGroupMsgPrivilegeNoti
+{
+	optional uint64 group_id							= 1;
+	repeated CidUid users								= 2; //要删除个人权限的用户列表
+}
+
+//------------------------------------ 添加群标签 ------------------------------------
+// 添加群标签请求
+message AddGroupLabelReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated string labels 								= 2; //标签内容数组: 群标签字符串最大长度限制为60
+}
+
+// 添加群标签回调
+message AddGroupLabelAck
+{
+    required Ret ret 									= 1;
+    optional uint32 num_limit 							= 2; //单次请求标签数量限制
+    optional uint32 con_limit 							= 3; //单个标签内容长度限制
+}
+
+// 添加群标签通知
+message AddGroupLabelNoti
+{
+    optional uint64 group_id 							= 1;
+    optional uint32 dev                                 = 2;
+	repeated bytes labels 								= 3;
+}
+
+//------------------------------------ 删除群标签 ------------------------------------
+// 删除群标签请求
+message DelGroupLabelReq
+{
+    required uint64 group_id 							= 1; //群id
+    repeated string labels 								= 2; //标签内容数组: 群标签字符串最大长度限制为60
+}
+
+// 删除群标签回调
+message DelGroupLabelAck
+{
+    required Ret ret 									= 1;
+    optional uint32 num_limit 							= 2; //单次请求标签数量限制
+    optional uint32 con_limit 							= 3; //单个标签内容长度限制
+}
+
+// 删除群标签通知
+message DelGroupLabelNoti
+{
+    optional uint64 group_id 							= 1;
+	repeated bytes labels 								= 2;
+}
+
+//------------------------------------ 获取所有群标签 ------------------------------------
+// 获取所有群标签请求
+message GetAllGroupLabelReq
+{
+    optional uint32 id									= 1; //起始id: 分页拉取时上一页返回的最大id，首页传0
+	optional uint32 max_num								= 2; //最大数量: 默认为10
+}
+
+// 获取所有群标签回调
+message GetAllGroupLabelAck
+{
+    required Ret ret 									= 1;
+	optional uint32 num_limit 							= 2; //服务器限制单次请求的最大个数
+	repeated GroupProto.AllGroupLabelData datas 		= 3; 
+	optional uint32 end_flag 							= 4; //是否结束
+}
+
+//------------------------------------ 获取群标签 ------------------------------------
+// 获取群标签请求
+message GetGroupLabelReq
+{
+	repeated GroupProto.GroupLabelReqData conds 		= 1;//群标签条件
+}
+
+// 获取群标签回调
+message GetGroupLabelAck
+{
+    required Ret ret 									= 1;
+	repeated GroupProto.GroupLabelRespData datas 		= 2;
+	optional uint32 limit_num 							= 3; //服务器总数限制
+}

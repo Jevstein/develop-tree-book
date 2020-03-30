@@ -1,0 +1,194 @@
+syntax = "proto2";
+package sdk.session;
+
+import "base.proto";
+import "mongodb.proto";
+import "msg_search.proto";
+
+//会话标识
+message SessionKey
+{
+	required uint32 type  					= 1; //会话类型：1=单人会话，2=群会话，3=系统消息会话，4=文件夹会话
+	optional CidUid user		  			= 2; //用户标识: type为1时必传
+	optional uint64 group_id	  			= 3; //群标识: type为2时必传
+	optional uint32 group	  				= 4; //系统消息: type为3时必传
+	optional uint32 folder	  				= 5; //客户群文件夹会话: type为4时必传
+}
+
+//会话信息
+message GetSessionInfo
+{
+    required MongoDBProto.SessionInfo info 	= 1; //会话基本信息，见root/mongodb/proto/mongodb.proto
+	optional bytes avatar 					= 2; //头像： 单人会话为uint64，系统会话为uint32
+	optional bytes name 					= 3; //名称
+    optional fixed64 task_id 				= 4; //[群会话有效]，见GetGroupInfoData.task_id
+    optional uint32 mask 					= 5; //[群会话有效]，见GetGroupInfoData.mask
+} 
+
+//搜索到的用户及团队信息	
+message SearchUserInfo	
+{	
+	optional uint64 cid						= 1;
+	optional uint64 uid						= 2;
+	optional uint64 head_pic				= 3;
+	optional bytes user_name				= 4;
+	optional bytes mobile					= 5;
+	optional bytes corp_name				= 6;
+	optional bytes ext						= 7;
+}	
+	
+//搜索到的群组信息	
+message SearchGroupInfo	
+{	
+	optional uint64 group_id 				= 1;
+	optional bytes avatar 					= 2;
+	optional bytes name 					= 3;
+	optional uint32 type 					= 4;
+	optional bytes ext						= 5;
+}	
+	
+//搜索到的系统群信息	
+message SearchSysGroupInfo	
+{	
+	optional uint32 group	 				= 1;
+	optional bytes name 					= 2;
+	optional uint32 imgid 					= 3;
+	optional bytes ext						= 4;
+}	
+
+//------------------------------------ 获取会话列表 ------------------------------------
+//获取首页会话列表请求
+message GetHomeSessionListReq
+{
+    optional uint32 api_get_type 			= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+}
+
+//分页获取（非首页）会话列表请求
+message GetPageSessionListReq
+{
+    optional uint32 api_get_type 			= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    optional uint64 last_msgid 				= 2; //上一页的最后一个消息id，当get_type=1时必传
+    optional uint32 page_size 				= 3; //分页大小，当get_type=1时必传
+}
+
+//获取客户群会话列表请求
+message GetCustomerSessionListReq
+{
+    optional uint32 api_get_type 			= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+}
+
+//获取我的其他团队会话列表请求
+message GetOtherSessionListReq
+{
+    optional uint32 api_get_type 			= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+}
+
+//获取会话列表回调
+message GetSessionListAck
+{
+    required Ret ret 						= 1;
+    repeated GetSessionInfo datas 			= 2;//会话列表数据
+}
+
+//------------------------------------ 设置会话状态 ------------------------------------
+//设置会话状态请求
+message SetSessionStatusReq
+{
+	optional SessionKey session				= 1; //会话标识
+    required uint32 flag 					= 2; //设置标识：0=设置会话已读，1=设置会话置顶，2=设置会话未读 【注意】：对系统消息会话设置已读/未读无效
+    optional uint32 top_status				= 3; //置顶状态[flag=1时必传]：0=不置顶，1=置顶，2=固定。【注意】：对客户群文件夹会话设置置顶无效
+}
+
+//设置会话状态回调,包括：阅读状态、会话置顶
+message SetSessionStatusAck
+{
+    required Ret ret 						= 1;
+    optional uint32 read_count 				= 2; //标记已读时，返回标记的计数，主要用户sessiontype=7客户群组
+}
+
+//设置会话状态通知
+message SetSessionStatusNoti
+{
+	message ReqInfo
+	{
+		optional bool cls_unreadcount 	= 1; //清空未读计数，与3任选其一
+		optional uint32 top_status 		= 2; //会话置顶，与2任选其一
+		optional CidUid user 			= 3; //用户标识，设置单聊会话时有效，其余为空
+		optional uint64 group_id 		= 4; //群组ID，设置群聊会话时有效，其余为空
+		optional uint32 group 			= 5; //组ID，设置系统消息时有效，其余为空
+	}
+	
+	optional uint32	dev						= 1; //请求方设备
+    optional uint32 read_count 				= 2; //标记已读时，返回标记的计数，主要用户sessiontype=7客户群组
+	optional ReqInfo req_info 				= 3; //客户端请求的会话信息
+	optional MongoDBProto.SessionInfo info	= 4; //可忽略
+	optional uint32 flag					= 5; //可忽略
+}
+
+//------------------------------------ 删除最近会话 ------------------------------------
+//删除最近会话请求
+message DeleteSessionReq
+{
+	required SessionKey session				= 1; //会话标识
+}	
+
+//删除最近会话回调
+message DeleteSessionAck
+{
+	required Ret ret		     			= 1;
+	optional uint32 unread_count 			= 2; //删除不成功的时候返回未读计数
+	optional uint32 session_type 			= 3;
+	optional CidUid user 					= 4;
+	optional uint64 group_id 				= 5;
+	optional uint32 group 					= 6;
+}		
+
+//------------------------------------ 会话搜索 ------------------------------------	
+//搜索会话请求
+message SearchSessionReq
+{	
+	required string keyword		     		= 1; //搜索关键字
+	optional uint32 flag					= 2; //标识: 0或31或不传=全部, 1=系统消息, 2=群组, 4=人员，8=群组人员搜索
+							                     //    , 16=系统人员, 32=全部聊天记录搜索, 64=单聊聊天记录, 128=群聊聊天记录
+	optional string i18n 					= 3; //国际化标识（如："zh_CN"）: 为空则默认中文
+	optional uint32 page_size 				= 4; //页显示数: 最大数量为20, 0或不传或默认为10
+	optional uint32 page_num 				= 5; //页数: 从1开始，传0时默认为1
+	optional uint32 location 				= 6; //搜索方式: 0或不填=网络搜索，1=本地搜索
+}
+
+//搜索会话回调
+message SearchSessionAck	
+{	
+	required Ret ret		     			= 1;
+	repeated SearchUserInfo users			= 2;
+	repeated SearchGroupInfo groups 		= 3;
+	repeated SearchSysGroupInfo sysgroups 	= 4;
+}
+
+//------------------------------------ 消息搜索 ------------------------------------
+//消息搜索请求
+message SearchMsgReq
+{
+	message Session
+	{
+		required uint32 type  		  = 1; //会话类型：1=单人会话，2=群会话
+		optional CidUid user		  = 2; //用户标识: type为1时必传
+		optional uint64 group_id	  = 3; //群标识: type为2时必传
+	}
+	required Session session		     	= 1; //会话
+	required string keyword		     		= 2; //搜索关键字
+	optional string i18n 					= 3; //国际化标识（如："zh_CN"）: 为空则默认中文
+	optional uint32 page_size 				= 4; //页显示数: 最大数量为20, 0或不传或默认为10
+	optional uint32 page_num 				= 5; //页数: 从1开始，传0时默认为1
+	optional uint32 location 				= 6; //搜索方式: 0或不填=网络搜索，1=本地搜索
+}
+
+//消息搜索回调
+message SearchMsgAck
+{
+	required Ret ret						= 1;
+	repeated DataProto.SearchMsg datas 		= 2;
+}
+
+
+

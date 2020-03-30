@@ -1,0 +1,136 @@
+syntax = "proto2";
+package sdk.chatmsg;
+
+import "base.proto";
+import "helper.proto";
+import "sdk_ppchat_msg.proto";
+import "sdk_group_msg.proto";
+
+//------------------------------------ 消息转发 ------------------------------------
+// 消息转发请求
+message ForwardMsgReq
+{
+	message Target
+	{
+		repeated CidUid users		= 1;//用户ID
+		repeated uint64 group_ids 	= 2;//群ID
+	}
+	
+	message Source
+	{
+		required uint32 type		= 1;//标识: 0=用户, 1=群
+		optional CidUid user		= 2;//用户ID
+		optional uint64 group_id 	= 3;//群ID
+	}
+	
+	optional uint64 cli_msgid 					= 1; //客户端消息ID: 用于服务器端去重
+	optional uint32 flag 						= 2; //转发方式：0或不传=合并转发，1=逐一转发
+	repeated uint64 msgids						= 3; //被转发的msgid列表
+	optional string msg 						= 4; //发送消息: 若为空，则由SDK负责组装
+    optional string title 						= 5; //副标题: 若为空，则由SDK负责组装
+	optional Target target						= 6; //接收对象[必传]
+	optional Source source						= 7; //来源[必传]
+}
+
+// 消息转发回调
+message ForwardMsgAck
+{
+    required Ret ret 							= 1;
+    repeated HelperProto.ForwardSource source 	= 2;
+    optional uint32 msgtime 					= 3;
+}
+
+// 消息转发通知（废弃 --改为单聊或群聊通知：150，250）
+message ForwardMsgNoti
+{
+    optional CidUid fuser						= 1;//转发人
+    repeated HelperProto.ForwardSource source	= 2;//哪些会话来了新消息
+}
+
+//------------------------------------ 拉取转发消息详情消息 ------------------------------------
+//拉取转发消息详情消息请求
+message GetCombineMsgReq
+{	
+	message Source
+	{
+		required uint32 type		= 1;//标识: 0=用户, 1=群
+		optional CidUid user		= 2;//用户ID
+		optional uint64 group_id 	= 3;//群ID
+	}
+	
+    required fixed64 msgid 						= 1; //消息id
+    optional fixed64 start 						= 2; //0或者不传，根据排序顺序起点开始拉取对应的msgid
+    optional uint32 max_num 					= 3; //默认不传1次10条记录
+    optional uint32 order 						= 4; //消息拉取顺序，0或者不传：顺序，1：倒序
+	optional Source source						= 5; //来源[必传]
+}
+
+//拉取转发消息详情消息回调
+message GetCombineMsgAck
+{
+    required Ret ret 							= 1;
+    repeated ComMsgData datas 					= 2;
+    optional uint32 end_flag 					= 3;
+}
+
+//------------------------------------ 撤回消息 ------------------------------------
+// 撤回消息请求
+message WithdrawMsgReq
+{
+	message Session
+	{
+		required uint32 type		= 1;//标识: 0=用户, 1=群
+		optional CidUid user		= 2;//用户ID
+		optional uint64 group_id 	= 3;//群ID
+	}
+    required uint64 msgid 						= 1; //待撤回的消息id
+	optional string msg 						= 2; //消息撤回后的消息
+    optional string title 						= 3; //副标题: 若为空，则由SDK负责组装
+	optional Session session					= 4; //[必传]
+}
+
+// 撤回消息回调
+message WithdrawMsgAck
+{
+    required Ret ret 							= 1;
+    optional uint32 time_out 					= 2; //超过多长时间 无法撤回
+}
+
+// 撤回单聊消息通知
+message WithdrawSingleMsgNoti
+{
+	optional CidUid from_user                   = 1; //消息撤回方cid
+	optional uint32	dev							= 2; //消息撤回方设备
+    optional ppchatmsg.SingleMsgDataEx datas   	= 3;
+}
+
+// 撤回群聊消息通知	
+message WithdrawGroupMsgNoti
+{	
+    optional uint64 group_id 					= 1;
+    optional GroupType type 					= 2;
+	optional uint32	dev							= 3; //消息撤回方设备
+    optional groupmsg.GroupMsgDataEx data     	= 4;
+}	
+
+//------------------------------------ 同步撤回消息（消息撤回可编辑） ------------------------------------
+// 同步撤回消息请求
+message SyncWithdrawMsgReq
+{
+	message Session
+	{
+		required uint32 type		= 1;//标识: 0=用户, 1=群
+		optional CidUid user		= 2;//用户ID
+		optional uint64 group_id 	= 3;//群ID
+	}
+    required fixed64 msgid 						= 1; //服务器返回，客户端不传,拉取时传
+	optional Session session					= 2; //[必传]
+}
+
+// 同步撤回消息回调
+message SyncWithdrawMsgAck
+{
+    required Ret ret 							= 1;
+    optional ComMsgData data 					= 2;
+    optional uint32 msgtime 					= 3; // 可编辑时间
+}

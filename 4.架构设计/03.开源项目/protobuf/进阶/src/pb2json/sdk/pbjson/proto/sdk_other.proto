@@ -1,0 +1,37 @@
+syntax = "proto2";
+package sdk.other;
+
+import "base.proto";
+
+
+//------------------------------------ 获取sdk信息 ------------------------------------
+//获取sdk信息请求
+message GetSdkInfoReq
+{
+	optional string reserved               = 1;//预留：可不传
+}
+
+//获取sdk信息回调
+message GetSdkInfoAck
+{
+	required Ret ret                        = 1;
+	optional bytes build_date               = 2;
+	optional bytes build_time               = 3;
+	optional bytes platform                 = 4;
+	optional bytes arch                     = 5;
+	optional bytes abi                      = 6;
+	optional bytes version                  = 7;
+}
+
+//------------------------------------ 清理缓存 ------------------------------------
+//清理缓存请求
+message ClearCacheReq
+{
+	optional uint32 type                    = 1;//清理类型：0=清空所有
+}
+
+//清理缓存回调
+message ClearCacheAck
+{
+	required Ret ret                        = 1;
+}

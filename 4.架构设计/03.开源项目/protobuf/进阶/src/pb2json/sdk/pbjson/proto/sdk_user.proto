@@ -1,0 +1,108 @@
+syntax = "proto2";
+package sdk.user;
+
+import "base.proto";
+import "data_base.proto";
+import "helper.proto";
+import "user.proto";
+
+
+//------------------------------------ 按cid获取用户信息列表 ------------------------------------
+// 按cid获取用户信息列表请求（注：该接口不太完善，sdk1.0用的是eteams接口获取通讯录）
+message GetCidUserInfoReq
+{
+    optional uint64 cid                         = 1; //指定团队id，默认为0则表示本用户所在的cid
+    optional uint64 uid                         = 2; //上一页的最大uid，默认为0
+    optional uint32 num 						= 3; //请求最大返回的用户数
+}
+
+// 按cid获取用户信息列表回调
+message GetCidUserInfoAck
+{
+    required Ret ret 							= 1; //0:成功返回数据，100：表示和服务器数据一致；
+    optional uint32 limit_num 					= 2; //每个请求最大返回的用户数
+    repeated DataProto.UserData datas 			= 3;
+    optional uint32 all_num 					= 5; //团队总的人数
+    optional uint32 end_flag 					= 6; //是否结束
+}
+
+//------------------------------------ 根据cid、uid获取用户信息 ------------------------------------
+//根据cid、uid获取用户信息请求
+message GetUserInfoReq
+{
+    optional uint32 api_get_type 				= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+    repeated CidUid users  						= 2; //若是users大小为0，则为全体成员
+}
+
+//根据cid、uid获取用户信息回调
+message GetUserInfoAck
+{
+    required Ret ret                    		= 1;
+    repeated DataProto.UserData datas  			= 2; //用户信息列表 root/data/proto/data_base.proto
+}
+
+//------------------------------------ 获取客户信息 ------------------------------------
+//获取客户信息请求
+message GetCustomInfoReq
+{
+    repeated CidUid users  						= 1; //若是users大小为0，则为全体成员
+}
+
+//获取客户信息回调
+message GetCustomInfoAck
+{
+    required Ret ret 							= 1;
+    repeated HelperProto.CustomInfo datas 		= 2;
+}
+
+//------------------------------------ 获取团队信息 ------------------------------------
+//同步团队信息请求
+message GetCorpInfoReq
+{
+    optional uint32 api_get_type 				= 1; //SDK获取方式: 0=由sdk内部决定在何时拉取在线数据或本地数据(默认); 1=强制获取在线数据; 2=强制获取本地数据
+	repeated uint64 corps						= 2; //团队id
+}
+
+//同步团队信息回调
+message GetCorpInfoAck
+{
+    required Ret ret 							= 1;
+    repeated DataProto.CorpData datas 			= 2;
+}
+
+//------------------------------------ 动态获取appkey ------------------------------------
+//动态获取appkey请求
+message GetAppKeyReq
+{
+    optional uint32 flag                        = 1; // flag=0或不传，表示获取声网appid和唯一id mid。
+                                                     // flag=1，表示只获取唯一id mid
+}
+
+// 动态获取appkey回调
+message GetAppKeyAck
+{
+    required Ret ret                            = 1;
+    optional bytes key                          = 2; // flag= 0或不传是，表示声网appid
+    optional fixed64 mid                        = 3; // 唯一id
+}
+
+//------------------------------------ 更新用户信息 ------------------------------------
+// 更新用户信息请求
+message UpdateUserInfoReq
+{
+    optional uint32 mask                        = 1;
+    optional DataProto.UserData data            = 2; //若data.user不传，则取请求头cid/uid，即更新自己的用户信息
+}
+
+// 更新用户信息回调
+message UpdateUserInfoAck
+{
+    required Ret ret                            = 1;
+}
+
+// 更新用户信息通知
+message UpdateUserInfoNoti
+{
+    optional uint32 mask                        = 1;
+    optional CidUid user                        = 2;       //若user没传，则表示更新的是自己的用户信息
+}
