@@ -46,6 +46,8 @@ audi.py			#子类
 
 ​	此处从`if __name__ == '__main__'`作为入口，请看代码：
 
+#### 1) 头部: 注释、import
+
 ```python
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
@@ -65,7 +67,11 @@ from audi import Audi
 
 def log_title1(title):
     print("\n--------- " + title + " ---------")
+```
 
+#### 2) 变量
+
+```python
 #描述变量的用法
 def var_usage(a, b):
     print("我来自形参1：" + a + ", 我来自形参2：" + b)
@@ -83,7 +89,11 @@ def var_usage(a, b):
     print("加减乘除: " + str(s1) + ", " + str(s2) + ", " + str(s3) + ", " + str(s4))
 
     return 1
+```
 
+#### 3) 列表（数组）
+
+```python
 #列表/数组: 增、删、改、查
 def arr_usage():
     bicycles = ['trek', 'cannondale', 'redline', 'specialized']
@@ -111,7 +121,11 @@ def arr_usage():
     print("排序：" + str(cars))
     cars.reverse()
     print("反转:" + str(cars))
+```
 
+#### 4) for循环
+
+```python
 #for循环: 遍历、创建
 def for_usage():
     magicians = ['alice', 'david', 'carolina']
@@ -130,7 +144,11 @@ def for_usage():
     ret = range(2,11,2)#[2,11)步长为2的元组
     even_numbers = list(ret)
     print(even_numbers)
+```
 
+#### 5) 元组（只读）
+
+```python
 # 元组：只读
 def tuple_usage():
     dimensions = (200, 50, 10)
@@ -145,7 +163,11 @@ def tuple_usage():
     #无此操作
     # dimensions.append(300)
     # print(dimensions)
+```
 
+#### 6).if条件
+
+```python
 #if的用法
 def if_usage():
     # bool var = 1 #布尔类型：True/False
@@ -183,7 +205,11 @@ def if_usage():
         print("x")
     else:
         print("y")
+```
 
+#### 7) 函数
+
+```python
 def describe_pet(animal_type, pet_name="dog"):
     """显示宠物的信息"""
     print("\nI have a " + animal_type + ".")
@@ -196,7 +222,11 @@ def func_usage():
     describe_pet('harry', 'hamster')
     describe_pet("willie")
     describe_pet(animal_type='willie')
+```
 
+#### 8) 字典
+
+```python
 #字典的用法: 增、删、改、查
 def dict_usage():
     #字典变量
@@ -246,7 +276,11 @@ def dict_usage():
 
     for k, v in pizza['alien'].items(): 
         print("依次遍历字典中的字典：key: " + k + ", value: " + str(v))
+```
 
+#### 9) input
+
+```python
 #iput的用法
 def input_usage():
     #age: 通过input传进来的值，无论是什么，一律作为字符串类型，比如输入21，它其实就是"21"
@@ -256,7 +290,11 @@ def input_usage():
     #     print("age[" + age + "]是大于18岁的！")
     # else:
     #     print("age[" + age + "]是小于或等于18岁的！")
+```
 
+#### 10) while循环
+
+```python
 #while循环的用法
 def while_usage():
     t = 10
@@ -283,7 +321,11 @@ def while_usage():
         else:
             print("不爱了")
             break
+```
 
+#### 11) class类
+
+```python
 #用于组合
 class SuperPower():
     def __init__(self):
@@ -397,12 +439,24 @@ def class_usage():
     girlfriend.love()
     girlfriend.wash()
     girlfriend.dance()
+```
+
+#### 12) 不同文件的调用
+
+```shell
+#见头部：
+# from car import Car
+from audi import Audi
 
 #不同python文件的调用
 def diff_files_usage():
     audi = Audi()
     audi.run()
+```
 
+#### 13) 文件读写
+
+```python
 def file_write(file_name):
     print("向文件" + file_name + "中覆盖写入三句： I love python!")
     with open(file_name, "w") as file_obj:
@@ -442,7 +496,11 @@ def fileop_usage():
         if os.path.exists(file_name):
             os.remove(file_name)
             print("文件" + file_name + "已删除")
+```
 
+#### 14) 异常处理
+
+```python
 #异常的处理
 def exception_usage():
     file_name = 'a.txt'
@@ -483,7 +541,11 @@ def exception_usage():
         else:
             print(str(num1) + " / " + str(num2) + " = " + str(var))
             break
+```
 
+#### 15) json格式
+
+```python
 #json的处理
 def json_usage():
     file_name = 'numbers.json'
@@ -506,6 +568,11 @@ def json_usage():
             os.remove(file_name)
             print("文件" + file_name + "已删除")
 
+```
+
+#### 16) from_book
+
+```python
 def from_book():
     name = "ada\tlovelace"
     print(name.title())
@@ -551,8 +618,11 @@ def from_book():
         print("while:" + str(pets))
 
     print(pets) 
-    
+```
 
+#### 17) main
+
+```python
 def main():
     print("========= hello world =========")
 
