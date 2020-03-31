@@ -139,7 +139,7 @@
 
 ## 3.具体实现
 
-​	脚本代码详见：http://wenqiang.yi@git.teems.cn/scm/im/imsdk.git/imsdk/protocol/pb2json.h
+​	脚本代码详见: [pb2json.py](src/pb2json/pb2json.py)
 
 * 1.抽象出proto文件的属性
 
