@@ -1,16 +1,15 @@
 [TOC]
 
-# c++操作sqlite
+# C++操作SQLite
 
 ## 0.前言
 
-​	代码下载：
-
+​	地址：
 ​		1. [SQLite官网](http://www.sqlite.org/)
-
 ​		2.[cppsqlite下载地址](https://github.com/lmmir/CppSQLite3)
+​		3.[SQLite 教程.RUNOOB.com](https://www.runoob.com/sqlite/sqlite-tutorial.html)
 
-​	Sqlite3 小巧、速度快，不需要任何数据库引擎，这意味着如果你需要 sqlite 来保存一些用户数据，甚至都不需要安装数据库（如果你做个小软件还要求人家必须装了sqlserver 才能运行，那也太黑心了）。
+​	Sqlite3 小巧、速度快。跟MS的access一样是文件型数据库，就是说，一个数据库就是一个文件，此数据库里可以建立很多的表，可以建立索引、触发器等等，但是，它实际上得到的就是一个文件。备份这个文件就备份了整个数据库。不需要任何数据库引擎，这意味着如果你需要 sqlite 来保存一些用户数据，甚至都不需要安装数据库（如果你做个小软件还要求人家必须装了sqlserver 才能运行，那也太黑心了）。
 
 
 
@@ -24,6 +23,7 @@
 sqlite3 *
   
 //2.打开数据库
+//若文件存在，尝试把它当数据库文件来打开；否则，sqlite会自动建立
 int sqlite3_open(filename, sqlite3 ** );//文件名需UTF-8，否则中文可能乱码
 
 //3.关闭数据库
@@ -38,14 +38,14 @@ typedef int (*sqlite3_callback)(void*,int,char**, char**);
 int LoadMyInfo(void *para, int n_column, char **column_value, char **column_name )
 {
     int i;
-		printf("记录包含 %d 个字段/n", n_column );
+    printf("记录包含 %d 个字段/n", n_column );
 
-		for( i = 0 ; i < n_column; i ++ )
-		{
-    		printf("字段名:%s  ß> 字段值:%s/n", column_name[i], column_value[i] );
-		}
-      
-		return 0;
+    for( i = 0 ; i < n_column; i ++ )
+    {
+        printf("字段名:%s  ß> 字段值:%s/n", column_name[i], column_value[i] );
+    }
+
+    return 0;
 }
 
 //6.不使用回调查询数据库
@@ -77,9 +77,9 @@ int main( int , char** )
    result = sqlite3_open( "./database.db", &db );
    if ( result != SQLITE_OK )
    {
-			//数据库打开失败
-			return -1;
-		}
+       //数据库打开失败
+       return -1;
+   }
 
 	//2.数据库操作代码
 	//创建一个测试表，表名叫 MyTable_1，有2个字段： ID 和 name。
@@ -100,14 +100,14 @@ int main( int , char** )
       return -1;
     }
 
-    result = sqlite3_exec(db, "insert into MyTable_1(name) values (‘骑单车’)”, 0, 0, errmsg );
+    result = sqlite3_exec(db, "insert into MyTable_1(name) values (‘骑单车’)", 0, 0, errmsg );
     if (result != SQLITE_OK )
     {
         printf( “插入记录失败，错误码:%d，错误原因:%s/n”, result, errmsg );
         return -1;
     }
 
-    result = sqlite3_exec(db, "insert into MyTable_1(name) values (‘坐汽车’)”, 0, 0, errmsg );
+    result = sqlite3_exec(db, "insert into MyTable_1(name) values (‘坐汽车’)", 0, 0, errmsg );
     if (result != SQLITE_OK )
     {
         printf( “插入记录失败，错误码:%d，错误原因:%s/n”, result, errmsg );
