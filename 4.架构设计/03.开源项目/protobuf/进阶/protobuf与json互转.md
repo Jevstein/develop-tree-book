@@ -286,3 +286,41 @@ def main():
 
 ## 2.c++版
 
+### 2.1.protobuf数据与json的转换
+
+```c++
+//1.proto转json
+bool Protobuf2Json(const ProMessage& pro_message, std::string& js_out)
+{
+    js_out.clear();
+    if (!pro_message.IsInitialized())
+      return false;
+
+    google::protobuf::util::JsonPrintOptions tran_opt;
+    tran_opt.add_whitespace = false;
+    tran_opt.always_print_primitive_fields = true;
+    tran_opt.always_print_enums_as_ints = true;
+    tran_opt.preserve_proto_field_names = true;
+
+    auto tran_ret = google::protobuf::util::MessageToJsonString(pro_message, &js_out, tran_opt, false);
+    return tran_ret.ok();
+}
+
+//2.json转proto
+bool Json2Protobuf(const std::string& jstr, ProMessage &pro_out)
+{
+	google::protobuf::util::JsonParseOptions opt;
+	opt.ignore_unknown_fields = true;
+	auto ret = google::protobuf::util::JsonStringToMessage(jstr, &pro_out, opt);
+	return ret.ok();
+}
+```
+
+### 2.2.protobuf的bytes魔改
+
+【**注意**】: protobuf中的bytes类似数据，当转换为字符串时，内部会将二进制数据进行base64编码（同样，字符串转protobuf时，再进行相应的base64解码操作）。有时，将bytes直接作为字符串（string）使用，单希望取消protobuf的自动编解码操作。则可以对protobuf进行魔改，如下：
+
+```c++
+
+```
+
