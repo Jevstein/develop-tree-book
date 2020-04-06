@@ -314,7 +314,6 @@ INSERT INTO TABLE(col1, col2) SELECT val11, val12 UNION ALL SELECT val21, val22 
 
 ```c++
 #include <iostream>
-#include <windows.h>
 using namespace std;
 #include "sqlite/sqlite3.h"
 int main()
