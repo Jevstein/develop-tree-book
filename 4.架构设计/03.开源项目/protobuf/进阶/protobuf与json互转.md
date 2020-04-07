@@ -301,6 +301,7 @@ bool Protobuf2Json(const ProMessage& pro_message, std::string& js_out)
     tran_opt.always_print_primitive_fields = true;
     tran_opt.always_print_enums_as_ints = true;
     tran_opt.preserve_proto_field_names = true;
+	tran_opt.bytes_to_encode_base64 = false;//不进行base64编码，即：bytes当string使用
 
     auto tran_ret = google::protobuf::util::MessageToJsonString(pro_message, &js_out, tran_opt, false);
     return tran_ret.ok();
@@ -311,6 +312,7 @@ bool Json2Protobuf(const std::string& jstr, ProMessage &pro_out)
 {
 	google::protobuf::util::JsonParseOptions opt;
 	opt.ignore_unknown_fields = true;
+	opt.bytes_from_encode_base64 = false;//不进行base64编码，即：bytes当string使用
 	auto ret = google::protobuf::util::JsonStringToMessage(jstr, &pro_out, opt);
 	return ret.ok();
 }
@@ -320,7 +322,179 @@ bool Json2Protobuf(const std::string& jstr, ProMessage &pro_out)
 
 【**注意**】: protobuf中的bytes类似数据，当转换为字符串时，内部会将二进制数据进行base64编码（同样，字符串转protobuf时，再进行相应的base64解码操作）。有时，将bytes直接作为字符串（string）使用，单希望取消protobuf的自动编解码操作。则可以对protobuf进行魔改，如下：
 
-```c++
-
+```shell
+#如上述bytes_to_encode_base64变量，就是自定义变量，用于控制是否进行base64编解码
 ```
+
+* 1）Protobuf2Json
+
+  ```c++
+  //1.protobuf/src/google/protobuf/util/json_util.h
+  struct JsonPrintOptions {
+     //-- snip --
+      
+    // bytes类型的值是否进行base64编码
+    bool bytes_to_encode_base64;
+  
+    JsonPrintOptions()
+        : add_whitespace(false),
+      
+          //-- snip --
+      
+  		bytes_to_encode_base64(true){}
+  };
+  
+  //2.protobuf/src/google/protobuf/util/json_util.c
+  util::Status BinaryToJsonStream(TypeResolver* resolver,
+                                    const string& type_url,
+                                    io::ZeroCopyInputStream* binary_input,
+                                    io::ZeroCopyOutputStream* json_output,
+                                    const JsonPrintOptions& options) {
+    //-- snip --
+      
+    proto_source.set_bytes_to_encode_base64(options.bytes_to_encode_base64);
+      
+    //-- snip --
+  }
+  
+  //3.protobuf/src/google/protobuf/util/internal/protostream_objectsource.h
+  class LIBPROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
+    //-- snip --
+  
+    //bytes类型的值是否进行base64编码
+    void set_bytes_to_encode_base64(bool bteb) {
+        bytes_to_encode_base64_ = bteb;
+    }
+      
+    //-- snip --
+      
+    //bytes类型的值是否进行base64编码
+    bool bytes_to_encode_base64_;
+  
+    GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(ProtoStreamObjectSource);
+  };
+  
+  
+  //4.protobuf/src/google/protobuf/util/internal/protostream_objectsource.c
+  ProtoStreamObjectSource::ProtoStreamObjectSource(
+      google::protobuf::io::CodedInputStream* stream, TypeResolver* type_resolver,
+      const google::protobuf::Type& type)
+      : stream_(stream),
+        //-- snip --
+        bytes_to_encode_base64_(true) {
+    GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
+  }
+  
+  ProtoStreamObjectSource::ProtoStreamObjectSource(
+      google::protobuf::io::CodedInputStream* stream, const TypeInfo* typeinfo,
+      const google::protobuf::Type& type)
+      : stream_(stream),
+        //-- snip --
+        bytes_to_encode_base64_(true) {
+    GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
+  }
+  
+  
+  Status ProtoStreamObjectSource::RenderNonMessageField(
+      const google::protobuf::Field* field, StringPiece field_name,
+      ObjectWriter* ow) const {
+    // Temporary buffers of different types.
+    uint32 buffer32;
+    uint64 buffer64;
+    string strbuffer;
+    switch (field->kind()) {
+    //-- snip --        
+      case google::protobuf::Field_Kind_TYPE_BYTES: {
+        stream_->ReadVarint32(&buffer32);  // bytes size.
+        stream_->ReadString(&strbuffer, buffer32);
+        bytes_to_encode_base64_ ?  ow->RenderBytes(field_name, strbuffer)
+          					 : ow->RenderString(field_name, strbuffer);
+        break;
+      }
+      default:
+        break;
+    }
+    return util::Status();
+  }
+  ```
+
+  
+
+* 2）Json2Protobuf
+
+  ```c++
+  //1.protobuf/src/google/protobuf/util/json_util.h
+  struct JsonParseOptions {
+    //-- snip --
+      
+    // bytes类型的值是否进行base64编码
+    bool bytes_from_encode_base64;
+  
+    JsonParseOptions() : ignore_unknown_fields(false), bytes_from_encode_base64(true){}
+  };
+  
+  //2.protobuf/src/google/protobuf/util/json_util.c
+  util::Status JsonToBinaryStream(TypeResolver* resolver,
+                                    const string& type_url,
+                                    io::ZeroCopyInputStream* json_input,
+                                    io::ZeroCopyOutputStream* binary_output,
+                                    const JsonParseOptions& options) {
+    //-- snip --
+      
+    proto_writer.set_bytes_from_encode_base64(options.bytes_from_encode_base64);
+      
+    //-- snip --
+  }
+  
+  //3.protobuf/src/google/protobuf/util/internal/proto_writer.h
+  class LIBPROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
+     //-- snip --
+      
+    //bytes类型的值是否进行base64编码
+    void set_bytes_from_encode_base64(bool bteb) {
+  	  bytes_from_encode_base64_ = bteb;
+    }
+      
+    //-- snip --
+      
+    //bytes类型的值是否进行base64编码
+    bool bytes_from_encode_base64_;
+  
+    GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(ProtoWriter);
+  }
+  
+  //4.protobuf/src/google/protobuf/util/internal/proto_writer.c
+  ProtoWriter::ProtoWriter(TypeResolver* type_resolver,
+                           const google::protobuf::Type& type,
+                           strings::ByteSink* output, ErrorListener* listener)
+      : master_type_(type),
+        //-- snip --
+  	  bytes_from_encode_base64_(true){}
+  
+  ProtoWriter::ProtoWriter(const TypeInfo* typeinfo,
+                           const google::protobuf::Type& type,
+                           strings::ByteSink* output, ErrorListener* listener)
+      : master_type_(type),
+        //-- snip --
+  	  bytes_from_encode_base64_(true) {}
+  
+  ProtoWriter* ProtoWriter::RenderPrimitiveField(
+      const google::protobuf::Field& field, const google::protobuf::Type& type,
+      const DataPiece& data) {
+      //-- snip --
+      
+    switch (field.kind()) {
+      //-- snip --
+            
+      case google::protobuf::Field_Kind_TYPE_BYTES: {
+  	  status = bytes_from_encode_base64_ ? WriteBytes(field.number(), data, stream_.get()) 
+              							: WriteString(field.number(), data, stream_.get());
+        break;
+          
+      //-- snip --
+      }
+   }
+  ```
+
+  
 
