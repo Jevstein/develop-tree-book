@@ -1,6 +1,6 @@
 [TOC]
 
-# 封装mssql的c++库
+# 用c++封装高质量的mssql操作库
 
 ​	内部实现sql server的所有操作，对外隐藏关于操作sql server的具体实现细节。显然，只适合windows系统。
 

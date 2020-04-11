@@ -1,6 +1,6 @@
 [TOC]
 
-# 封装sqlite的c++库
+# 用c++封装高质量的sqlite操作库
 
 内部实现sqlite的所有操作，对外隐藏关于操作sqlite的具体实现细节。
 
