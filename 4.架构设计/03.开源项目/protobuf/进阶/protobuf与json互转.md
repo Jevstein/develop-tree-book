@@ -2,7 +2,11 @@
 
 # protobuf与json的互转
 
-​	在工程化中，经常会遇到诸如：1）用json格式写功能测试用例，转成内部protobuf进行序列化；2）多语言模块调用时，原本采用了json格式作为协议交互，需要将内部实现的protobuf自动转换成json；3）特殊情况下，将protobuf转成json格式保存，便于阅读等。。。
+​	在项目工程化实现中，经常会遇到以下问题：
+
+* 1.用json格式写功能测试用例，转成内部protobuf进行序列化；
+* 2.多语言模块调用时，原本采用了json格式作为协议交互，需要将内部实现的protobuf自动转换成json；
+* 3.特殊情况下，将protobuf转成json格式保存，便于阅读等。。。
 
 ​	假如有protobuf如下：
 
@@ -34,7 +38,7 @@ $ python
 >>> import google.protobuf
 ```
 
-### 1.1.第三方pbjson支持
+### 1.1.第三方pbjson支持json互转
 
 #### 1.1.1.pbjson.py
 
@@ -206,7 +210,7 @@ if __name__ == "__main__":
 
 
 
-### 1.2.protobuf语法支持
+### 1.2.protobuf自身语法支持互转
 
 #### 1.2.1.pb2json & pb2dict
 
@@ -236,7 +240,7 @@ def main():
 
 
 
-#### 1.2.2.json2obj
+#### 1.2.2.json2obj：将json转换成python对象
 
 ```python
 #!/usr/bin/env python
@@ -278,7 +282,7 @@ def main():
 
 
 
-### 1.3.proto文档转成json文档
+### 1.3.将proto文档转成json文档
 
 ​	详见：[python实现proto转json文档](python实现proto转json文档.md)
 
@@ -287,6 +291,8 @@ def main():
 ## 2.c++版
 
 ### 2.1.protobuf数据与json的转换
+
+#### 2.1.1.protobuf自带的json转换功能
 
 ```c++
 //1.proto转json
@@ -317,6 +323,10 @@ bool Json2Protobuf(const std::string& jstr, ProMessage &pro_out)
 	return ret.ok();
 }
 ```
+
+#### 2.1.2.利用反射机制，配合rapidjson进行转换
+
+![pb-reflection](./images/pb-reflection.png)
 
 ### 2.2.protobuf的bytes魔改
 
