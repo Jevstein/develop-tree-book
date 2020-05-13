@@ -95,3 +95,5 @@ npm install
 
 
 ## nodejs与nginx的完美搭配
+
+[nginx下载](http://nginx.org/en/download.html)
