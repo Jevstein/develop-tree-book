@@ -5,6 +5,8 @@
 > [Node.js安装及环境配置之Windows篇](https://www.cnblogs.com/liuqiyun/p/8133904.html)
 >
 > [node-koa](https://github.com/Hansen-hjs/node-koa)
+>
+> [webpack中文文档](https://www.webpackjs.com/)
 
 #### 一：下载安装nodejs和安装express框架
 

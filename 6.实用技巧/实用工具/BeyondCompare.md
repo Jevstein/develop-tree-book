@@ -36,17 +36,24 @@
 
 * 1.[下载](https://www.scootersoftware.com/download.php)安装
 
-* 2.删除文件：BC4Key.txt
+* 2.删除文件：BC4Key.txt、BCState.xml
 
-       写一个批处理, 如下：
+   * 删除注册表信息，重新计算30天过期，如：
 
-  ```bat
-  #reuse_bc.bat
-  reg delete "HKEY_CURRENT_USER\Software\Scooter Software\Beyond Compare 4" /v CacheID /f
-  ```
+    ```shell
+    regedit:
+    删除： 计算机\HKEY_CURRENT_USER\Software\Scooter Software\Beyond Compare 4\CacheId
+    ```
 
+  * 同理，可写一个批处理, 如下：
+
+    ```shell
+    #reuse_bc.bat
+    reg delete "HKEY_CURRENT_USER\Software\Scooter Software\Beyond Compare 4" /v CacheID /f
+    ```
+  
   *附加一个序列号：
-
+  
   ```shell
   #Beyond Compare Version 4.0 (build 18847)/BCompare-4.0.0.18847.1418105535序列号:
   H1bJTd2SauPv5Garuaq0Ig43uqq5NJOEw94wxdZTpU-pFB9GmyPk677gJ
