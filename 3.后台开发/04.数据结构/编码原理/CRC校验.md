@@ -43,7 +43,7 @@
 
 * **3.带校验码的新帧**：
 
-  ​	将上面的**校验码**附加在**原数据帧**后面形成**新的数据帧**，发送端即发生这个“新的数据帧”到接收端。注意：此时“新的数据帧（m位）”和上一步的“新帧（m+k-1位）”不同。
+  ​	将上面的**校验码**附加在**原始数据帧**后面形成**新的数据帧**，发送端即发生这个“新的数据帧”到接收端。注意：此时“新的数据帧（m位）”和上一步的“新帧（m+k-1位）”不同。
 
 * **4.校验结果**：
 
@@ -94,7 +94,15 @@
 
 
 
-## 3.CRC的代码实现
+## 3.CRC的c代码实现
+
+https://blog.csdn.net/Shayne_Lee/article/details/88087518?utm_medium=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase&depth_1-utm_source=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase
+
+ ```c
+void send_with_crc(int data);
+
+void recv_with_crc(int data);
+ ```
 
 
 
