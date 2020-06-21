@@ -58,18 +58,24 @@
 ​	由以上分析可知，既然除数是"随机"或者"按标准选定"的，所以CRC校验的关键是如何求出**余数**(即CRC校验码)。下面举例说明计算过程：
 ​	假设选择的CRC生成多项式为G(X) = X^4 + X^3 + 1，要求出二进制序列10110011的CRC校验码。
 
-计算过程：
+**计算过程**：
 
 * 1.将生成多项式G(x) = X^4 + X^3 + 1 转换成二进制数：11001
 
   ```shell
   	由G(x) = X^4 + X^3 + 1可知：它一共是5位（总位数 = 最高位的幂次 + 1，即 4 + 1 = 5），再根据多项式各项的含义（多项式只列出二进制值为1的位，即该二进制数的第4位、第3位、第0位的二进制均为1，其它位均为0）得知，该二进制比特串为11001
+  #详细解题步骤，如下:
+  	G(x) = X^4 + X^3 + 1
+  	     = 1 * X^4 + 1 * X^3 + 0 *X^2 + 0 * X^1 + 1
+  	     = 11001
   ```
 
 * 2.计算CRC校验码：0100
 
   ```shell
-  因为生成多项式的位数为5，根据前面的介绍，得知CRC校验码的位数为4（校验码的位数 = 生成多项式的位数 - 1 = 生成多项式的最高次数 = 4）；又因原数据帧为10110011，则在它后面再加4个0，得到101100110000；最后，把这个数以“模2除法”方式除以生成多项式，得到的余数，即为CRC校验码（0100）。
+  	因为生成多项式的位数为5，根据前面的介绍，得知CRC校验码的位数为4（校验码的位数 = 生成多项式的位数 - 1 = 生成多项式的最高次数 = 4）；
+  	又因原数据帧为10110011，则在它后面再加4个0，得到101100110000；
+  	最后，把这个数以“模2除法”方式除以生成多项式，得到的余数，即为CRC校验码（0100）。
   ```
 
   如图：
@@ -94,19 +100,167 @@
 
 
 
+**总结计算过程**：
+
+```shell
+# 假设选择的CRC生成多项式为G(X) = X^4 + X^3 + 1，要求出二进制序列10110011的CRC校验码
+# 解：
+1. G(X) = X^4 + X^3 + 1
+        = 1 * X^4 + 1 * X^3 + 0 *X^2 + 0 * X^1 + 1
+	      = 11001
+2.数据补充4个0（多项式G(x)的最高位为4），即：
+		data = 10110011 0000
+3.模2求余：
+		crc = data % G(x) 
+				= 101100110000 % 11001
+				= 0100
+4.构造带crc的数据： 
+		data_crc = data & crc
+						 = 10110011 0000 & 0100
+						 = 10110011 0100
+5.验证结果：
+	ret = data_crc % G(X)
+	    = 10110011 0100 % 11001
+	    = 0
+	if (ret) "验证成功！"
+```
+
+
+
+
+
 ## 3.CRC的c代码实现
 
-https://blog.csdn.net/Shayne_Lee/article/details/88087518?utm_medium=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase&depth_1-utm_source=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase
+### 3.1.定义
+
+```c
+//CRC-CCITT (XModem), e.g:
+//G(x) = X^16 + X^12 + X^5 + X^0
+//     = 1*X^16 + 0*X^15 + ... + 0*^X13 + 1*X12 + ... + 1*X^5 + ... + X^0
+//     = 0001 0001 0000 0010 0001
+//     = 0x11021
+#define GX 0x11021
+typedef unsigned int UINT32;
+
+UINT32 jvt_crc_code_16(const UINT32 data, UINT32 *crc);
+UINT32 jvt_crc_decode_16(const UINT32 data);
+```
+
+### 3.2.CRC编码（对应发送端）
 
  ```c
-void send_with_crc(int data);
+UINT32 jvt_crc_code_16(const UINT32 data, UINT32 *crc)
+{
+    UINT32 temp = 0;
+    UINT32 ax = 0;
+    UINT32 bx = 0;
+    UINT32 cx = 15;
 
-void recv_with_crc(int data);
+    temp = data;        //eg: 0xAB12 = 0000 0000 0000 0000 1010 1011 0001 0010
+
+    temp <<= 16;        //信息左移16位, eg: 0xAB120000 = 1010 1011 0001 0010 0000 0000 0000 0000
+    ax = temp >> 15;    //将前17位存在ax中, 准备与多项式GX做异或操作, eg: 0x15624 = 0000 0000 0000 0001 0101 0110 0010 0100
+    temp = 0;
+
+    for (cx = 15; cx > 0; cx--)
+    {
+        if (((ax >> 16) & 0x1) == 0x1)
+            ax ^= GX;
+
+        ax <<= 1;        
+        bx = temp >> 31;        
+        ax += bx;        
+        temp <<= 1;
+    }
+
+    if (((ax >> 16) & 0x1) == 0x1)//最后一位的异或操作
+        ax ^= GX;
+
+    *crc = ax; //crc 为根据信息内容data和CRC_CCITT的生成多项式GX求出的CRC码。
+    
+    //附加crc的新数据
+    return (data << 16) + (*crc);
+}
  ```
+
+### 3.3.CRC解码（对应接收端）
+
+```c
+UINT32 jvt_crc_decode_16(const UINT32 data_crc)
+{
+    UINT32 data = 0;
+    UINT32 ax = 0;
+    UINT32 bx = 0;
+    UINT32 cx = 0;
+
+    data = data_crc;//data_crc为信息内容
+    data <<= 16;
+    ax = data >> 15;
+    data <<= 17;
+    for (cx = 15; cx > 0; cx--)
+    {
+        if (((ax >> 16) & 0x1) == 0x1)
+            ax ^= GX;
+
+        ax <<= 1;
+        bx = data >> 31;
+        ax += bx;
+        data <<= 1;
+    }
+    if (((ax >> 16) & 0x1) == 0x1)
+        ax ^= GX;
+
+    return ax; //ax 加密信息data_crc模2除多项式GX的余数
+}
+```
+
+### 3.4.测试验证
+
+```c
+int main ()
+{
+    UINT32 data = 0xAB12;
+    UINT32 crc = 0;
+    UINT32 data_crc = 0;
+    UINT32 crc_ret = 0;
+    const UINT32 N = 16;
+
+    //1.发送端
+    printf("--------- 1.对将发送的数据进行CRC编码 ---------\n");
+    data_crc = jvt_crc_code_16(data, &crc);
+    printf("原始数据:%x\n", data);
+    printf("多项式信息:%x\n", GX);
+    printf("生成CRC校验码:%x\n", crc);
+    printf("带CRC的新数据:%x\n", data_crc);
+
+    //2.接收端
+    printf("\n--------- 2.对接收到到数据进行CRC校验 ---------\n");
+    data = data_crc >> N;
+    printf("带CRC的原始信息:%x，实际原始信息: %x\n", data_crc, data);
+    crc_ret = jvt_crc_decode_16(data);
+    // printf("CRC校验码:%x\n", crc_ret);
+    printf("多项式信息:%x\n", GX);
+    printf("最后模2除结果:%x\n", crc_ret);
+
+    data_crc <<= N;
+    data_crc >>= N;
+    printf((data_crc ^ crc_ret) == 0 ? "\n传输成功！\n" : "\n传输错误！\n" );
+
+    return 0;
+}
+```
+
+
+
+
 
 
 
 > 巨人的肩膀：
->
 > [CRC码计算及校验原理的最通俗诠释](https://blog.csdn.net/lycb_gz/article/details/8201987)
+> [CRC校验 C语言代码实现](https://blog.csdn.net/Shayne_Lee/article/details/88087518?utm_medium=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase&depth_1-utm_source=distribute.wap_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.nonecase)
+>
+> 在线验证工具：
+> [On-line CRC calculation and free library](http://www.ip33.com/crc.html)
+> [CRC(循环冗余校验)在线计算](https://www.lammertbies.nl/comm/info/crc-calculation)
 
