@@ -8,6 +8,8 @@
 
 ## 4.git常用命令
 
+![Git常用命令速查表](.\images\git常用命令.jpg)
+
 ### 4.1. 环境配置
 
 ```shell
@@ -32,14 +34,14 @@ $ git config --global core.ignorecase false
 * 1.命令：
 
 ```shell
-$git reset HEAD [ 被删除的文件或文件夹 ]	
-$git checkout [ 被删除的文件或文件夹 ]
+$ git reset HEAD [ 被删除的文件或文件夹 ]	
+$ git checkout [ 被删除的文件或文件夹 ]
 ```
 
 * 2.示例：假如误删了文件"../../script.py", 操作如下：
 
 ```shell
-$git reset HEAD ../../script.py
-$git checkout ../../script.py
+$ git reset HEAD ../../script.py
+$ git checkout ../../script.py
 ```
 
