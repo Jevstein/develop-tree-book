@@ -21,6 +21,9 @@ $ git config --global core.editor /usr/bin/vim
 $ git config --global credential.helper store
 $ git config --global credential.helper wincred
 $ git config --global core.ignorecase false
+
+#附注：windows下可通过git的配置文件编辑和修改信息，目录如：
+C:\Users\用户名\.gitconfig文件
 ```
 
 > 参考：[Git 运行配置（git config）](https://www.jianshu.com/p/f29ca723db4f)
