@@ -195,12 +195,26 @@ $ sudo apt-get install python3.5
 
   ![windows下安装](images/install-1.png)
 
-  ​	【**注意**】：<font color=red>如果没有勾选上“add python 3.5 to PATH”，命令窗口则将无法找到python.exe（除非你在安装目录C:\User\Administrator\AppData\Local\Programs\Python\Python35\下打开命令窗口），那么此时就需要手动修改环境变量</font>。在“我的电脑-属性-高级系统设置-高级-环境变量”中，编辑path：
+  ​	【**注意**】：
 
-  ```shell
-  C:\Users\Administrator\AppData\Local\Programs\Python\Python35\;
-  C:\Users\Administrator\AppData\Local\Programs\Python\Python35\Scripts\
-  ```
+  * <font color=red>如果没有勾选上“add python 3.5 to PATH”，命令窗口则将无法找到python.exe（除非你在安装目录C:\User\Administrator\AppData\Local\Programs\Python\Python35\下打开命令窗口），那么此时就需要手动修改环境变量</font>。在“我的电脑-属性-高级系统设置-高级-环境变量”中，编辑path：
+
+    ```shell
+    C:\Users\Administrator\AppData\Local\Programs\Python\Python35\;
+    C:\Users\Administrator\AppData\Local\Programs\Python\Python35\Scripts\
+    ```
+
+  * windows10环境变量设置
+
+    ```shell
+    # 【已验证】或打开PowerShell，输入
+    $env:path="$env:Path;C:\Users\Administrator\AppData\Local\Programs\Python\Python35"  --注意：必须带上$
+    
+    # 打开PowerShell，输入
+    [Environment]::SetEnvironmentVariable(“Path”,”$env:Path;C:\Users\Administrator\AppData\Local\Programs\Python\Python35″, “User”)
+    ```
+
+    
 
 * 3.安装成功，在任意目录下打开命令窗口，输入以下命令验证：
 
@@ -288,14 +302,15 @@ C:\Program Files\Python27\Scripts
       $ py -3 -m pip install XXXX
       
   #3.当指定脚本使用python2/3运行时,需在脚本文件开头加上【#! python2/3】,如：
-      ```
+  ```
       #! python2
       print 1234567
       ```
-  	然后运行：$ py xxx.py
+      然后运行：$ py xxx.py
   ```
-
+  
   ​	缺点：正常运行脚本时，每次都会多这一节注释，显得繁琐和不便
+  ```
 
 * 方案三（采纳）：**复制后重命名python.exe**
 
