@@ -20,3 +20,5 @@ https://www.typoraio.cn/#
 ​		将它改为 hasActivated="true"=="true"
 
 4. 成功激活！！！
+
+### 2.1 windows破解
