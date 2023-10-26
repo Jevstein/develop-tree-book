@@ -1,4 +1,7 @@
+[TOC]
+
 # Typora
+
 Typora作为一款简单易用的Markdown编辑器，非常适合开发者
 
 ## 1、下载安装
