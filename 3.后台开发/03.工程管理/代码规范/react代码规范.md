@@ -63,21 +63,13 @@ DaZhePromotion [打折] / getPingfenByName() [评分] / int 某变量 = 3
 推荐使用 HTML5 的文档类型申明： 
 （建议使用 text/html 格式的 HTML。避免使用 XHTML。XHTML 以及它的属性，比如 application/xhtml+xml 在浏览器中的应用支持与优化空间都十分有限）。
 
-- •
+- 规定字符编码
 
-  规定字符编码
+- IE 兼容模式
 
-- •
+- 规定字符编码
 
-  IE 兼容模式
-
-- •
-
-  规定字符编码
-
-- •
-
-  doctype 大写
+- doctype 大写
 
 正例：
 
@@ -105,17 +97,11 @@ DaZhePromotion [打折] / getPingfenByName() [评分] / int 某变量 = 3
 
 ### 3.1 命名  
 
-- •
+- 类名使用小写字母，以中划线分隔 
 
-  类名使用小写字母，以中划线分隔 
+- id 采用驼峰式命名
 
-- •
-
-  id 采用驼峰式命名
-
-- •
-
-  less 中的变量、函数、混合、placeholder 采用驼峰式命名  ID 和 class 的名称总是使用可以反应元素目的和用途的名称，或其他通用的名称，代替表象和晦涩难懂的名称  
+- less 中的变量、函数、混合、placeholder 采用驼峰式命名  ID 和 class 的名称总是使用可以反应元素目的和用途的名称，或其他通用的名称，代替表象和晦涩难懂的名称  
 
 不推荐：
 
@@ -143,11 +129,11 @@ DaZhePromotion [打折] / getPingfenByName() [评分] / int 某变量 = 3
 
 ### 3.2 选择器
 
-\1) css 选择器中避免使用标签名
+1) css 选择器中避免使用标签名
 
 ​	从结构、表现、行为分离的原则来看，应该尽量避免 css 中出现 HTML 标签，并且在 css 选择器中出现标签名会存在潜在的问题。
 
-\2) 很多前端开发人员写选择器链的时候不使用 直接子选择器（注：直接子选择器和后代选择器的区别）。
+2) 很多前端开发人员写选择器链的时候不使用 直接子选择器（注：直接子选择器和后代选择器的区别）。
 
 ​	有时，这可能会导致疼痛的设计问题并且有时候可能会很耗性能。然而，在任何情况下，这是一个非常不好的做法。如果你不写很通用的，需要匹配到 DOM 末端的选择器， 你应该总是考虑直接子选择器。
 
@@ -221,8 +207,8 @@ button{
 
 ```css
 div	{
-	 padding-bottom: 0px;
-	 margin: 0em; 
+	padding-bottom: 0px;
+	margin: 0em;
 }
 ```
 
@@ -267,17 +253,11 @@ header {
 
 #### 2）按以下顺序组织
 
-1. 1.
+1. @import;
 
-   @import;
+2. 变量声明;
 
-2. 2.
-
-   变量声明;
-
-3. 3.
-
-   样式声明;
+3. 样式声明;
 
 ```css
 @import "mixins/size.less";
@@ -322,11 +302,11 @@ header {
 
 ### 5.1 命名
 
-1) 采用小写驼峰命名 lowerCamelCase，代码中的命名均不能以下划线，也不能以下划线或美元符号结束
+ 1) 采用小写驼峰命名 lowerCamelCase，代码中的命名均不能以下划线，也不能以下划线或美元符号结束
 
 ​		反例： `_name / name_ / name$`
 
- 2.方法名、参数名、成员变量、局部变量都统一使用 lowerCamelCase 风格，必须遵从驼峰形式。
+ 2) 方法名、参数名、成员变量、局部变量都统一使用 lowerCamelCase 风格，必须遵从驼峰形式。
 
 ​		正例： `localValue / getHttpMessage() / inputUserId`
 
@@ -509,51 +489,33 @@ if (person === undefined) {
 
 
 
-### 5.11 正则表达式
-
-
-
 
 
 ## 6、React和JSX 规范
 
 ### 6.1 基本规则
 
-- •
+- 每个文件只包含一个React组件；
 
-  每个文件只包含一个React组件；
+- 但是[无状态, 或者 Pure 组件](https://link.zhihu.com/?target=https%3A//facebook.github.io/react/docs/reusable-components.html%23stateless-functions) 允许一个文件包含多个组件。eslint: [react/no-multi-comp](https://link.zhihu.com/?target=https%3A//github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-multi-comp.md%23ignorestateless).
 
-  - •
+- 始终使用 JSX 语法;
 
-    但是[无状态, 或者 Pure 组件](https://link.zhihu.com/?target=https%3A//facebook.github.io/react/docs/reusable-components.html%23stateless-functions) 允许一个文件包含多个组件。eslint: [react/no-multi-comp](https://link.zhihu.com/?target=https%3A//github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-multi-comp.md%23ignorestateless).
-
-- •
-
-  始终使用 JSX 语法;
-
-- •
-
-  不要使用 React.createElement方法，除非初始化 app 的文件不是 JSX 格式。
+- 不要使用 React.createElement方法，除非初始化 app 的文件不是 JSX 格式。
 
 ### 6.2 命名规范
 
-- •
-
-  组件文件扩展名
+- 组件文件扩展名
 
 如果使用 `TypeScript`，则文件扩展名为 `.tsx`；如果使用 JavaScript，则文件扩展名为 `.js`；
 
-- •
-
-  组件文件名
+- 组件文件名
 
 如果是组件文件，则使用 PascalCase，如 `MyComponent.js`
 
 如果组件是一个目录，则组件主入口命名为 `index`，如 `index.js`
 
-- •
-
-  引用命名
+- 引用命名
 
 React 组件使用 PascalCase，组件实例使用 CamelCase，eslint: [react/jsx-pascal-case](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-pascal-case.md)
 
@@ -569,9 +531,7 @@ const ReservationItem = <ReservationCard />
 const reservationItem = <ReservationCard />
 ```
 
-- •
-
-  组件属性名
+- 组件属性名
 
 ReactDOM 使用小驼峰式命名法来定义属性的名称，而不使用 HTML 属性名称的命名约定，例如
 
@@ -631,9 +591,7 @@ ReactDOM 使用小驼峰式命名法来定义属性的名称，而不使用 HTML
 
 ### 6.5 空格
 
-- •
-
-  自闭合的标签前要加一个空格，eslint: [no-multi-spaces](https://eslint.org/docs/rules/no-multi-spaces), [react/jsx-tag-spacing](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-tag-spacing.md)
+- 自闭合的标签前要加一个空格，eslint: [no-multi-spaces](https://eslint.org/docs/rules/no-multi-spaces), [react/jsx-tag-spacing](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-tag-spacing.md)
 
 ```react
 // bad
@@ -650,9 +608,7 @@ ReactDOM 使用小驼峰式命名法来定义属性的名称，而不使用 HTML
 <Foo />
 ```
 
-- •
-
-  不要在 JSX 的花括号里边加空格，eslint: [react/jsx-curly-spacing](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-curly-spacing.md)
+- 不要在 JSX 的花括号里边加空格，eslint: [react/jsx-curly-spacing](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-curly-spacing.md)
 
 ```react
 // bad
@@ -1005,10 +961,10 @@ function a () {
     return
   }
   if (condtion2) {
-    // todo1
+    // todo2
     return
   }
-  // todo2
+  // todo3
   ```
 
 * If 里面的代码不要太多，多了要新建一个函数
@@ -1110,8 +1066,8 @@ sendNext(messages: any[], isRedirect: boolean = false, sendAllSuccess: boolean =
   
   // good
   datas.map((item: any, index: number) => {    	
-    return <UIAbc id={index} option={item}/>
-  }
+    return <UIAbc key={index} option={item}/>
+  })
   ```
 
 
@@ -1121,13 +1077,13 @@ sendNext(messages: any[], isRedirect: boolean = false, sendAllSuccess: boolean =
 ​	建议优先使用面向对象方法封装：
 
 ```react
-// bad: 比较适用于导出少量的函数
+// 少用: 比较适用于导出少量的函数
 const datas = {}
 export func1() { /** todo */ }
 export func2() { /** todo */ }
 func3() { /** todo */ }
 
-// good: 
+// 推荐: 
 class CXX {
   private datas = {}
   public func1() { /** todo */ }
@@ -1136,7 +1092,7 @@ class CXX {
 }
 new CXX()
 
-// good
+// 推荐
 const datas = {}
 class CYY {
   static func1() { /** todo */ }
