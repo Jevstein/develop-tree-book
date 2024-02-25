@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>动画</title>
+
+  <style>
+    .rotating-infinite-box {
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: yellow;
+
+      width: 100px;
+      height: 100px;
+      background-color: red;
+      animation: rotating-infinite-animation 3s linear infinite;
+    }
+    @keyframes rotating-infinite-animation {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(90deg);
+      }
+
+      50% {
+        transform: rotate(180deg);
+      }
+
+      75% {
+        transform: rotate(270deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .rotating-click {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      color: #999999;
+
+      &:hover {
+        color: blue;
+        .rotating-click-arrow {
+          border-color: transparent transparent transparent blue;
+        }
+      }
+
+      .rotating-click-arrow {
+        margin-left: 5px;
+        width: 0;
+        height: 0;
+        border-width: 6px;
+        border-style: solid dashed dashed dashed;
+        border-color: transparent transparent transparent #999999;
+
+        /* 添加过渡效果，持续0.3秒*/
+        transition: transform 0.5s ease;
+
+        &.rotated {
+          /* 设置旋转角度 */
+          transform: rotate(90deg);
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="rotating-infinite-box">无限旋转</div>
+  <div class="rotating-click" onclick="handleClickRotating(this)">
+    <span>点击旋转</span>
+    <div class="rotating-click-arrow"></div>
+  </div>
+  <script>
+    let rotateVisible = false;
+    function handleClickRotating(event) {
+      this.rotateVisible = !this.rotateVisible;
+      const name = `rotating-click-arrow ${this.rotateVisible ? 'rotated' : ''}`;
+      const targetElement = document.querySelector('.rotating-click-arrow');
+      targetElement.setAttribute('class', name);
+    }
+  </script>
+</body>
+
+</html>

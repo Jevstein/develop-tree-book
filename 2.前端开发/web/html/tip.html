@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>自定义提示</title>
+  <style>
+    .method {
+      margin: 20px 0;
+    }
+
+    .method1 {
+      &.message-box {
+        position: relative;
+        width: 240px;
+        height: 60px;
+        line-height: 60px;
+        background: #E9FBE4;
+        box-shadow: 1px 2px 3px #E9FBE4;
+        border: 1px solid #C9E9C0;
+        border-radius: 4px;
+        text-align: center;
+        color: #0C7823;
+      }
+
+      .triangle-character {
+        position: absolute;
+        left: 30px;
+        overflow: hidden;
+        width: 26px;
+        height: 30px;
+        /* 字符的大小和字体也有关系哦！ */
+        font: normal 26px "宋体";
+      }
+
+      .tc-border {
+        bottom: -13px;
+        color: #C9E9C0;
+      }
+
+      .tc-background {
+        bottom: -12px;
+        color: #E9FBE4;
+      }
+    }
+
+    .method2 {
+      display: flex;
+      justify-content: left;
+
+      .triangle {
+        margin-right: 20px;
+      }
+
+      .border-triangle1 {
+        width: 30px;
+        height: 30px;
+        border-width: 20px;
+        border-style: solid;
+        border-color: #e66161 #f3bb5b #94e24f #85bfda;
+      }
+
+      .border-triangle2 {
+        width: 0;
+        height: 0;
+        border-width: 20px;
+        border-style: solid;
+        border-color: #e66161 #f3bb5b #94e24f #85bfda;
+      }
+
+      .border-triangle3 {
+        width: 0;
+        height: 0;
+        border-width: 20px;
+        border-style: solid dashed dashed dashed;
+        border-color: #e66161 transparent transparent transparent;
+      }
+
+      .message-box {
+        position: relative;
+        width: 200px;
+        height: 60px;
+        line-height: 60px;
+        background: #E9FBE4;
+        box-shadow: 1px 2px 3px #E9FBE4;
+        border: 1px solid #C9E9C0;
+        border-radius: 4px;
+        text-align: center;
+        color: #0C7823;
+
+        .triangle-border {
+          position: absolute;
+          left: 30px;
+          overflow: hidden;
+          width: 0;
+          height: 0;
+          border-width: 10px;
+          border-style: solid dashed dashed dashed;
+        }
+
+        .tb-border {
+          bottom: -20px;
+          border-color: #C9E9C0 transparent transparent transparent;
+        }
+
+        .tb-background {
+          bottom: -19px;
+          border-color: #E9FBE4 transparent transparent transparent;
+        }
+      }
+    }
+
+    .method3 {
+      &.message-box {
+        position: relative;
+        width: 290px;
+        height: 60px;
+        line-height: 60px;
+        background: #E9FBE4;
+        box-shadow: 1px 2px 3px #E9FBE4;
+        border: 1px solid #C9E9C0;
+        border-radius: 4px;
+        text-align: center;
+        color: #0C7823;
+
+        .arrow {
+          position: absolute;
+          bottom: -8px;
+          left: 30px;
+          overflow: hidden;
+          width: 13px;
+          height: 13px;
+          background: #E9FBE4;
+          border-bottom: 1px solid #C9E9C0;
+          border-right: 1px solid #C9E9C0;
+        }
+
+        .transform {
+          -webkit-transform: rotate(45deg);
+          -moz-transform: rotate(45deg);
+          -o-transform: rotate(45deg);
+          transform: rotate(45deg);
+        }
+      }
+    }
+
+    .method4 {
+      &.message-box {
+        position: relative;
+        padding: 10px 0;
+        width: 310px;
+        height: 40px;
+        line-height: 40px;
+        background: #E9FBE4;
+        box-shadow: 1px 2px 3px #E9FBE4;
+        border: 1px solid #C9E9C0;
+        border-radius: 4px;
+        text-align: center;
+        color: #0C7823;
+
+        .arrow-transform {
+          position: absolute;
+          top: -8px;
+          left: 50%;
+          overflow: hidden;
+          width: 13px;
+          height: 13px;
+          background: #E9FBE4;
+          border-bottom: 1px solid #C9E9C0;
+          border-right: 1px solid #C9E9C0;
+          border-left: none;
+          -webkit-transform: translate(-50%, 0) rotate(-135deg);
+          -moz-transform: translate(-50%, 0) rotate(-135deg);
+          -o-transform: translate(-50%, 0) rotate(-135deg);
+          transform: translate(-50%, 0) rotate(-135deg);
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="https://www.jianshu.com/p/b2eec4bcccaf" target="_blank">绘制三角形的三种方法</a>
+  <div class="method method1 message-box">
+    <span>1、利用 ◆ 字符实现（不推荐）</span>
+    <div class="triangle-character tc-border">◆</div>
+    <div class="triangle-character tc-background">◆</div>
+  </div>
+  <div class="method method2">
+    <div class="message-box triangle">
+      <span>2、利用 border 属性实现</span>
+      <div class="triangle-border tb-border"></div>
+      <div class="triangle-border tb-background"></div>
+    </div>
+    <div class="border-triangle1 triangle" title="利用bord实现三角形, 宽高为30px"></div>
+    <div class="border-triangle2 triangle" title="利用bord实现三角形, 宽高为0px"></div>
+    <div class="border-triangle3 triangle" title="利用bord实现一个三角形"></div>
+  </div>
+  <div class="method method3 message-box">
+    <span>3、利用 css transfrom 属性字符实现</span>
+    <div class="arrow transform"></div>
+  </div>
+  <div class="method method4 message-box">
+    <span>实践：利用 css transfrom 属性字符实现</span>
+    <div class="arrow-transform"></div>
+  </div>
+</body>
+
+</html>

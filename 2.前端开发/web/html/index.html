@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- meta元素提供的信息是用户不可见的，它不显示在页面中，一般用来定义页面信息的名称、关键字、作者等。
+    而在一个html头页面中可以有多个meta元素。meta元素的属性有两种：name和tttp-equiv -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <title>web研究院</title>
+  <!-- <link href="css/style" rel="stylesheet" type="text/css" /> -->
+  <!-- 引入css外部样式表 -->
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    .webdict-page {
+      height: 100%;
+      border: 1px dashed #999999;
+      margin: 5px;
+      padding: 10px;
+
+      .webdict-tip {
+        width: 100%;
+        font-size: 12px;
+        color: #999999;
+        word-wrap: break-word;
+      }
+
+      .webdict-iframe {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .button {
+        margin-right: 2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="webdict-page" style="height: 100%">
+    <div class="webdict-btns"></div>
+    <div class='webdict-tip' id='id-webdict-tip'>请点击按钮查看对应示例</div>
+    <iframe class='webdict-iframe' name="top" frameborder="0" scrolling="No"></iframe>
+  </div>
+  <script>
+    function insertPageBtns() {
+      const pageBtns = [
+        { name: '自定义提示', url: 'tip.html' },
+        { name: '动画', url: 'animation.html' },
+        { name: '监听事件', url: 'keyboard-listen.html' },
+        { name: 'websocket', url: 'websocket.html' },
+      ];
+      pageBtns.forEach(item => {
+        const targetElement = document.querySelector('.webdict-btns');
+        // 新按钮
+        const btnElement = document.createElement("button");
+        btnElement.innerHTML = item.name;
+        btnElement.setAttribute('class', 'button');
+        btnElement.setAttribute('value', 'ok');
+        btnElement.setAttribute('type', 'button');
+        btnElement.onclick = function () {
+          // 更新iframe属性
+          const targetPageElement = document.querySelector('.webdict-iframe');
+          targetPageElement.setAttribute('src', item.url);
+          // 更新iframe 页面提示
+          document.getElementById('id-webdict-tip').innerHTML = `${item.name}: ${item.url}`;
+        }
+        // 插入按钮
+        targetElement.appendChild(btnElement);
+      });
+    }
+
+    function main() {
+      this.insertPageBtns();
+    }
+
+    this.main();
+
+  </script>
+</body>
+
+</html>
