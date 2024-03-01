@@ -17,73 +17,248 @@
   <style type="text/css">
     html,
     body {
+      width: 100%;
       height: 100%;
       margin: 0;
+      display: flex;
+      justify-content: start;
+    }
+
+    .webdict-dir {
+      background: #f2f2f2;
+      width: 260px;
+      height: 100%;
+      margin-top: -16px;
+      padding-top: 10px;
+
+      .webdict-dir-tree {
+        --spacing: 1.5rem;
+        --radius: 8px;
+        margin-left: -40px;
+        user-select: none;
+        color: #111;
+        font-size: 14px;
+
+        li {
+          display: block;
+          position: relative;
+          padding-left: calc(2 * var(--spacing) - var(--radius) - 2px);
+          cursor: pointer;
+
+          div {
+
+            &.active,
+            &:hover {
+              color: #696;
+            }
+          }
+        }
+
+        ul {
+          margin-left: calc(var(--radius) - var(--spacing));
+          padding-left: 0;
+
+          li {
+            border-left: 2px solid #ddd;
+          }
+
+          li:last-child {
+            border-color: transparent;
+          }
+
+          li::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: calc(var(--spacing) / -2);
+            left: -2px;
+            width: calc(var(--spacing) + 2px);
+            height: calc(var(--spacing) + 1px);
+            border: solid #ddd;
+            border-width: 0 0 2px 2px;
+          }
+        }
+
+        summary {
+          display: block;
+          cursor: pointer;
+
+          &:hover {
+            color: #696;
+          }
+        }
+
+        summary::marker,
+        summary::-webkit-details-marker {
+          display: none;
+        }
+
+        summary:focus {
+          outline: none;
+        }
+
+        summary:focus-visible {
+          outline: 1px dotted #000;
+        }
+
+        li::after,
+        summary::before {
+          content: '';
+          display: block;
+          position: absolute;
+          top: calc(var(--spacing) / 2 - var(--radius));
+          left: calc(var(--spacing) - var(--radius) - 1px);
+          width: calc(2 * var(--radius));
+          height: calc(2 * var(--radius));
+          border-radius: 50%;
+          background: #696;
+        }
+
+        summary::before {
+          content: '+';
+          z-index: 1;
+          background: #696;
+          color: #fff;
+          line-height: calc(2 * var(--radius) - 2px);
+          text-align: center;
+        }
+
+        details[open]>summary::before {
+          content: '−';
+          line-height: calc(2 * var(--radius) + 1px);
+        }
+      }
     }
 
     .webdict-page {
       height: 100%;
-      border: 1px dashed #999999;
       margin: 5px;
-      padding: 10px;
+      flex-grow: 1;
 
       .webdict-tip {
         width: 100%;
         font-size: 12px;
         color: #999999;
         word-wrap: break-word;
+        margin: 6px 0;
       }
 
       .webdict-iframe {
         position: relative;
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
+        width: calc(100% - 8px);
+        height: calc(100% - 42px);
+        border: 1px dashed #999999;
+        padding: 3px;
 
-      .button {
-        margin-right: 2px;
+        iframe {
+          width: 100%;
+          height: 100%;
+          border: none;
+        }
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="webdict-dir">
+    <ul class="webdict-dir-tree"></ul>
+  </div>
   <div class="webdict-page" style="height: 100%">
-    <div class="webdict-btns"></div>
-    <div class='webdict-tip' id='id-webdict-tip'>请点击按钮查看对应示例</div>
-    <iframe class='webdict-iframe' name="top" frameborder="0" scrolling="No"></iframe>
+    <div class='webdict-tip' id='id-webdict-tip'>请点击左边目录，查看对应示例</div>
+    <div class='webdict-iframe'>
+      <iframe id='id-webdict-iframe' name="top" frameborder="0" scrolling="No"></iframe>
+    </div>
   </div>
   <script>
-    function insertPageBtns() {
-      const pageBtns = [
-        { name: '自定义提示', url: 'tip.html' },
-        { name: '动画', url: 'animation.html' },
-        { name: '监听事件', url: 'keyboard-listen.html' },
-        { name: 'websocket', url: 'websocket.html' },
-      ];
-      pageBtns.forEach(item => {
-        const targetElement = document.querySelector('.webdict-btns');
-        // 新按钮
-        const btnElement = document.createElement("button");
-        btnElement.innerHTML = item.name;
-        btnElement.setAttribute('class', 'button');
-        btnElement.setAttribute('value', 'ok');
-        btnElement.setAttribute('type', 'button');
-        btnElement.onclick = function () {
-          // 更新iframe属性
-          const targetPageElement = document.querySelector('.webdict-iframe');
-          targetPageElement.setAttribute('src', item.url);
-          // 更新iframe 页面提示
-          document.getElementById('id-webdict-tip').innerHTML = `${item.name}: ${item.url}`;
+    const treeItems = [{
+      name: 'web研究院（html/css）', url: '', children: [
+        {
+          name: '基础', url: '', children: [
+            { name: '涂鸦墙', url: 'graffiti-wall.html' },
+            { name: '自定义提示', url: 'tip.html' },
+            { name: '树形控件', url: 'tree.html' },
+            { name: '动画', url: 'animation.html' },
+          ]
+        },
+        {
+          name: '进阶', url: '', children: [
+            { name: '监听事件', url: 'keyboard-listen.html' },
+            { name: '网络通讯', url: 'websocket.html' },
+          ]
+        },
+      ]
+    }];
+
+    function buildDirTree(items, parent) {
+      for (let item of items) {
+        const liElement = document.createElement('li');
+        if (item.children) {
+          const detailsElement = document.createElement('details');
+          detailsElement.setAttribute('open', '');
+
+          const summaryElement = document.createElement('summary');
+          if (item.url) {
+            const spanElement = document.createElement('div');
+            spanElement.innerHTML = item.name;
+            spanElement.setAttribute('name', 'tree-item-name');
+            spanElement.onclick = (event) => this.handleClick(event, item);
+            summaryElement.appendChild(spanElement);
+          } else {
+            summaryElement.innerHTML = item.name;
+          }
+          detailsElement.appendChild(summaryElement);
+
+          const ulElement = document.createElement('ul');
+          this.buildDirTree(item.children, ulElement);
+          detailsElement.appendChild(ulElement);
+
+          liElement.appendChild(detailsElement);
+        } else {
+          const spanElement = document.createElement('div');
+          spanElement.innerHTML = item.name;
+          spanElement.setAttribute('name', 'tree-item-name');
+          spanElement.onclick = (event) => this.handleClick(event, item);
+          liElement.appendChild(spanElement);
         }
-        // 插入按钮
-        targetElement.appendChild(btnElement);
-      });
+        parent.appendChild(liElement);
+      }
+    }
+
+    function handleClick(event, data) {
+
+      // // 获取dom的8种方法(及其案例): https://blog.csdn.net/Null_Robot/article/details/107101818
+      // // 1）4种动态方法
+      // document.getElementsByClassName()//通过class类名称获取元素，返回的是一个集合
+      // document.getElementsByName()//通过元素的name属性获取元素，返回的是一个集合
+      // document.getElementByTd()//通过元素的id获取，返回的是一个对象
+      // document.getElementsByTagName()//通过元素名称获取，返回的是一个集合
+      // //  2）2种静态方法
+      // document.querySelector();//返回的是一个单个对象
+      // document.querySelectorAll();//返回的是一个列表
+      // //  3）2固定对象获取
+      // document.body//获取body
+      // document.documentElement//获取整个HTML
+
+      // 更新选中颜色
+      const items = document.getElementsByName('tree-item-name');
+      items && items.forEach((item) => item.setAttribute('class', ''));// item.style.color = '#000000';
+      event.target.setAttribute('class', 'active'); // event.target.style.color = '#696';
+
+      // console.log('handleClick:', event, data, items);
+
+      // 更新页面提示
+      document.getElementById('id-webdict-tip').innerHTML = `${data.name}: ${data.url}`;
+
+      // 更新iframe属性
+      const targetPageElement = document.getElementById('id-webdict-iframe');
+      targetPageElement.setAttribute('src', data.url);
+
+      return false;// 阻止冒泡
     }
 
     function main() {
-      this.insertPageBtns();
+      this.buildDirTree(treeItems, document.querySelector('.webdict-dir-tree'));
     }
 
     this.main();

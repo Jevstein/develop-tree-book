@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>草稿</title>
+
+  <style>
+    .text {
+      position: relative;
+      font-size: 12px;
+      color: #5d9cec;
+      user-select: none;
+      width: 150px;
+
+      div {
+        margin-bottom: 20px;
+      }
+
+      .text-single {
+        word-break: keep-all;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .text-mutil-3 {
+        overflow: hidden;
+        text-overflow: ellipsis;  /* 超出部分省略号 */
+        word-break: break-all;  /* break-all(允许在单词内换行。) */  
+        display: -webkit-box; /* 对象作为伸缩盒子模型显示 */
+        -webkit-box-orient: vertical; /* 设置或检索伸缩盒对象的子元素的排列方式 */
+        -webkit-line-clamp: 3; /* 显示的行数 */
+        /* max-height: 80px; 设置最大高度，根据行高，要几行乘以几倍 */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="text">
+    <div class="text-single" title="溢出隐藏，不换行...">
+      溢出隐藏，不换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+    </div>
+    <div class="text-mutil-3" title="限制三行显示，超出后显示...">
+      限制三行显示，超出后显示省略号（如：长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+    </div>
+  </div>
+
+  <script>
+  </script>
+</body>
+
+</html>
