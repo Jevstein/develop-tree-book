@@ -3,15 +3,24 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>草稿</title>
+  <title>涂鸦墙</title>
 
   <style>
+    body {
+      display: flex;
+    }
+
+    .introduce {
+      margin-right: 20px;
+      font-size: 14px;
+    }
+
     .text {
       position: relative;
       font-size: 12px;
       color: #5d9cec;
       user-select: none;
-      width: 150px;
+      width: 200px;
 
       div {
         margin-bottom: 20px;
@@ -26,18 +35,50 @@
 
       .text-mutil-3 {
         overflow: hidden;
-        text-overflow: ellipsis;  /* 超出部分省略号 */
-        word-break: break-all;  /* break-all(允许在单词内换行。) */  
-        display: -webkit-box; /* 对象作为伸缩盒子模型显示 */
-        -webkit-box-orient: vertical; /* 设置或检索伸缩盒对象的子元素的排列方式 */
-        -webkit-line-clamp: 3; /* 显示的行数 */
+        text-overflow: ellipsis;
+        /* 超出部分省略号 */
+        word-break: break-all;
+        /* break-all(允许在单词内换行。) */
+        display: -webkit-box;
+        /* 对象作为伸缩盒子模型显示 */
+        -webkit-box-orient: vertical;
+        /* 设置或检索伸缩盒对象的子元素的排列方式 */
+        -webkit-line-clamp: 3;
+        /* 显示的行数 */
         /* max-height: 80px; 设置最大高度，根据行高，要几行乘以几倍 */
+      }
+
+      .text-math-formula {
+        line-height: 0;
       }
     }
   </style>
 </head>
 
-<body>
+<body text="blue">
+  <div class="introduce">
+    <div>书名： <em>《HTML 涂鸦实验室》</em></div>
+    <div>作者： Jevstein </div>
+    <div>日期： <u>2024年3月2日</u> </div>
+    <div>原价： <del>999.99</del>元 促销价： 888.88元 </div>
+    <div>
+      <div>数学公式：</div>
+      <div align="center">上标: X<sup>3</sup> + 6X<sup>2</sup> - 1 = 0 </div>
+      <div align="center">下标: X<sub>1</sub> + 6X<sub>2</sub> - 1 = 0 </div>
+    </div>
+    <div>换行符(br)：<br /> 君子生非异也，善假于物也</div>
+    <div>
+      <h3 align="center">水平线表格(hr)</h1>
+        <hr />
+        <p align="center"> 苹果 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3颗</p>
+        <hr />
+        <p align="center"> 核桃 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2粒</p>
+        <hr />
+        <p align="center"> 菠萝 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1个</p>
+        <hr />
+    </div>
+  </div>
+
   <div class="text">
     <div class="text-single" title="溢出隐藏，不换行...">
       溢出隐藏，不换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长
@@ -54,7 +95,6 @@
       长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
     </div>
   </div>
-
   <script>
   </script>
 </body>

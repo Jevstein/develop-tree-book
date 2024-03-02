@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>拖拽</title>
+
+  <style>
+
+    .drag-drop-simple {
+      margin-bottom: 20px;
+
+      .view {
+        display: flex;
+        margin-top: 20px;
+
+        .drag {
+          background: red;
+          color: yellow;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 100px;
+          cursor: pointer;
+        }
+
+        .drop {
+          width: 200px;
+          height: 200px;
+          border: 1px dashed #999999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #999999;
+          text-align: center;
+          font-size: 14px;
+
+          &.active {
+            background: #EFEFF8;
+            color: red;
+          }
+        }
+      }
+    }
+
+    .drag-drop-go {
+      .view {
+        margin-top: 20px;
+        height: 100px;
+
+        .drag {
+          background: red;
+          color: yellow;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 100px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .drag-drop-class-schdule {
+      .class-schdule-box {
+        margin-top: 20px;
+        display: flex;
+        color: black;
+
+        .over_bg {
+          border: 2px dashed #999999;
+          box-sizing: border-box;
+        }
+
+        .subjects {
+            cursor: pointer;
+            padding: 2px 10px;
+            border: 1px solid #999999;
+
+            &.color1 {
+              background-color: #fec0cb;
+            }
+            &.color2 {
+              background-color: #dc9fdc;
+            }
+            &.color3 {
+              background-color: aqua;
+            }
+            &.color4 {
+              background-color: cadetblue;
+            }
+          }
+
+        .left {
+          .subjects {
+            margin: 3px 5px;
+          }
+        }
+
+        td {
+          width: 80px;
+          height: 20px;
+          text-align: center;
+        }
+
+        thead {
+          td {
+            background: #c0bfc0;
+          }
+        }
+      }
+    }
+
+  </style>
+</head>
+
+<body text="blue">
+  <div><a href="https://zhuanlan.zhihu.com/p/482583250?utm_id=0" target="_blank">前端拖拽入门实践</a></div>
+  <div><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API" target="_blank">HTML Drag and Drop API</a></div>
+
+  <img src="./image/dragdrop.jpg" width="800px" height="500px">
+
+  <div class="drag-drop-simple">
+    <h1>1、基础拖拽</h1>
+    <div class="view">
+      <div class="drag" draggable="true" id="id-simple-drag"
+        ondragstart="handleSimpleDragStart(event)"
+        onclick="handleSimpleClick(event)"
+      >
+        拖我
+      </div>
+      <div class="drop" id="id-simple-drop-area"
+        ondragover="handleSimpleDragOver(event)"
+        ondragleave="handleSimpleDragLeave(event)"
+        ondrop="handleSimpleDrop(event)"
+      >
+        请拖拽到此处<br />(也可以是磁盘中的图片文件)
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="drag-drop-go">
+    <h1>2、拖拽行走</h1>
+    <div class="view">
+      <div class="drag" draggable="true" 
+        ondragstart="handleGoDragStart(event)" 
+        ondragend="handleGoDragEnd(event)"
+      >
+        拖行
+      </div>
+    </div>
+  </div>
+
+  <div class="drag-drop-line">
+    <h1>3、拖拽连线</h1>
+    <div class="view">
+        略
+    </div>
+  </div>
+
+  <div class="drag-drop-class-schdule">
+    <h1>4、自制课程表</h1>
+    <a href="https://blog.csdn.net/weixin_65793170/article/details/130941302" target="_blank">
+      JavaScript拖拽API，ondragstart、ondragover、ondragenter、ondrop，使用详细（JavaScript常用原生拖拽API）
+    </a>
+    <div class="class-schdule-box">
+      <div class="left" data-drop="move">
+        <div data-effect="copy" draggable="true" class="subjects color1">语文</div>
+        <div data-effect="copy" draggable="true" class="subjects color2">数学</div>
+        <div data-effect="copy" draggable="true" class="subjects color3">英语</div>
+        <div data-effect="copy" draggable="true" class="subjects color4">体育</div>
+      </div>
+      <table class="right_table" border="1">
+        <thead>
+          <tr>
+            <td>星期日</td>
+            <td>星期一</td>
+            <td>星期二</td>
+            <td>星期三</td>
+            <td>星期四</td>
+            <td>星期五</td>
+            <td>星期六</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+          <tr>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+            <td data-drop="copy"></td>
+          </tr>
+        </tbody>
+   
+      </table>
+    </div>
+   
+
+  </div>
+
+  <script>
+    //------------------ 1、基础拖拽 ------------------ 
+    // ondragstart = handleSimpleDragStart
+    // ondragover = handleSimpleDragOver
+    // ondragleave = handleSimpleDragLeave
+    // ondrop = handleSimpleDrop
+    // dataTransfer: effectAllowed、setData、getData
+    // 拖拽-目标
+    function handleSimpleDragStart(event) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', '这是拖进来的自定义数据');
+      // console.log('拖拽开始:', event.dataTransfer, event);
+    }
+    function handleSimpleClick(event) {
+      const target = document.getElementById('id-simple-drop-area');
+      target.innerHTML = '请拖拽到此处<br />(也可以是磁盘中的图片文件)';
+
+      event.target.innerHTML = '拖我';
+      
+    }
+    // 拖拽-目的地
+    function handleSimpleDragOver(event) {
+      // console.log('拖拽经过:', event.dataTransfer, event);
+      event.target.innerHTML='松开鼠标释放'
+      event.target.setAttribute('class', 'drop active');
+
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    function handleSimpleDragLeave(event) {
+      // console.log('拖拽离开:', event.dataTransfer, event);
+      event.target.innerHTML='请拖拽到此处<br />(也可以是磁盘中的图片文件)'
+      event.target.setAttribute('class', 'drop');
+    }
+    function handleSimpleDrop(event) {
+      this.handleSimpleDragLeave(event);
+      
+      const target = document.getElementById('id-simple-drag');
+      target.innerHTML = '点我';
+
+      const data = event.dataTransfer.getData('text/plain');
+      if (data && typeof(data) === 'string') {
+        event.target.innerHTML = data;
+        return;
+      }
+      // console.log('拖拽释放:', event.dataTransfer, event, data);
+
+      // 拖拽文件
+      if (event.dataTransfer.files?.length > 0) {
+        const file = event.dataTransfer.files[0];
+    
+        //从文件对象中读取数据  
+        const fileReader = new FileReader();  
+        //fileReader.readAsText(file); //从文件中读取文本字符串  
+        fileReader.readAsDataURL(file); //从文件中读取URL数据  
+        fileReader.onload = function(){
+          const img = new Image();  
+          img.src = fileReader.result;
+          img.width = '200';
+          img.height = '200';
+          event.target.innerHTML = '';
+          event.target.appendChild(img);
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+
+    //------------------ 2、拖拽行走 ------------------ 
+    let goMouseDiff = null;
+
+    function handleGoDragStart(e) {
+      //初始时鼠标与元素的位置差
+      goMouseDiff = `translate(${-e.offsetX}px, ${-e.offsetY}px)`;
+      console.log('handleGoDragStart:', goMouseDiff);
+    }
+
+    function handleGoDragEnd(e) {
+      //开始时元素的位置
+      const startPosition = window.getComputedStyle(e.target).transform;
+      //鼠标移动的位置
+      const mouseMove = `translate(${e.offsetX}px, ${e.offsetY}px)`;
+      // e.target.style.transform = `${goMouseDiff} ${startPosition} ${mouseMove}`;
+      // e.target.style.transform = `${goMouseDiff}`;
+      // e.target.style.transform = `${startPosition}`;
+      e.target.style.transform = `${mouseMove}`;
+      // console.log('handleGoDragEnd:', startPosition, mouseMove, e.target.style.transform);
+    }
+
+    //------------------ 3、拖拽连线 ------------------ 
+    
+    //------------------ 4、自制课程表 ------------------ 
+    // 用到的自定义属性
+    // draggable="true"
+    // data-effect="copy"
+    // data-drop="copy"
+    // data-drop="move"
+
+    // 事件委托  获取父元素
+    const containerBox = document.querySelector('.class-schdule-box');
+    
+    let source;//定义source ，用于拿到节点‘
+    
+    // 拖拽开始 执行一次
+    containerBox.ondragstart = (e) => {
+      // console.log("start", e.target);
+      // 拖拽事件改为移动 此事拖拽时元素上没有加号 
+      // e.dataTransfer.effectAllowed = "move";
+      // 默认是copy复制 此事拖拽时元素上有加号
+      // e.dataTransfer.effectAllowed = "copy";
+    
+      // 自定义事件data-effect = "copy" ,此事件可共享, 所以
+      e.dataTransfer.effectAllowed = e.target.dataset.effect;
+      // 拿到节点
+      source = e.target;
+    };
+    
+    // 拖拽经过 一直执行，类似Mousemove事件
+    containerBox.ondragover = (e) => {
+      // console.log("over", e.target);
+      //  阻止默认行为 这里就是开启表格的drop事件
+      e.preventDefault();
+    };
+    
+    function clearStyle() {
+      // 清除之前的背景颜色over_bg
+      document.querySelectorAll(".over_bg").forEach((node) => {
+        node.classList.remove("over_bg");
+      });
+    }
+    // 判断父元素
+    function getDropNode(node) {
+      while (node) {
+        if (node.dataset && node.dataset.drop) {
+          return node;
+        }
+        node = node.parentNode;
+      }
+    }
+    // 拖拽进入 执行一次
+    containerBox.ondragenter = (e) => {
+      // 清除之前的背景调用
+      clearStyle();
+      // console.log("enter", e.target);
+      // 改变背景颜色 添加over_bg时父子都会触发
+      // e.target.classList.add('over_bg');
+      // 所以给right里的td添加data-drop="copy"只接受复制
+      // 给left添加data-drop="move"
+      // const dropNode = e.target;
+      // 判断父元素
+      const dropNode = getDropNode(e.target);
+      if (dropNode && dropNode.dataset.drop === e.dataTransfer.effectAllowed) {
+        //如果相等 表示该节点能够接受目前拖拽的节点
+        dropNode.classList.add('over_bg');
+      }
+    };
+    
+    // 拖拽放手 执行一次，table中的tr td默认禁止拖拽在上面，所以需要阻止默认行为；
+    containerBox.ondrop = (e) => {
+      // console.log("drop", e.target);
+      // 首先清除之前的背景颜色
+      clearStyle();
+      const dropNode = getDropNode(e.target);
+      if (dropNode && dropNode.dataset.drop === e.dataTransfer.effectAllowed) {
+        //如果相等 表示该节点能够接受目前拖拽的节点
+        // 分为两种情况
+        if (dropNode.dataset.drop === "copy") {
+          dropNode.innerHTML = '';
+          // 克隆元素 source是上面拿到的元素
+          const cloned = source.cloneNode(true);
+          cloned.dataset.effect = "move";
+          // 添加克隆的元素
+          dropNode.appendChild(cloned);
+        }
+        else {
+          source.remove();
+        }
+      }
+    };
+
+  </script>
+</body>
+
+</html>
