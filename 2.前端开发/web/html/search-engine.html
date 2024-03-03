@@ -271,7 +271,7 @@
 
   <script>
     const websiteMap = {
-      '1': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度' },
+      '1': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度', isOpen: true },
       '2': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者' },
       '3': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应' },
     };
@@ -349,6 +349,13 @@
     function handleClickMenuItem(event) {
       const isSelected = event.target.getAttributeNode('class').value.indexOf('selected') > -1;
       const key = event.target.getAttributeNode('data-key').value;
+
+      if (websiteMap[key].isOpen) {
+        const url = this.getSearchUrl(key);
+        window.open(url, "_blank", "noopener=yes,noreferrer=yes");
+        return;
+      }
+
       if (isSelected) {
         const idx = websiteKeys.findIndex(item => item === key);
         websiteKeys.splice(idx, 1);
