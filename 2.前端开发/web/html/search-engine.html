@@ -63,10 +63,10 @@
 
           &.erasable-select {
             position: relative;
-            min-height: calc(30 * 1px);
+            min-height: calc(38 * 1px);
             font-size: calc(14 * 1px);
             font-weight: 400;
-            line-height: calc(calc(30 * 1px) - calc(4 * 1px) * 2);
+            line-height: calc(calc(38 * 1px) - calc(4 * 1px) * 2);
             padding: calc(4 * 1px);
             border: calc(1 * 1px) solid #e5e5e5;
             box-shadow: none;
@@ -104,9 +104,11 @@
             .note {
               display: flex;
               align-items: center;
+              color: #999999;
             }
 
             .arrow {
+              margin-left: 5px;
               width: 0;
               height: 0;
               border-width: 4px;
@@ -132,33 +134,34 @@
                 position: absolute;
                 z-index: 99999;
                 left: 0;
-                top: 32px;
+                top: 42px;
                 display: block;
                 padding: 0px;
                 width: 100px;
                 background: #fff;
                 box-shadow: 0 0 2px #ccc;
+                text-align: left;
 
                 .menu-item {
-                  padding: 5px 10px;
+                  padding: 7px 10px;
                   font-size: 14px;
                   line-height: 14px;
-                  color: #111;
+                  color: #999999;
 
                   &:hover {
-                    color: #5d9cec;
+                    color: #4e6ef2;
                     background-color: #f5f5f5;
                   }
 
                   &.selected {
-                    color: #5d9cec;
+                    color: #4e6ef2;
                   }
                 }
               }
             }
 
             &.is-data {
-              border-color: #5d9cec;
+              border-color: #4e6ef2;
               background: #F9F9F9;
 
               .note,
@@ -167,7 +170,7 @@
               }
 
               &:hover {
-                border-color: #5d9cec;
+                border-color: #4e6ef2;
                 background: #ffffff;
 
                 .erasable-select-content {
@@ -178,7 +181,7 @@
               .erasable-select-content {
                 display: flex;
                 justify-content: space-between;
-                color: #5d9cec;
+                color: #4e6ef2;
                 border-radius: calc(3 * 1px);
                 padding: 0 3px;
                 cursor: pointer;
