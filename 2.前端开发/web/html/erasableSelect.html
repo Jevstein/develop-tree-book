@@ -6,11 +6,23 @@
   <title>可删选择框</title>
 
   <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .weblab-select-head {
+      width: 200px;
+    }
+
     .erasable-select {
-      min-height: calc(28 * 1px);
-      font-size: calc(12 * 1px);
+      position: relative;
+      min-height: calc(30 * 1px);
+      font-size: calc(14 * 1px);
       font-weight: 400;
-      line-height: calc(calc(28 * 1px) - calc(4 * 1px) * 2);
+      line-height: calc(calc(30 * 1px) - calc(4 * 1px) * 2);
       padding: calc(4 * 1px);
       border: calc(1 * 1px) solid #e5e5e5;
       box-shadow: none;
@@ -25,24 +37,9 @@
       -webkit-user-select: none;
       user-select: none;
 
-      &.has-data {
-        border-color: #5d9cec;
-        background: #F9F9F9;
-
-        &:hover {
-          border-color: #5d9cec;
-          background: #ffffff;
-
-          .content {
-            background: #f0f4ff;
-          }
-        }
-      }
-
-
       &::placeholder {
         color: #cccccc;
-        font-size: calc(12 * 1px);
+        font-size: calc(14 * 1px);
         opacity: 1;
         transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
       }
@@ -60,60 +57,108 @@
         }
       }
 
-
-      .empty {
-        width: 100%;
-
+      .note {
         display: flex;
-        justify-content: space-between;
+        align-items: center;
+      }
 
-        .note {
-          display: flex;
-          align-items: center;
-        }
+      .arrow {
+        width: 0;
+        height: 0;
+        border-width: 4px;
+        border-style: solid dashed dashed dashed;
+        border-color: transparent transparent transparent #bbbbbb;
 
-        .arrow {
-          /* color: #bbbbbb; */
-          margin-left: 5px;
+        transition: all .3s;
 
-          width: 0;
-          height: 0;
-          border-width: 4px;
-          border-style: solid dashed dashed dashed;
-          border-color: #bbbbbb transparent transparent transparent;
-
-          transition: 'all .3s';
-
-          /* transform: 'rotate(180deg)' : '', ; */
+        &.bottom {
+          transform: rotate(90deg);
         }
       }
 
-      .content {
-        display: flex;
-        justify-content: space-between;
-        color: #5d9cec;
-        border-radius: calc(3 * 1px);
-        padding: 0 3px;
-        cursor: pointer;
+      .erasable-select-menu,
+      .erasable-select-content {
+        display: none;
+      }
 
-        .title {
-          margin-right: 5px;
-          font-weight: 500;
-        }
+      &.is-menu {
+        position: relative;
 
-        .data-item {
-          display: flex;
-          align-items: center;
+        .erasable-select-menu {
+          position: absolute;
+          left: 0;
+          top: 32px;
+          display: block;
+          padding: 0px;
+          width: 100px;
+          background: #fff;
+          box-shadow: 0 0 2px #ccc;
 
-          .icon-close {
-            margin-left: 3px;
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            border-radius: 2px;
+          .menu-item {
+            padding: 5px 10px;
+            font-size: 14px;
+            line-height: 14px;
+            color: #111;
 
             &:hover {
-              background: #dae4fe;
+              color: #5d9cec;
+              background-color: #f5f5f5;
+            }
+
+            &.selected {
+              color: #5d9cec;
+            }
+          }
+        }
+      }
+
+      &.is-data {
+        border-color: #5d9cec;
+        background: #F9F9F9;
+
+        .note,
+        .arrow {
+          display: none;
+        }
+
+        &:hover {
+          border-color: #5d9cec;
+          background: #ffffff;
+
+          .erasable-select-content {
+            background: #f0f4ff;
+          }
+        }
+
+        .erasable-select-content {
+          display: flex;
+          justify-content: space-between;
+          color: #5d9cec;
+          border-radius: calc(3 * 1px);
+          padding: 0 3px;
+          cursor: pointer;
+
+          .title {
+            margin-right: 5px;
+            font-weight: 500;
+          }
+
+          .content-item {
+            display: flex;
+            align-items: center;
+            margin-right: 2px;
+
+            .icon-close {
+              margin-left: 0px;
+              display: flex;
+              align-items: center;
+              padding: 0 4px;
+              border-radius: 2px;
+              height: 16px;
+
+              &:hover {
+                background-color: #dae4fe;
+              }
             }
           }
         }
@@ -123,38 +168,134 @@
 </head>
 
 <body>
-
-  <div class='erasable-select has-data' onclick="handleClickArrow(event)">
-    <!-- 无数据 -->
-    <div class="empty">
+  <div class="weblab-select-head">
+    <div class='erasable-select' onclick="handleClickArrow(event)">
+      <!-- 无数据 -->
       <div class='note'>
         <span class='title'> 请设置搜索引擎 </span>
       </div>
-      <div class='arrow'> </div>
-    </div>
+      <div class='arrow left'> </div>
 
-    <!-- 有数据 -->
-    <!-- <div class='content'>
-      {keepTitle && <span class='title'> {title} </span>}
-      <div class='data-item'>
-        { item.icon && <Icon class='data-item-icon' name={item.icon} width="13" />}
-        百度
-        <div class='icon-close' onclick="handleClickClose(event)">
-          <Icon name={'Icon-error01'} width="13" />
+      <!-- 有数据 -->
+      <div class='erasable-select-content'>
+        <!-- <span class='title'> 当前搜索 </span> -->
+        <div class='content-item'>
+          百度
+          <div class='icon-close' onclick="handleClickClose(event)">×</div>
         </div>
       </div>
-    </div> -->
+      <!-- 弹出菜单 -->
+      <div class="erasable-select-menu">
+        <div>百度</div>
+        <div>必应</div>
+      </div>
+    </div>
   </div>
 
 
   <script>
-    function handleClickArrow(event) {
+    const websiteMap = {
+      '1': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度' },
+      '2': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者' },
+      '3': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应' },
+    };
+    const websiteIds = ['2', '3'];
 
+    function handleClickArrow(event) {
+      const selectElement = document.querySelector('.erasable-select');
+
+      const isMenu = selectElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
+      isMenu ? selectElement.classList.remove('is-menu') : selectElement.classList.add('is-menu')
+
+      const arrowElement = document.querySelector('.arrow');
+      arrowElement.classList.remove(isMenu ? 'bottom' : 'left');
+      arrowElement.classList.add(isMenu ? 'left' : 'bottom');
+
+      console.log(event);
     }
 
     function handleClickClose(event) {
+      event.preventDefault();
+      event.stopPropagation();
 
+      const id = event.target.getAttributeNode('data-id').value;
+      const idx = websiteIds.findIndex(item => item === id);
+      websiteIds.splice(idx, 1);
+      this.updateMenu();
     }
+
+    function handleClickMenuItem(event) {
+      const isSelected = event.target.getAttributeNode('class').value.indexOf('selected') > -1;
+      const id = event.target.getAttributeNode('data-id').value;
+      if (isSelected) {
+        const idx = websiteIds.findIndex(item => item === id);
+        websiteIds.splice(idx, 1);
+      } else {
+        websiteIds.push(id);
+      }
+
+      this.updateMenu();
+    }
+
+    function buildMenu() {
+      const menuElememt = document.querySelector('.erasable-select-menu');
+      menuElememt.innerHTML = "";
+
+      Object.keys(websiteMap).forEach(key => {
+        const item = websiteMap[key];
+        const isSelected = websiteIds.includes(key);
+
+        const element = document.createElement('div');
+        element.innerHTML = item.name;
+        element.setAttribute('class', `menu-item ${isSelected ? 'selected' : ''}`);
+        element.setAttribute('data-id', key);
+        element.onclick = (event) => this.handleClickMenuItem(event);
+
+        menuElememt.appendChild(element);
+      });
+    }
+
+    function buildContent() {
+      // 更新class
+      const selectElement = document.querySelector('.erasable-select');
+      const isData = selectElement.getAttributeNode('class').value.indexOf('is-data') > -1;
+      if (websiteIds.length > 0) {
+        !isData && selectElement.classList.add('is-data');
+      } else {
+        isData && selectElement.classList.remove('is-data');
+      }
+
+      // 更新选中内容
+      const contentElememt = document.querySelector('.erasable-select-content');
+      contentElememt.innerHTML = "";
+
+      websiteIds.forEach(key => {
+        const item = websiteMap[key];
+
+        // 选中数据
+        const element = document.createElement('div');
+        element.innerHTML = item.name;
+        element.setAttribute('class', `content-item`);
+        element.setAttribute('data-id', key);
+
+        // 关闭按钮
+        const closeElement = document.createElement('div');
+        closeElement.innerHTML = '×';
+        closeElement.setAttribute('class', `icon-close`);
+        closeElement.setAttribute('data-id', key);
+        closeElement.onclick = (event) => this.handleClickClose(event);
+        element.appendChild(closeElement);
+
+        contentElememt.appendChild(element);
+      });
+    }
+
+    function updateMenu() {
+      this.buildContent();
+      this.buildMenu();
+    }
+
+    updateMenu();
 
   </script>
 </body>
