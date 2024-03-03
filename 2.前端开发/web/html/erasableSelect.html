@@ -199,7 +199,7 @@
       '2': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者' },
       '3': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应' },
     };
-    const websiteIds = ['2', '3'];
+    const websiteKeys = ['2', '3'];
 
     function handleClickArrow(event) {
       const selectElement = document.querySelector('.erasable-select');
@@ -210,28 +210,26 @@
       const arrowElement = document.querySelector('.arrow');
       arrowElement.classList.remove(isMenu ? 'bottom' : 'left');
       arrowElement.classList.add(isMenu ? 'left' : 'bottom');
-
-      console.log(event);
     }
 
     function handleClickClose(event) {
       event.preventDefault();
       event.stopPropagation();
 
-      const id = event.target.getAttributeNode('data-id').value;
-      const idx = websiteIds.findIndex(item => item === id);
-      websiteIds.splice(idx, 1);
+      const key = event.target.getAttributeNode('data-key').value;
+      const idx = websiteKeys.findIndex(item => item === key);
+      websiteKeys.splice(idx, 1);
       this.updateMenu();
     }
 
     function handleClickMenuItem(event) {
       const isSelected = event.target.getAttributeNode('class').value.indexOf('selected') > -1;
-      const id = event.target.getAttributeNode('data-id').value;
+      const key = event.target.getAttributeNode('data-key').value;
       if (isSelected) {
-        const idx = websiteIds.findIndex(item => item === id);
-        websiteIds.splice(idx, 1);
+        const idx = websiteKeys.findIndex(item => item === key);
+        websiteKeys.splice(idx, 1);
       } else {
-        websiteIds.push(id);
+        websiteKeys.push(key);
       }
 
       this.updateMenu();
@@ -243,12 +241,12 @@
 
       Object.keys(websiteMap).forEach(key => {
         const item = websiteMap[key];
-        const isSelected = websiteIds.includes(key);
+        const isSelected = websiteKeys.includes(key);
 
         const element = document.createElement('div');
         element.innerHTML = item.name;
         element.setAttribute('class', `menu-item ${isSelected ? 'selected' : ''}`);
-        element.setAttribute('data-id', key);
+        element.setAttribute('data-key', key);
         element.onclick = (event) => this.handleClickMenuItem(event);
 
         menuElememt.appendChild(element);
@@ -259,7 +257,7 @@
       // 更新class
       const selectElement = document.querySelector('.erasable-select');
       const isData = selectElement.getAttributeNode('class').value.indexOf('is-data') > -1;
-      if (websiteIds.length > 0) {
+      if (websiteKeys.length > 0) {
         !isData && selectElement.classList.add('is-data');
       } else {
         isData && selectElement.classList.remove('is-data');
@@ -269,20 +267,20 @@
       const contentElememt = document.querySelector('.erasable-select-content');
       contentElememt.innerHTML = "";
 
-      websiteIds.forEach(key => {
+      websiteKeys.forEach(key => {
         const item = websiteMap[key];
 
         // 选中数据
         const element = document.createElement('div');
         element.innerHTML = item.name;
         element.setAttribute('class', `content-item`);
-        element.setAttribute('data-id', key);
+        element.setAttribute('data-key', key);
 
         // 关闭按钮
         const closeElement = document.createElement('div');
         closeElement.innerHTML = '×';
         closeElement.setAttribute('class', `icon-close`);
-        closeElement.setAttribute('data-id', key);
+        closeElement.setAttribute('data-key', key);
         closeElement.onclick = (event) => this.handleClickClose(event);
         element.appendChild(closeElement);
 
