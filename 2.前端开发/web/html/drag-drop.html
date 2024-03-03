@@ -157,15 +157,8 @@
     </div>
   </div>
 
-  <div class="drag-drop-line">
-    <h1>3、拖拽连线</h1>
-    <div class="view">
-        略
-    </div>
-  </div>
-
   <div class="drag-drop-class-schdule">
-    <h1>4、自制课程表</h1>
+    <h1>3、自制课程表</h1>
     <a href="https://blog.csdn.net/weixin_65793170/article/details/130941302" target="_blank">
       JavaScript拖拽API，ondragstart、ondragover、ondragenter、ondrop，使用详细（JavaScript常用原生拖拽API）
     </a>
@@ -260,6 +253,13 @@
 
   </div>
 
+  <div class="drag-drop-line">
+    <h1>4、拖拽连线</h1>
+    <div class="view">
+        略
+    </div>
+  </div>
+
   <script>
     //------------------ 1、基础拖拽 ------------------ 
     // ondragstart = handleSimpleDragStart
@@ -349,10 +349,8 @@
       e.target.style.transform = `${mouseMove}`;
       // console.log('handleGoDragEnd:', startPosition, mouseMove, e.target.style.transform);
     }
-
-    //------------------ 3、拖拽连线 ------------------ 
     
-    //------------------ 4、自制课程表 ------------------ 
+    //------------------ 3、自制课程表 ------------------ 
     // 用到的自定义属性
     // draggable="true"
     // data-effect="copy"
@@ -440,6 +438,8 @@
         }
       }
     };
+
+    //------------------ 4、拖拽连线 ------------------ 
 
   </script>
 </body>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" />
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src *" /> -->
+  <!-- <meta http-equiv="Content-security-Policy" content="script-src 'self'; form-action 'self'; report-uri report"> -->
+  <title>搜索引擎</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .website-head {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+
+      .search-bar {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+        /* border: 1px solid red; */
+        border-radius: 5px;
+
+        input {
+          width: 480px;
+          height: 34px;
+          border-radius: 10px 0 0 10px;
+          border: 2px solid #c4c7ce;
+          border-right: 0;
+          font-size: 16px;
+          padding-left: 10px;
+
+          &:hover {
+            border-color: #A7AAB5;
+          }
+        }
+
+        div {
+          cursor: pointer;
+          width: 112px;
+          height: 40px;
+          line-height: 40px;
+          color: #FFFFFF;
+          background-color: #4e6ef2;
+          border-radius: 0 10px 10px 0;
+          font-size: 17px;
+          box-shadow: none;
+          font-weight: 400;
+          border: 0;
+          outline: 0;
+          letter-spacing: normal;
+          user-select: none;
+        }
+      }
+    }
+
+    .website-body {
+      &.frame-view {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: calc(100% - 5px);
+
+        iframe {
+          display: block;
+          border: none;
+          /* make the border size be included in the height */
+          box-sizing: border-box;
+          /* make them block to fix white space margin */
+          width: 100%;
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="website-head">
+    <div class="search-bar" align="center">
+      <input class="search-text" type="text" onkeydown="handleKeyDownInput(event)"> </input>
+      <div class="search-btn" onclick="handleClickSearch(event)"> 搜索一下 </div>
+    </div>
+  </div>
+  <div class="website-body frame-view">
+
+  </div>
+
+  <script>
+    const websites = [
+      // { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度' },
+      { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '百度开发者' },
+      { url: 'https://cn.bing.com', param: '/search?q=', name: '必应' },
+    ]
+
+    function handleKeyDownInput(event) {
+      let keycode = 0;
+
+      const browser = navigator.appName;
+      if (browser == "Microsoft Internet Explorer") { // IE浏览器
+        keycode = event.keyCode;
+      } else {
+        keycode = event.which;
+      }
+
+      if (keycode == 13) {//回车键
+        this.handleClickSearch(event);
+      }
+    }
+
+    function handleClickSearch(event) {
+      const inputElement = document.querySelector('.search-text');
+      const text = inputElement.value;
+
+      const frameViewElement = document.querySelector('.frame-view');
+      frameViewElement.childNodes.forEach(node => {
+        const id = node.getAttributeNode('id-iframe').value;
+        const item = websites.find(item => item.url === id);
+        if (item) {
+          const src = `${item.url}${item.param}${text}`;
+          node.setAttribute('src', src);
+        }
+      });
+    }
+
+    function buildIframe() {
+      const frameViewElement = document.querySelector('.frame-view');
+      frameViewElement.innerHTML = "";// 删除所有子节点
+
+      websites.forEach(item => {
+        const element = document.createElement('iframe');
+        element.setAttribute('id-iframe', item.url);
+        element.setAttribute('src', item.url);
+        frameViewElement.appendChild(element);
+      })
+    }
+
+    function main() {
+      this.buildIframe();
+    }
+
+    main();
+
+  </script>
+</body>
+
+</html>

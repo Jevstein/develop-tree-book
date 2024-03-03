@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>可删选择框</title>
+
+  <style>
+    .erasable-select {
+      min-height: calc(28 * 1px);
+      font-size: calc(12 * 1px);
+      font-weight: 400;
+      line-height: calc(calc(28 * 1px) - calc(4 * 1px) * 2);
+      padding: calc(4 * 1px);
+      border: calc(1 * 1px) solid #e5e5e5;
+      box-shadow: none;
+      box-sizing: border-box;
+      align-items: center;
+      border-radius: calc(3 * 1px);
+      background-color: #ffffff;
+      transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1), color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      -webkit-user-select: none;
+      user-select: none;
+
+      &.has-data {
+        border-color: #5d9cec;
+        background: #F9F9F9;
+
+        &:hover {
+          border-color: #5d9cec;
+          background: #ffffff;
+
+          .content {
+            background: #f0f4ff;
+          }
+        }
+      }
+
+
+      &::placeholder {
+        color: #cccccc;
+        font-size: calc(12 * 1px);
+        opacity: 1;
+        transition: color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      }
+
+      &:hover {
+        border-color: #bbbbbb;
+
+        /* // 处理 input disabled禁用情况下 hover placeholder color颜色问题 */
+        &:not([disabled])::placeholder {
+          color: #999999;
+        }
+
+        .arrow {
+          color: #999999;
+        }
+      }
+
+
+      .empty {
+        width: 100%;
+
+        display: flex;
+        justify-content: space-between;
+
+        .note {
+          display: flex;
+          align-items: center;
+        }
+
+        .arrow {
+          /* color: #bbbbbb; */
+          margin-left: 5px;
+
+          width: 0;
+          height: 0;
+          border-width: 4px;
+          border-style: solid dashed dashed dashed;
+          border-color: #bbbbbb transparent transparent transparent;
+
+          transition: 'all .3s';
+
+          /* transform: 'rotate(180deg)' : '', ; */
+        }
+      }
+
+      .content {
+        display: flex;
+        justify-content: space-between;
+        color: #5d9cec;
+        border-radius: calc(3 * 1px);
+        padding: 0 3px;
+        cursor: pointer;
+
+        .title {
+          margin-right: 5px;
+          font-weight: 500;
+        }
+
+        .data-item {
+          display: flex;
+          align-items: center;
+
+          .icon-close {
+            margin-left: 3px;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            border-radius: 2px;
+
+            &:hover {
+              background: #dae4fe;
+            }
+          }
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class='erasable-select has-data' onclick="handleClickArrow(event)">
+    <!-- 无数据 -->
+    <div class="empty">
+      <div class='note'>
+        <span class='title'> 请设置搜索引擎 </span>
+      </div>
+      <div class='arrow'> </div>
+    </div>
+
+    <!-- 有数据 -->
+    <!-- <div class='content'>
+      {keepTitle && <span class='title'> {title} </span>}
+      <div class='data-item'>
+        { item.icon && <Icon class='data-item-icon' name={item.icon} width="13" />}
+        百度
+        <div class='icon-close' onclick="handleClickClose(event)">
+          <Icon name={'Icon-error01'} width="13" />
+        </div>
+      </div>
+    </div> -->
+  </div>
+
+
+  <script>
+    function handleClickArrow(event) {
+
+    }
+
+    function handleClickClose(event) {
+
+    }
+
+  </script>
+</body>
+
+</html>

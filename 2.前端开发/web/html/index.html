@@ -22,14 +22,28 @@
       margin: 0;
       display: flex;
       justify-content: start;
+      overflow: hidden;
     }
 
     .weblab-dir {
+      position: relative;
       background: #f2f2f2;
       width: 260px;
       height: 100%;
       margin-top: -16px;
       padding-top: 12px;
+
+      &.is-fold {
+        width: 1px;
+
+        .weblab-dir-tree {
+          display: none;
+        }
+
+        .fold {
+          left: 1px;
+        }
+      }
 
       .weblab-dir-tree {
         --spacing: 1.5rem;
@@ -131,6 +145,56 @@
           line-height: calc(2 * var(--radius) + 1px);
         }
       }
+
+      .fold {
+        position: absolute;
+        z-index: 100;
+        top: 50%;
+        right: -4px;
+        width: 14px;
+        height: 36px;
+        border: 1px solid #e5e5e5;
+        border-radius: 6px;
+        box-sizing: border-box;
+
+        cursor: pointer;
+        background: #fff;
+        color: #999;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.right {
+          border-right: none;
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        &.left {
+          border-left: none;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+          .weblab-dir-arrow {
+            border-style: solid dashed dashed dashed;
+            margin-right: -5px;
+            border-color: transparent transparent transparent #e5e5e5;
+          }
+        }
+
+        &:hover {
+          background-color: #f0f1f4;
+        }
+
+        .weblab-dir-arrow {
+          width: 0;
+          height: 0;
+          border-width: 4px;
+          border-style: solid dashed dashed dashed;
+          border-color: transparent #e5e5e5 transparent transparent;
+          margin-right: 5px;
+        }
+      }
     }
 
     .weblab-page {
@@ -138,12 +202,16 @@
       margin: 5px;
       flex-grow: 1;
 
-      .weblab-tip {
+      .weblab-title {
         width: 100%;
         font-size: 12px;
         color: #999999;
         word-wrap: break-word;
         margin: 6px 0;
+
+        a {
+          margin-left: 5px;
+        }
       }
 
       .weblab-iframe {
@@ -156,8 +224,9 @@
 
         iframe {
           width: 100%;
-          height: 100%;
+          height: calc(100% - 6px);
           border: none;
+          box-sizing: border-box;
         }
       }
     }
@@ -167,9 +236,12 @@
 <body>
   <div class="weblab-dir">
     <ul class="weblab-dir-tree"></ul>
+    <div class="fold right" onclick="handleClickFold(event)">
+      <div class="weblab-dir-arrow"></div>
+    </div>
   </div>
   <div class="weblab-page" style="height: 100%">
-    <div class='weblab-tip' id='id-weblab-tip'>请点击左边目录，查看对应示例</div>
+    <div class='weblab-title' id='id-weblab-title'>请点击左边目录，查看对应示例 </div>
     <div class='weblab-iframe'>
       <iframe id='id-weblab-iframe' name="top" frameborder="0" scrolling="yes"></iframe>
     </div>
@@ -178,20 +250,24 @@
     const treeItems = [{
       name: 'WEB 研究院（html&css&js）', url: '', children: [
         {
-          name: '基础', url: '', children: [
-            { name: '涂鸦墙', url: 'graffiti-wall.html' },
-            { name: '控件', url: '', children: [
-              { name: '气泡提示', url: 'tip.html' },
-              { name: '树形控件', url: 'tree.html' },
-            ]},
+          name: '实验室', url: '', children: [
+            { name: '涂鸦', url: 'graffiti.html' },
+            {
+              name: '控件', url: '', children: [
+                { name: '气泡提示', url: 'bubble.html' },
+                { name: '树形控件', url: 'tree.html' },
+                { name: '可删选择框', url: 'erasableSelect.html' },
+              ]
+            },
             { name: '动画', url: 'animation.html' },
             { name: '拖拽', url: 'drag-drop.html' },
+            { name: '监听事件', url: 'keyboard-listen.html' },
+            { name: '网络通讯', url: 'websocket.html' },
           ]
         },
         {
-          name: '进阶', url: '', children: [
-            { name: '监听事件', url: 'keyboard-listen.html' },
-            { name: '网络通讯', url: 'websocket.html' },
+          name: '工具箱', url: '', children: [
+            { name: '百度必应', url: 'search-engine.html' },
           ]
         },
       ]
@@ -202,7 +278,8 @@
         const divElement = document.createElement('div');
         divElement.innerHTML = node.name;
         divElement.setAttribute('name', 'tree-item-link');
-        divElement.onclick = (event) => this.handleClick(event, node);
+        divElement.onclick = (event) => this.handleClickDirectroy(event, node);
+        divElement.ondblclick = (event) => this.handleDblClickDirectroy(event, node);
         parentElement.appendChild(divElement);
       }
 
@@ -232,7 +309,7 @@
       }
     }
 
-    function handleClick(event, data) {
+    function handleClickDirectroy(event, data) {
       // // 获取dom的8种方法(及其案例): https://blog.csdn.net/Null_Robot/article/details/107101818
       // // 1）4种动态方法
       // document.getElementsByClassName()    //通过class类名称获取元素，返回的是一个集合
@@ -251,14 +328,34 @@
       items && items.forEach((item) => item.setAttribute('class', 'link'));// item.style.color = '#000000';
       event.target.setAttribute('class', 'active'); // event.target.style.color = '#696';
 
-      // 更新页面提示
-      document.getElementById('id-weblab-tip').innerHTML = `${data.name}: ${data.url}`;
+      // 更新页面标题
+      const titleElement = document.getElementById('id-weblab-title');
+      titleElement.innerHTML = `${data.name}: `;
+      const aElement = document.createElement('a');
+      aElement.innerHTML = data.url;
+      aElement.setAttribute('href', data.url);
+      aElement.setAttribute('target', '_blank');
+      titleElement.appendChild(aElement);
 
       // 更新iframe属性
       const targetPageElement = document.getElementById('id-weblab-iframe');
       targetPageElement.setAttribute('src', data.url);
 
       return false;// 阻止冒泡
+    }
+
+    function handleDblClickDirectroy(event, data) {
+      window.open(data.url, "_blank", "noopener=yes,noreferrer=yes");
+    }
+
+    function handleClickFold(event) {
+      const dirElement = document.querySelector('.weblab-dir');
+      const isFold = dirElement.getAttributeNode('class').value.indexOf('is-fold') > -1;
+      isFold ? dirElement.classList.remove('is-fold') : dirElement.classList.add('is-fold')
+
+      const foldElement = document.querySelector('.fold');
+      foldElement.classList.remove(isFold ? 'left' : 'right');
+      foldElement.classList.add(isFold ? 'right' : 'left');
     }
 
     function main() {
