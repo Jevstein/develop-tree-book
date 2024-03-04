@@ -197,14 +197,7 @@
                   align-items: center;
                   margin-right: 2px;
 
-                  /* &:hover {
-                    .icon-close {
-                      visibility: visible;
-                    }
-                  } */
-
                   .icon-close {
-                    /* visibility: hidden; */
                     margin-left: 0px;
                     display: flex;
                     align-items: center;
@@ -225,11 +218,24 @@
     }
 
     .website-body {
-      &.frame-view {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: calc(100% - 5px);
+
+      .frame-view {
         position: relative;
-        display: flex;
         width: 100%;
-        height: calc(100% - 5px);
+        height: 100%;
+
+        &.is-fold {
+          width: 14px;
+          background-color: #f2f2f2;
+
+          iframe {
+            display: none;
+          }
+        }
 
         iframe {
           display: block;
@@ -238,6 +244,44 @@
           box-sizing: border-box;
           /* make them block to fix white space margin */
           width: 100%;
+          height: 100%;
+        }
+
+        .fold {
+          position: absolute;
+          z-index: 100;
+          top: 50%;
+          right: 0;
+          width: 14px;
+          height: 36px;
+          border: 1px solid #e5e5e5;
+          border-radius: 6px;
+          box-sizing: border-box;
+          cursor: pointer;
+          background: #fff;
+          color: #999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 600;
+          user-select: none;
+
+          &.right {
+            /* border-right: none; */
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+
+          &.left {
+            /* border-left: none; */
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+
+          &:hover {
+            background-color: #f0f1f4;
+          }
         }
       }
     }
@@ -264,7 +308,7 @@
     <div class="search-bar" align="center">
       <input class="search-text" type="text" onkeydown="handleKeyDownInput(event)"> </input>
       <div class="search-btn" onclick="handleClickSearch(event)"> 搜索一下 </div>
-      <div class='search-select erasable-select' onclick="handleClickArrow(event)">
+      <div class='search-select erasable-select' onclick="handleClickErasableSelect(event)">
         <!-- 无数据 -->
         <div class='note'>
           <span class='title'> 请设置搜索引擎 </span>
@@ -287,8 +331,15 @@
 
     </div>
   </div>
-  <div class="website-body frame-view">
-
+  <div class="website-body">
+    <div class="frame-view">
+      <iframe src=""></iframe>
+      <div class="fold"></div>
+    </div>
+    <div class="frame-view">
+      <iframe src=""></iframe>
+      <div class="fold"></div>
+    </div>
   </div>
   <!-- 蒙版 -->
   <div class="website-mask" onclick="handleClickSelectMask(event)"></div>
@@ -311,9 +362,9 @@
       if (!value) {
         websiteKeys = ['3', '4'];
         return
-      } 
+      }
 
-      websiteKeys = value==='empty' ? [] : value.split(",");
+      websiteKeys = value === 'empty' ? [] : value.split(",");
     }
 
     function writeWebsiteKeys() {
@@ -348,43 +399,90 @@
     }
 
     function handleClickSearch(event) {
-      const frameViewElement = document.querySelector('.frame-view');
-      frameViewElement.childNodes.forEach(node => {
+      const nodes = document.getElementsByClassName('iframe-website');
+      for (const node of nodes) {
         const key = node.getAttributeNode('data-key').value;
         const src = this.getSearchUrl(key);
         src && node.setAttribute('src', src);
-      });
+      }
     }
 
     function buildIframe() {
-      const frameViewElement = document.querySelector('.frame-view');
-      frameViewElement.innerHTML = "";// 删除所有子节点
+      const parentElement = document.querySelector('.website-body');
+      parentElement.innerHTML = "";// 删除所有子节点
 
       websiteKeys.forEach(key => {
-        const element = document.createElement('iframe');
+        const element = document.createElement('div');
+        element.setAttribute('class', `frame-view frame-view-${key}`);
         element.setAttribute('data-key', key);
-        element.setAttribute('src', this.getSearchUrl(key));
-        frameViewElement.appendChild(element);
+
+        const iframeElement = document.createElement('iframe');
+        iframeElement.setAttribute('class', `iframe-website iframe-website-${key}`);
+        iframeElement.setAttribute('data-key', key);
+        iframeElement.setAttribute('src', this.getSearchUrl(key));
+        element.appendChild(iframeElement);
+
+        const foldElement = document.createElement('div');
+        foldElement.innerHTML = "<";
+        foldElement.setAttribute('class', `fold fold-${key} right`);
+        foldElement.setAttribute('data-key', key);
+        foldElement.onclick = (event) => {
+          const isFold = event.target.getAttributeNode('class').value.indexOf('left') > -1;
+          const key = event.target.getAttributeNode('data-key').value;
+
+          const frameViewElement = document.querySelector(`.frame-view-${key}`);
+
+          if (isFold) {
+            frameViewElement.classList.remove('is-fold');
+            foldElement.innerHTML = "<";
+            event.target.classList.remove('left');
+            event.target.classList.add('right');
+          } else {
+            frameViewElement.classList.add('is-fold');
+            foldElement.innerHTML = ">";
+            event.target.classList.remove('right');
+            event.target.classList.add('left');
+          }
+        }
+        element.appendChild(foldElement);
+
+        parentElement.appendChild(element);
       });
     }
 
     // ------------------ 2、过滤 ------------------
-    function handleClickArrow(event) {
-      const selectElement = document.querySelector('.erasable-select');
-      const maskElement = document.querySelector('.website-mask');
+    let timerOut = null;
 
-      const isMenu = selectElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
-      if (isMenu) {
-        selectElement.classList.remove('is-menu');
-        maskElement.classList.remove('is-mask');
-      } else {
-        selectElement.classList.add('is-menu');
-        maskElement.classList.add('is-mask');
-      }
+    function handleClickErasableSelect(event) {
+      timerOut = setTimeout(() => {
+        const selectElement = document.querySelector('.erasable-select');
+        const maskElement = document.querySelector('.website-mask');
 
-      const arrowElement = document.querySelector('.arrow');
-      arrowElement.classList.remove(isMenu ? 'bottom' : 'left');
-      arrowElement.classList.add(isMenu ? 'left' : 'bottom');
+        const isMenu = selectElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
+        if (isMenu) {
+          selectElement.classList.remove('is-menu');
+          maskElement.classList.remove('is-mask');
+        } else {
+          selectElement.classList.add('is-menu');
+          maskElement.classList.add('is-mask');
+        }
+
+        const arrowElement = document.querySelector('.arrow');
+        arrowElement.classList.remove(isMenu ? 'bottom' : 'left');
+        arrowElement.classList.add(isMenu ? 'left' : 'bottom');
+
+        clearTimeout(timerOut);
+      }, 200);
+    }
+
+    function handleDblClickContent(event) {
+      clearTimeout(timerOut);
+      event.preventDefault();
+      event.stopPropagation();
+
+      key = event.target.getAttributeNode('data-key').value;
+      const url = this.getSearchUrl(key);
+      window.open(url, "_blank", "noopener=yes,noreferrer=yes");
     }
 
     function handleClickClose(event) {
@@ -425,7 +523,7 @@
 
       const url = this.getSearchUrl(key);
       window.open(url, "_blank", "noopener=yes,noreferrer=yes");
-      
+
       const selectElement = document.querySelector('.erasable-select');
       const maskElement = document.querySelector('.erasable-select-mask');
       selectElement.classList.remove('is-menu');
@@ -482,6 +580,7 @@
         element.setAttribute('class', `content-item`);
         element.setAttribute('data-key', key);
         element.setAttribute('title', item.tip);
+        element.ondblclick = (event) => this.handleDblClickContent(event);
 
         // 关闭按钮
         const closeElement = document.createElement('div');
