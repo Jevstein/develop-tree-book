@@ -233,6 +233,21 @@
         }
       }
     }
+
+    .website-mask {
+      display: none;
+      position: absolute;
+      z-index: 99998;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-color: transparent;
+
+      &.is-mask {
+        display: block;
+      }
+    }
   </style>
 </head>
 
@@ -247,7 +262,6 @@
           <span class='title'> 请设置搜索引擎 </span>
         </div>
         <div class='arrow left'> </div>
-
         <!-- 有数据 -->
         <div class='erasable-select-content'>
           <!-- <span class='title'> 当前搜索 </span> -->
@@ -268,10 +282,11 @@
   <div class="website-body frame-view">
 
   </div>
-
+  <!-- 蒙版 -->
+  <div class="website-mask" onclick="handleClickSelectMask(event)"></div>
   <script>
     const websiteMap = {
-      '1': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度', isOpen: true },
+      '1': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度', isNewPage: true },
       '2': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者' },
       '3': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应' },
     };
@@ -312,7 +327,7 @@
       });
     }
 
-    function updateIframe() {
+    function buildIframe() {
       const frameViewElement = document.querySelector('.frame-view');
       frameViewElement.innerHTML = "";// 删除所有子节点
 
@@ -327,9 +342,16 @@
     // ------------------ 2、过滤 ------------------
     function handleClickArrow(event) {
       const selectElement = document.querySelector('.erasable-select');
+      const maskElement = document.querySelector('.website-mask');
 
       const isMenu = selectElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
-      isMenu ? selectElement.classList.remove('is-menu') : selectElement.classList.add('is-menu')
+      if (isMenu) {
+        selectElement.classList.remove('is-menu');
+        maskElement.classList.remove('is-mask');
+      } else {
+        selectElement.classList.add('is-menu');
+        maskElement.classList.add('is-mask');
+      }
 
       const arrowElement = document.querySelector('.arrow');
       arrowElement.classList.remove(isMenu ? 'bottom' : 'left');
@@ -350,7 +372,7 @@
       const isSelected = event.target.getAttributeNode('class').value.indexOf('selected') > -1;
       const key = event.target.getAttributeNode('data-key').value;
 
-      if (websiteMap[key].isOpen) {
+      if (websiteMap[key].isNewPage) {
         const url = this.getSearchUrl(key);
         window.open(url, "_blank", "noopener=yes,noreferrer=yes");
         return;
@@ -364,6 +386,13 @@
       }
 
       this.updateSearch();
+    }
+
+    function handleClickSelectMask(event) {
+      const selectElement = document.querySelector('.erasable-select');
+      const isMenu = selectElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
+      isMenu && selectElement.classList.remove('is-menu');
+      event.target.classList.remove('is-mask');
     }
 
     function buildMenu() {
@@ -422,7 +451,7 @@
     function updateSearch() {
       this.buildContent();
       this.buildMenu();
-      this.updateIframe();
+      this.buildIframe();
     }
 
     // ------------------ main ------------------
