@@ -242,9 +242,7 @@
         iframe {
           display: block;
           border: none;
-          /* make the border size be included in the height */
           box-sizing: border-box;
-          /* make them block to fix white space margin */
           width: 100%;
           height: 100%;
         }
@@ -409,12 +407,31 @@
       }
     }
 
-    function buildIframe() {
+    function buildIframe(option = null) {
+      if (option && option.del) {
+        const element = document.querySelector(`.frame-view-${option.key}`);
+        if (element) {
+          element.parentNode.removeChild(element);
+        }
+        return;
+      }
+
       const parentElement = document.querySelector('.website-body');
-      parentElement.innerHTML = "";// 删除所有子节点
+      if (!option) {
+        parentElement.innerHTML = "";// 删除所有子节点
+      }
 
       websiteKeys.forEach(key => {
-        const element = document.createElement('div');
+        let element = undefined;
+
+        if (option && option.add) {
+          element = document.querySelector(`.frame-view-${key}`);
+          if (element) {
+            return;
+          }
+        }
+
+        element = document.createElement('div');
         element.setAttribute('class', `frame-view frame-view-${key}`);
         element.setAttribute('data-key', key);
 
@@ -495,7 +512,7 @@
       const idx = websiteKeys.findIndex(item => item === key);
       websiteKeys.splice(idx, 1);
       this.writeWebsiteKeys();
-      this.updateSearch();
+      this.updateSearch({del: true, key});
     }
 
     function handleClickMenuItem(event) {
@@ -514,7 +531,7 @@
       }
       this.writeWebsiteKeys();
 
-      this.updateSearch();
+      this.updateSearch({add: true});
     }
 
     function handleRClickMenuItem(event, key = '') {
@@ -597,10 +614,10 @@
       });
     }
 
-    function updateSearch() {
+    function updateSearch(option = null) {
       this.buildContent();
       this.buildMenu();
-      this.buildIframe();
+      this.buildIframe(option);
     }
 
     // ------------------ main ------------------
