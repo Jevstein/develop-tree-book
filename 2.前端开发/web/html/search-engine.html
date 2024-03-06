@@ -25,6 +25,7 @@
       .search-bar {
         display: flex;
         justify-content: center;
+        justify-items: center;
         margin: 10px 0;
         /* border: 1px solid red; */
         border-radius: 5px;
@@ -216,6 +217,13 @@
             }
           }
         }
+
+        .search-urlnavi {
+          margin-left: 10px;
+          color: #4e6ef2;
+          font-size: 14px;
+          line-height: 40px;
+        }
       }
     }
 
@@ -328,7 +336,7 @@
           <div>必应</div>
         </div>
       </div>
-
+      <a class="search-urlnavi" href="./url-navigation.html" target="_blank"> 门户导航 </a>
     </div>
   </div>
   <div class="website-body">
@@ -512,7 +520,7 @@
       const idx = websiteKeys.findIndex(item => item === key);
       websiteKeys.splice(idx, 1);
       this.writeWebsiteKeys();
-      this.updateSearch({del: true, key});
+      this.updateSearch({ del: true, key });
     }
 
     function handleClickMenuItem(event) {
@@ -531,7 +539,7 @@
       }
       this.writeWebsiteKeys();
 
-      this.updateSearch({add: true});
+      this.updateSearch({ add: true });
     }
 
     function handleRClickMenuItem(event, key = '') {

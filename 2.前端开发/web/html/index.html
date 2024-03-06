@@ -18,7 +18,7 @@
     html,
     body {
       width: 100%;
-      height: calc(100% - 3px);
+      height: calc(100% - 1px);
       margin: 0;
       display: flex;
       justify-content: start;
@@ -61,6 +61,7 @@
           cursor: pointer;
 
           div {
+
             &.active,
             &:hover {
               color: #696;
@@ -174,6 +175,7 @@
           border-left: none;
           border-top-left-radius: 0;
           border-bottom-left-radius: 0;
+
           .weblab-dir-arrow {
             border-style: solid dashed dashed dashed;
             margin-right: -5px;
@@ -201,29 +203,44 @@
       margin: 5px;
       flex-grow: 1;
 
-      .weblab-title {
+      .weblab-page-bar {
+        position: relative;
         width: 100%;
         font-size: 12px;
         color: #999999;
         word-wrap: break-word;
-        margin: 6px 0;
+        margin: 5px 0;
 
-        a {
-          margin-left: 5px;
+        display: flex;
+        justify-content: space-between;
+
+        .title {
+          width: 100%;
+
+          a {
+            margin-left: 5px;
+          }
+        }
+
+        .advertising {
+          width: 100%;
+          text-align: right;
+          padding-right: 10px;
         }
       }
 
       .weblab-iframe {
         position: relative;
-        overflow: auto;
-        width: calc(100% - 8px);
-        height: calc(100% - 46px);
+        overflow: hidden;
+        width: calc(100% - 0px);
+        height: calc(100% - 35px);
         border: 1px dashed #999999;
+        box-sizing: border-box;
         padding: 3px;
 
         iframe {
           width: 100%;
-          height: calc(100% - 6px);
+          height: calc(100% - 0px);
           border: none;
           box-sizing: border-box;
         }
@@ -240,7 +257,10 @@
     </div>
   </div>
   <div class="weblab-page" style="height: 100%">
-    <div class='weblab-title' id='id-weblab-title'>请点击左边目录，查看对应示例 </div>
+    <div class='weblab-page-bar'>
+      <div class='title' id='id-weblab-title'>请点击左边目录，查看对应示例 </div>
+      <div class="advertising">君子生非异也，善假于物也!</div>
+    </div>
     <div class='weblab-iframe'>
       <iframe id='id-weblab-iframe' name="top" frameborder="0" scrolling="yes"></iframe>
     </div>
@@ -262,11 +282,17 @@
             { name: '拖拽', url: 'drag-drop.html' },
             { name: '监听事件', url: 'keyboard-listen.html' },
             { name: '网络通讯', url: 'websocket.html' },
+            {
+              name: 'electron', url: '', children: [
+                { name: '托盘通知', url: 'notice/notice.html' },
+              ]
+            },
           ]
         },
         {
           name: '工具箱', url: '', children: [
             { name: '百度必应', url: 'search-engine.html' },
+            { name: '门户导航', url: 'url-navigation.html' },
           ]
         },
       ]
