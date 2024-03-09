@@ -13,37 +13,246 @@
       margin: 0;
       display: flex;
       justify-content: start;
-      overflow: hidden;
+      /* overflow: hidden; */
+      background-color: #c4cbfa;
     }
 
     .weblab-urlnavi {
       position: relative;
       display: flex;
+      justify-content: center;
       width: 100%;
       height: 100%;
+      user-select: none;
 
       .weblab-urlnavi-left {
-        width: 370px;
+        /* width: 445px; */
+        margin: 10px;
 
         .box {
           position: relative;
-          width: 100%;
-          margin-bottom: 20px;
-          padding: 20px;
-          border-radius: 20px;
+          width: 332px;
+          margin-bottom: 15px;
+          padding: 10px;
+          border-radius: 10px;
           background: #e0e1f7;
+
+          &:hover {
+            .more {
+              display: flex;
+            }
+          }
 
           .title {
             font-size: 16px;
             font-weight: 600;
             line-height: 2.5rem;
           }
+
+          .more {
+            display: none;
+            position: absolute;
+            top: 13px;
+            right: 23px;
+            cursor: pointer;
+          }
+
+          .area {
+            display: flex;
+            flex-wrap: wrap;
+
+            .item {
+              position: relative;
+              width: 135px;
+              padding: 8px;
+              margin: 6px;
+              align-items: center;
+              background-color: #f5f5f5;
+              border: 1px solid transparent;
+              border-radius: 16px;
+              box-shadow: 4px 4px 8px 0px rgba(1, 1, 2, .13);
+              color: #161e2e;
+              cursor: pointer;
+              display: flex;
+              justify-content: start;
+              /* text-align: center; */
+
+              &:hover {
+                border: 1px solid #4e6ef2;
+              }
+
+              .icon {
+                margin-right: 5px;
+              }
+
+              a {
+                width: 100%;
+                word-break: keep-all;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 12px;
+                color: #161e2e;
+                text-decoration: none;
+
+                &:hover {
+                  color: #4e6ef2;
+                }
+              }
+            }
+          }
         }
       }
 
       .weblab-urlnavi-center {
-        width: 100%;
-        /* height: 100%; */
+        position: relative;
+        max-width: 1000px;
+        min-width: 600px;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        background: #e0e1f7;
+        display: flex;
+        flex-wrap: wrap;
+
+        .box {
+          position: relative;
+          margin: 0 20px 20px 0;
+          width: 260px;
+          flex-shrink: 1;
+
+          &:hover {
+            .more {
+              display: flex;
+            }
+          }
+
+          .title {
+            font-size: 16px;
+            line-height: 22px;
+            font-weight: 500;
+            color: #111;
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding-left: 10px;
+            border-left: 3px solid #7ed321;
+            margin-bottom: 8px;
+          }
+
+          .more {
+            display: none;
+            position: absolute;
+            top: -5px;
+            right: 12px;
+            cursor: pointer;
+          }
+
+          .item {
+            display: flex;
+            justify-items: center;
+            margin: 5px 0;
+
+            .icon {
+              margin-right: 5px;
+              /* margin-top: 6px;
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background: #7ed321; */
+            }
+
+            a {
+              width: 100%;
+              word-break: keep-all;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              font-size: 12px;
+              color: #161e2e;
+              text-decoration: none;
+
+              &:hover {
+                color: #4e6ef2;
+              }
+            }
+          }
+        }
+      }
+
+      .weblab-urlnavi-menu {
+        position: absolute;
+        z-index: 99999;
+        right: -50px;
+        top: 36px;
+        display: none;
+        padding: 5px 0;
+        max-width: 320px;
+        min-width: 100px;
+        max-height: 500px;
+        background: #fff;
+        box-shadow: 0 0 2px #ccc;
+        text-align: left;
+        border-radius: 5px;
+        overflow: auto;
+
+        &.is-menu {
+          display: block;
+        }
+
+        .item {
+          display: flex;
+          justify-items: center;
+          margin: 5px 0;
+          padding: 7px 15px;
+          color: #999999;
+          cursor: pointer;
+
+          &:hover {
+            color: #4e6ef2;
+            background-color: #f5f5f5;
+          }
+
+          .icon {
+            margin-right: 5px;
+            /* margin-top: 6px;
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background: #7ed321; */
+          }
+
+          .a {
+            width: 100%;
+            word-break: keep-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            color: #161e2e;
+            text-decoration: none;
+
+            &:hover {
+              color: #4e6ef2;
+            }
+          }
+        }
+      }
+    }
+
+    .weblab-urlnavi-mask {
+      display: none;
+      position: absolute;
+      z-index: 99998;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-color: transparent;
+
+      &.is-mask {
+        display: block;
       }
     }
   </style>
@@ -51,19 +260,230 @@
 
 <body>
   <div class="weblab-urlnavi">
-
     <div class="weblab-urlnavi-left">
       <div class="box">
         <div class="title">高频网址</div>
-        <div class="body"></div>
+        <div class="more">...</div>
+        <div class="area">
+          <div class="item">
+            <a href="aaa">网址网址网址网址网址网址网址网址网址网址</a>
+          </div>
+          <div class="item">
+            <a href="aaa">网址网址网址网址网址网址网址网址网址网址</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="weblab-urlnavi-center">
+      <div class="box">
+        <div class="title">高频网址</div>
+        <div class="more">...</div>
+        <div class="area">
+          <div class="item">
+            <div class="icon"></div>
+            <a href="aaa">网址网址网址网址网址网址网址网址网址网址</a>
+          </div>
+          <div class="item">
+            <div class="icon"></div>
+            <a href="aaa">网址网址网址网址网址网址网址网址网址网址</a>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="weblab-urlnavi-right">
     </div>
   </div>
+  <!-- 蒙版 -->
+  <div class="weblab-urlnavi-mask" onclick="handleClickMask(event)"> </div>
 
+  <script>
+    const cfgs = {
+      // 左侧栏
+      left: [
+        {
+          title: '常用网址', show: 12,
+          items: [
+            { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+            { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+            { name: 'my github', url: 'https://github.com/jevstein' },
+          ],
+        },
+        {
+          title: '工作台',
+          items: [
+            { name: 'gitlab-emessage', url: 'http://10.12.101.12/EM/weapp-emmessage' },
+            { name: 'Jenkins-emessage', url: 'http://10.12.101.25:8080/job/weapp-emmessage' },
+            { name: '快捷工作台', url: 'https://www.e-cology.com.cn/sp/doc/docDetail/100500240013412987?type=IM_View&_isEm=1&_emUid=4975624591352436806&_emCid=874152414695915520&weappAuthStr=eyJtc2dpZCI6IjE3MDAyMDUxNDkxNjA0MzYxMTciLCJmbGFnIjowLCJ1c2VyIjp7ImNpZCI6Ijg3NDE1MjQxNDY5NTkxNTUyMCIsInVpZCI6IjQ5NzU2MjQ1OTEzNTI0MzY4MDYifX0=' },
+          ],
+        },
+      ],
+      // 中间栏
+      center: [
+        {
+          title: '在线工具', show: 20,
+          items: [
+            { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+            { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+            { name: 'tinypng-图片压缩', url: 'https://tinypng.com', icon: 'https://tinypng.com/images/apple-touch-icon.png' },
+          ],
+        },
+        {
+          title: '持续学习',
+          items: [
+            { name: '谈谈JS二进制：File、Blob、FileReader、ArrayBuffer、Base64', url: 'https://zhuanlan.zhihu.com/p/568915443' },
+          ],
+        },
+        {
+          title: '高质量生活',
+          items: [
+            { name: '积分管理-上海市居住证', url: 'https://jzzjf.rsj.sh.gov.cn/jzzjf/login.jsp' },
+          ],
+        },
+      ],
+    }
+
+    let timerOutMore = null;
+    let timerOutMask = null;
+
+    function hideMenu() {
+      const maskElement = document.querySelector('.weblab-urlnavi-mask');
+      maskElement.classList.remove('is-mask');
+
+      const elements = document.getElementsByClassName('weblab-urlnavi-menu');
+      for (const element of elements) {
+        if (element.getAttributeNode('class').value.indexOf('is-menu') > -1) {
+          element.classList.remove('is-menu');
+          return;
+        }
+      }
+    }
+
+    function handleClickMore(event) {
+      const maskElement = document.querySelector('.weblab-urlnavi-mask');
+
+      const id = event.target.getAttributeNode('data-id').value;
+      const menuElement = document.getElementById(id);
+
+      const isMenu = menuElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
+      if (isMenu) {
+        menuElement.classList.remove('is-menu');
+        maskElement.classList.remove('is-mask');
+      } else {
+        menuElement.classList.add('is-menu');
+        maskElement.classList.add(`is-mask`);
+      }
+    }
+
+    function handleClickMask(event) {
+        this.hideMenu();
+    }
+
+    function handleClickUrl(event) {
+      const url = event.target.getAttributeNode('data-url').value;
+      window.open(url, "_blank", "noopener=yes,noreferrer=yes");
+
+      this.hideMenu();
+    }
+
+    function main() {
+      Object.keys(cfgs).forEach(key => {
+        const parentElement = document.querySelector(`.weblab-urlnavi-${key}`);
+        parentElement.innerHTML = '';
+
+        cfgs[key].forEach((box, boxIndex) => {
+          const id = `${key}-${boxIndex}`;
+          const boxElement = document.createElement('div');
+          boxElement.setAttribute('class', 'box');
+
+          const titleElement = document.createElement('div');
+          titleElement.innerHTML = box.title;
+          titleElement.setAttribute('class', 'title');
+          boxElement.appendChild(titleElement);
+
+          const isMore = (box.show > 0) && (box.items.length > box.show);
+          const showItems = isMore ? box.items.slice(0, box.show) : box.items;
+          const moreItems = isMore ? box.items.slice(box.show) : [];
+
+          // 1、面板显示
+          const areaElement = document.createElement('div');
+          areaElement.setAttribute('class', 'area');
+          showItems.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.title = `${item.name}: \n ${item.url}`
+            itemElement.setAttribute('class', 'item');
+
+            // logo
+            const urlObj = new URL(item.url);
+            const img = new Image();
+            img.className = "icon";
+            img.src = item.icon || `${urlObj.origin}/favicon.ico`;
+            img.width = '16';
+            img.height = '16';
+            itemElement.appendChild(img);
+
+            // a标签
+            const aElement = document.createElement('a');
+            aElement.innerHTML = item.name;
+            aElement.setAttribute('href', item.url);
+            aElement.setAttribute('target', '_blank');
+            itemElement.appendChild(aElement);
+
+            areaElement.appendChild(itemElement);
+
+            boxElement.appendChild(areaElement);
+          });
+
+          // 2、更多显示
+          if (moreItems.length > 0) {
+            const menuId = `menu-${id}`;
+            // 更多
+            const moreElement = document.createElement('div');
+            moreElement.innerHTML = '...';
+            moreElement.setAttribute('class', 'more');
+            moreElement.setAttribute('title', '更多');
+            moreElement.setAttribute('data-id', menuId);
+            moreElement.onclick = (event) => this.handleClickMore(event);
+            boxElement.appendChild(moreElement);
+            // 菜单
+            const areaElement = document.createElement('div');
+            areaElement.setAttribute('class', 'weblab-urlnavi-menu');
+            areaElement.setAttribute('id', menuId);
+            moreItems.forEach(item => {
+              const itemElement = document.createElement('div');
+              itemElement.title = `${item.name}: \n ${item.url}`
+              itemElement.setAttribute('class', 'item');
+
+              // logo
+              const urlObj = new URL(item.url);
+              const img = new Image();
+              img.className = "icon";
+              img.src = item.icon || `${urlObj.origin}/favicon.ico`;
+              img.width = '16';
+              img.height = '16';
+              itemElement.appendChild(img);
+
+              // a标签
+              const aElement = document.createElement('div');
+              aElement.innerHTML = item.name;
+              aElement.setAttribute('class', 'a');
+              aElement.setAttribute('data-url', item.url);
+              aElement.onclick = (event) => this.handleClickUrl(event);
+              itemElement.appendChild(aElement);
+
+              areaElement.appendChild(itemElement);
+
+              boxElement.appendChild(areaElement);
+            });
+          }
+
+          parentElement.appendChild(boxElement);
+        })
+      });
+    }
+
+    main();
+
+  </script>
 </body>
 
 </html>

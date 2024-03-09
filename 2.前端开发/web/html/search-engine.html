@@ -336,7 +336,7 @@
           <div>必应</div>
         </div>
       </div>
-      <a class="search-urlnavi" href="./url-navigation.html" target="_blank"> 门户导航 </a>
+      <a class="search-urlnavi" href="./url-navigation.html" target="_blank"> 我的站点 </a>
     </div>
   </div>
   <div class="website-body">
@@ -452,6 +452,7 @@
         const foldElement = document.createElement('div');
         foldElement.innerHTML = "<";
         foldElement.setAttribute('class', `fold fold-${key} right`);
+        foldElement.setAttribute('title', `收起${websiteMap[key].name}`);
         foldElement.setAttribute('data-key', key);
         foldElement.onclick = (event) => {
           const isFold = event.target.getAttributeNode('class').value.indexOf('left') > -1;
@@ -462,11 +463,13 @@
           if (isFold) {
             frameViewElement.classList.remove('is-fold');
             foldElement.innerHTML = "<";
+            foldElement.setAttribute('title', `收起${websiteMap[key].name}`);
             event.target.classList.remove('left');
             event.target.classList.add('right');
           } else {
             frameViewElement.classList.add('is-fold');
             foldElement.innerHTML = ">";
+            foldElement.setAttribute('title', `打开${websiteMap[key].name}`);
             event.target.classList.remove('right');
             event.target.classList.add('left');
           }
