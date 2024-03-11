@@ -301,7 +301,7 @@
       // 左侧栏
       left: [
         {
-          title: '常用网址', show: 12,
+          title: '常用网站', show: 12,
           items: [
             { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
             { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
@@ -325,16 +325,21 @@
             { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
             { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
             { name: 'tinypng-图片压缩', url: 'https://tinypng.com', icon: 'https://tinypng.com/images/apple-touch-icon.png' },
+            { name: '时间戳转换', url: 'https://www.jyshare.com/front-end/852/' },
+            { name: 'url转码', url: 'https://tool.oschina.net/encode?type=4' },
+            { name: '正则测试工具', url: 'https://tool.lu/regex/' },
+            { name: 'MD5在线加密', url: 'https://www.jyshare.com/front-end/703/' },
           ],
         },
         {
           title: '持续学习',
           items: [
             { name: '谈谈JS二进制：File、Blob、FileReader、ArrayBuffer、Base64', url: 'https://zhuanlan.zhihu.com/p/568915443' },
+            
           ],
         },
         {
-          title: '高质量生活',
+          title: '高质生活',
           items: [
             { name: '积分管理-上海市居住证', url: 'https://jzzjf.rsj.sh.gov.cn/jzzjf/login.jsp' },
           ],
@@ -409,7 +414,7 @@
           areaElement.setAttribute('class', 'area');
           showItems.forEach(item => {
             const itemElement = document.createElement('div');
-            itemElement.title = `${item.name}: \n ${item.url}`
+            itemElement.title = `${item.name}:\n${item.url}`
             itemElement.setAttribute('class', 'item');
 
             // logo
@@ -450,7 +455,7 @@
             areaElement.setAttribute('id', menuId);
             moreItems.forEach(item => {
               const itemElement = document.createElement('div');
-              itemElement.title = `${item.name}: \n ${item.url}`
+              itemElement.title = `${item.name}:\n${item.url}`
               itemElement.setAttribute('class', 'item');
 
               // logo

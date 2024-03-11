@@ -8,6 +8,31 @@
   <style>
     body {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .body {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+
+    .box {
+      margin: 10px;
+
+      .box-title {
+        font-size: 16px;
+        line-height: 22px;
+        /* font-weight: 500; */
+        color: #111;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+        border-left: 3px solid #7ed321;
+        margin-bottom: 8px;
+      }
     }
 
     .introduce {
@@ -56,50 +81,323 @@
         line-height: 0;
       }
     }
+
+    .image {
+      font-size: 12px;
+      width: 300px;
+
+      .image-format {
+        span {
+          font-size: 14px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .link {}
+
+    .list1 {
+      span {
+        color: #111;
+      }
+    }
+
+    .list2 {
+      .cont {
+        margin: 20px auto;
+        width: 300px;
+        position: relative;
+
+        ul {
+          width: 100%;
+          height: 50px;
+          background-color: #777;
+          counter-reset: #fff;
+
+          &:first-child {
+            background-color: #eee;
+            color: rgb(28, 178, 156);
+          }
+
+          li {
+            width: 100px;
+            float: left;
+            line-height: 50px;
+            text-align: center;
+            list-style: none;
+            font-size: 14px;
+            position: relative;
+
+            &:hover {
+              background-color: #fff;
+              color: rgb(28, 178, 156);
+
+              ul {
+                li {
+                  display: block;
+                }
+              }
+            }
+
+            ul {
+              list-style: none;
+              color: #000;
+              position: absolute;
+              top: 50px;
+              left: 0;
+
+              li {
+                display: none;
+                padding: 0 35px;
+                background: #fff;
+                clear: both;
+                color: #000;
+
+                &:hover {
+                  background-color: #c0ff00;
+                }
+              }
+            }
+          }
+        }
+      }
+
+    }
   </style>
 </head>
 
 <body text="blue">
-  <div class="introduce">
-    <div>书名： <em>《HTML 涂鸦实验室》</em></div>
-    <div>作者： Jevstein </div>
-    <div>日期： <u>2024年3月2日</u> </div>
-    <div>原价： <del>999.99</del>元 促销价： 888.88元 </div>
-    <div>
-      <div>数学公式：</div>
-      <div align="center">上标: X<sup>3</sup> + 6X<sup>2</sup> - 1 = 0 </div>
-      <div align="center">下标: X<sub>1</sub> + 6X<sub>2</sub> - 1 = 0 </div>
+  <div class="body">
+
+    <div class="box introduce">
+      <div class="box-title"><b>纯html</b></div>
+      <div>书名： <em>《HTML 涂鸦实验室》</em></div>
+      <div>作者： Jevstein </div>
+      <div>日期： <u>2024年3月2日</u> </div>
+      <div>原价： <del>999.99</del>元 促销价： 888.88元 </div>
+      <div>
+        <div>数学公式：</div>
+        <div align="center">上标: X<sup>3</sup> + 6X<sup>2</sup> - 1 = 0 </div>
+        <div align="center">下标: X<sub>1</sub> + 6X<sub>2</sub> - 1 = 0 </div>
+      </div>
+      <div>换行符(br)：<br /> 君子生非异也，善假于物也</div>
+      <div>
+        <h3 align="center">水平线表格(hr)</h1>
+          <hr />
+          <p align="center"> 苹果 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3颗</p>
+          <hr />
+          <p align="center"> 核桃 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2粒</p>
+          <hr />
+          <p align="center"> 菠萝 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1个</p>
+          <hr />
+      </div>
     </div>
-    <div>换行符(br)：<br /> 君子生非异也，善假于物也</div>
-    <div>
-      <h3 align="center">水平线表格(hr)</h1>
-        <hr />
-        <p align="center"> 苹果 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3颗</p>
-        <hr />
-        <p align="center"> 核桃 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2粒</p>
-        <hr />
-        <p align="center"> 菠萝 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1个</p>
-        <hr />
+
+    <div class="box text">
+      <div class="box-title"><b>文本</b></div>
+      <div class="text-single" title="溢出隐藏，不换行...">
+        溢出隐藏，不换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+      </div>
+      <div class="text-mutil-3" title="限制三行显示，超出后显示...">
+        限制三行显示，超出后显示省略号（如：长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+      </div>
+      <div class="text-mutil" title="溢出换行">
+        溢出换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
+        长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+      </div>
     </div>
+
+    <div class="box image">
+      <div class="box-title"><b>图像</b></div>
+      <div class="image-format">
+        <span>1、GIF格式</span> <br>采用LZW压缩，通过压缩相同颜色的色块来减少图像大小；无损失、压缩效率高，适合互联网；但仅能处理256色<br>
+        <span>2、JPEG格式</span> <br>通过剔除一些视觉上不易察觉的部分进行压缩，可超过256色，适合处理照片之类的全彩图像；但有损失，剔除太多数据，图像会失真<br>
+        <span>3、PNG格式</span> <br>非破坏性网页图像，提供将文件以最小方式压缩却不失真的技术，使其不仅具备gif的大部分优点，且支持48色彩、更快交错显示、跨平台亮度控制、多层透明度设置等优点<br>
+      </div>
+      <h2 align="center">
+        <!-- <hr size="2"> -->
+        <img src="./image/dragdrop.jpg" alt="动画拖拽属性" title="图像显示示例" width="280" height="150" hspace="10" vspace="10"
+          border="1" align="top">
+      </h2>
+    </div>
+
+    <div class="box link">
+      <div class="box-title"><b>书签链接跳转</b></div>
+      <div class="mr-txt">
+        <h4>位置：<a name="rongyao">华为荣耀</a> <a href="#top">>>回到顶部</a> </h4>
+        <div class="mr-phone rongyao">
+          <div class="mr-pic">华为荣耀1</div>
+          <div class="mr-pic"><img src="./image/dragdrop.jpg" alt="" width="200" height="30" /></div>
+          <div class="mr-pic"><img src="./image/dragdrop.jpg" alt="" width="200" height="30" /></div>
+        </div>
+        <h4 class="local">位置：<a name="mate8">华为mate</a><a href="#top">>>回到顶部</a></h4>
+        <div class="mr-phone mate8">
+          <div class="mr-pic">华为mate1</div>
+          <div class="mr-pic"><img src="./image/dragdrop.jpg" alt="" width="200" height="30" /></div>
+          <div class="mr-pic"><img src="./image/dragdrop.jpg" alt="" width="200" height="30" /></div>
+        </div>
+        <h4 class="local">位置：<a name="huaweip8">华为mate</a><a href="#top">>>回到顶部</a></h4>
+      </div>
+      <div class="mr-top">
+        <a name="top">
+          <div class="mr-nav">
+            <ul>
+              <li><a href="#rongyao">华为荣耀</a></li>
+              <li><a href="#mate">华为mate</a></li>
+              <li><a href="#huaweip9">华为p9</a></li>
+            </ul>
+            <img src="./image/dragdrop.jpg" alt="" width="200" height="30" />
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="box area">
+      <div class="box-title"><b>图像热区</b></div>
+      <a href="./image/dragdrop.jpg"><img src="./image/dragdrop.jpg" alt="" width="200" height="30"></a>
+      <hr size="2">
+      <div id="mr-cont">
+        <img class="addr" src="./image/dragdrop.jpg" alt="" usemap="#mr-hotpoint" width="200" height="30" />
+        <map name="mr-hotpoint">
+          <area shape="rect" coords="45,126,143,203" href="./image/dragdrop.jpg" title="测试1" target="_self" alt=""
+            width="200" height="30">
+          <area shape="circle" coords="410,80,508,173" href="./image/dragdrop.jpg" title="测试2" target="_top" alt=""
+            width="200" height="30">
+        </map>
+      </div>
+    </div>
+
+    <div class="box table" style="background-image: url(./image/dragdrop.jpg) no-repeat">
+      <div class="box-title"><b>表格</b></div>
+      <table align="center" border="1px" contenteditable="10%">
+        <!-- colgroup表示样式控制 -->
+        <colgroup>
+          <col style="background-color: #7ed321">
+          </col>
+          <col style="background-color: #5d9cec">
+          </col>
+          <col style="background-color: red">
+          </col>
+          <col style="background-color: wheat">
+          </col>
+        </colgroup>
+        <caption>课程表</caption>
+        <!-- tr表示行 -->
+        <tr bgcolor="#A5FEDE" align="center">
+          <!-- th表示表头 -->
+          <th></th>
+          <th></th>
+          <th>星期一</th>
+          <th>星期二</th>
+          <th>星期三</th>
+          <th>星期四</th>
+          <th>星期五</th>
+        </tr>
+        <tr align="center">
+          <!-- td表示普通单元格； 使用rowspan进行列合并-->
+          <td bgcolor="#FCD1C0" rowspan="2">上午</td>
+          <td bgcolor="#FCD1C0">1</td>
+          <td>语文</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>体育</td>
+          <td>音乐</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0">2</td>
+          <td>美术</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>语文</td>
+          <td>政治</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0" rowspan="2">下午</td>
+          <td bgcolor="#FCD1C0">1</td>
+          <td>语文</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>体育</td>
+          <td>音乐</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0">2</td>
+          <td>美术</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>语文</td>
+          <td>政治</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="box list1">
+      <div class="box-title"><b>列表</b></div>
+      <div>
+        <span>无序列表</span>
+        <ul>
+          <li>666</li>
+          <li>666</li>
+        </ul>
+      </div>
+      <div>
+        <span>有序列表</span>
+        <ol type="I" start="2">
+          <li>666</li>
+          <li>666</li>
+          <li>666</li>
+        </ol>
+      </div>
+      <div>
+        <span>定义列表</span>
+        <dl>
+          <dt>名词1</dt>
+          <dd>解释1</dd>
+          <dd>解释2</dd>
+          <dt>名词2</dt>
+          <dd>解释1</dd>
+          <dd>解释2</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="box list2">
+      <div class="box-title"><b>列表-导航菜单</b></div>
+      <div class="cont">
+        <ul>
+          <li>首页</li>
+          <li>IT精英
+            <ul>
+              <li>前端开发</li>
+              <li>后端开发</li>
+              <li>算法分析</li>
+            </ul>
+          </li>
+          <li>考试达人
+            <ul>
+              <li>公务员</li>
+              <li>雅思托福</li>
+              <li>从业资格</li>
+            </ul>
+          </li>
+          <!-- <li>个人名师
+            <ul>
+              <li>考研讲师</li>
+              <li>家教聘用</li>
+              <li>从业资格</li>
+            </ul>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+
   </div>
 
-  <div class="text">
-    <div class="text-single" title="溢出隐藏，不换行...">
-      溢出隐藏，不换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
-    </div>
-    <div class="text-mutil-3" title="限制三行显示，超出后显示...">
-      限制三行显示，超出后显示省略号（如：长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
-    </div>
-    <div class="text-mutil" title="溢出换行">
-      溢出换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
-      长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
-    </div>
-  </div>
   <script>
   </script>
 </body>
