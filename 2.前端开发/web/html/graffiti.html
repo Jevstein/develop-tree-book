@@ -103,65 +103,138 @@
     }
 
     .list2 {
-      .cont {
-        margin: 20px auto;
-        width: 300px;
-        position: relative;
+      background-color: #f2f2f2;
+      position: relative;
+      border-radius: 10px;
+      padding: 10px 0;
 
-        ul {
-          width: 100%;
+      li {
+        cursor: pointer;
+      }
+
+      .top {
+        .cont {
+          margin: 10px auto;
+          position: relative;
+        }
+
+        .cont>ul {
+          width: 340px;
           height: 50px;
           background-color: #777;
-          counter-reset: #fff;
+          color: #fff;
+        }
 
-          &:first-child {
-            background-color: #eee;
-            color: rgb(28, 178, 156);
-          }
+        .cont>ul>li {
+          width: 100px;
+          float: left;
+          line-height: 50px;
+          text-align: center;
+          list-style: none;
+          font-size: 14px;
+          position: relative;
+        }
 
-          li {
-            width: 100px;
-            float: left;
-            line-height: 50px;
-            text-align: center;
-            list-style: none;
-            font-size: 14px;
-            position: relative;
+        .cont>ul>li:hover {
+          background-color: #fff;
+          color: rgb(28, 178, 156);
+        }
 
-            &:hover {
-              background-color: #fff;
-              color: rgb(28, 178, 156);
+        .cont>ul>li:hover ul li {
+          display: block;
+          width: 60px;
+        }
 
-              ul {
-                li {
-                  display: block;
-                }
-              }
-            }
+        .cont>ul>:first-child {
+          background-color: #eee;
+          color: rgb(28, 178, 156);
+        }
 
-            ul {
-              list-style: none;
-              color: #000;
-              position: absolute;
-              top: 50px;
-              left: 0;
+        .cont>ul>li>ul {
+          list-style: none;
+          color: #000;
+          position: absolute;
+          top: 50px;
+          left: -40px;
+        }
 
-              li {
-                display: none;
-                padding: 0 35px;
-                background: #fff;
-                clear: both;
-                color: #000;
+        .cont>ul>li>ul>li {
+          display: none;
+          padding: 0 35px;
+          background: #fff;
+          clear: both;
+          color: #000;
+        }
 
-                &:hover {
-                  background-color: #c0ff00;
-                }
-              }
-            }
-          }
+        .cont>ul>li>ul>li:hover {
+          background-color: #c0ff00;
         }
       }
 
+      .bottom {
+        display: flex;
+
+        span {
+          color: #111;
+        }
+
+        .mr-box {
+          background-size: 100%;
+          border: 1px solid bisque;
+        }
+
+        .mr-nav {
+          margin: 0 auto;
+          background-color: bisque;
+          height: 37px;
+        }
+
+        .mr-nav li {
+          width: 176px;
+          list-style: none;
+          float: left;
+          text-align: center;
+          line-height: 37px;
+        }
+
+        .mr-nav li a {
+          text-decoration: none;
+          font: 17px/37px "微软雅黑";
+          padding: 6px 17px;
+          color: #222;
+        }
+
+        .mr-nav li:hover .mr-shopbox {
+          display: block;
+        }
+
+        .mr-nav:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mr-shopbox {
+          padding: 0 20px;
+          height: 235px;
+          display: none;
+          background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .mr-shopbox li {
+          width: 140px;
+          text-align: center;
+          margin: 15px auto 0;
+          border: 1px solid bisque;
+          border-radius: 14px;
+        }
+
+        .mr-shopbox li a {
+          font-size: 14px;
+        }
+
+        .mr-shopbox li:hover {
+          background-color: #CB0C10;
+        }
+      }
     }
   </style>
 </head>
@@ -368,31 +441,81 @@
 
     <div class="box list2">
       <div class="box-title"><b>列表-导航菜单</b></div>
-      <div class="cont">
-        <ul>
-          <li>首页</li>
-          <li>IT精英
-            <ul>
-              <li>前端开发</li>
-              <li>后端开发</li>
-              <li>算法分析</li>
+      <div class="top">
+        <div class="cont">
+          <ul>
+            <li>首页</li>
+            <li>IT精英
+              <ul>
+                <li>前端开发</li>
+                <li>后端开发</li>
+                <li>算法分析</li>
+              </ul>
+            </li>
+            <li>考试达人
+              <ul>
+                <li>公务员</li>
+                <li>雅思托福</li>
+                <li>从业资格</li>
+              </ul>
+            </li>
+            <!-- <li>个人名师
+              <ul>
+                <li>考研讲师</li>
+                <li>家教聘用</li>
+                <li>从业资格</li>
+              </ul>
+            </li> -->
+          </ul>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="origin">
+          <span>1、《原始ul/li》</span>
+          <ul>
+            <li>首页</li>
+            <li>
+              知识图谱
+              <ul>
+                <li>IT技术</li>
+                <li>AI算法</li>
+                <li>公务员</li>
+              </ul>
+            </li>
+            <li>
+              职场精英
+              <ul>
+                <li>职业招聘</li>
+                <li>职场风云</li>
+                <li>职场趣闻</li>
+              </ul>
+            </li>
+            <li>
+              个人名师
+              <ul>
+                <li>考研讲师</li>
+                <li>学长/姐说</li>
+                <li>百家讲坛</li>
+              </ul>
+            </li>
+
+          </ul>
+        </div>
+        <div class="beautify">
+          <span>2、《改造ul/li》</span>
+          <div class="mr-box">
+            <ul class="mr-nav">
+              <li class="mr-hover"><a href="#">春节特卖</a>
+                <ol class="mr-shopbox">
+                  <li class="mr-hover"><a href="#">服装服饰</a></li>
+                  <li class="mr-hover"><a href="#">母婴会场</a></li>
+                  <li class="mr-hover"><a href="#">汽车特卖</a></li>
+                  <li class="mr-hover"><a href="#">家纺家居</a></li>
+                </ol>
+              </li>
             </ul>
-          </li>
-          <li>考试达人
-            <ul>
-              <li>公务员</li>
-              <li>雅思托福</li>
-              <li>从业资格</li>
-            </ul>
-          </li>
-          <!-- <li>个人名师
-            <ul>
-              <li>考研讲师</li>
-              <li>家教聘用</li>
-              <li>从业资格</li>
-            </ul>
-          </li> -->
-        </ul>
+          </div>
+        </div>
       </div>
     </div>
 

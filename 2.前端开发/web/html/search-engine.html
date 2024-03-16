@@ -353,16 +353,16 @@
   <div class="website-mask" onclick="handleClickSelectMask(event)"></div>
   <script>
     const websiteMap = {
-      '1': { url: 'http://www.google.com', param: '/search?hl=zh-CN&q=', name: '谷歌', tip: '行业领先，不仅致力于帮助用户找到内容，还能对搜索结果进行精细的排序和分类' },
+      // '1': { url: 'http://www.google.com', param: '/search?hl=zh-CN&q=', name: '谷歌', tip: '行业领先，不仅致力于帮助用户找到内容，还能对搜索结果进行精细的排序和分类' },
       '2': { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度', isNewPage: true, tip: '国内最大搜索引擎，也是全球范围内知名的搜索引擎之一' },
-      '3': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者', tip: '百度旗下专为开发者提供的搜索引擎' },
-      '4': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应', tip: '微软推出，体验更人性化、全球化，提供了专门的搜索服务，如商业、娱乐、新闻等，并提供了更精准的搜索面板' },
-      '5': { url: 'https://www.so.com', param: '/s?q=', name: '360搜', tip: '偏向于推出精准的一些服务，例如知识层、地图搜索、图片搜索等' },
-      '6': { url: 'https://www.sogou.com', param: '/web?query=', name: '搜狗', tip: '人性化、智能化，提供更精细的搜索结果，如问答搜索、新闻搜索、音乐搜索等。此外，还具有输入法、浏览器、语音识别等领域的产品和服务' },
-      '7': { url: 'https://ts1.m.sm.cn', param: '/s?q=', name: '神马', tip: '专注于智能手机的短搜索服务，搜索结果准确率高。移动用户享受“无感搜索”功能，可以随时直接访问搜索结果' },
-      // '8': { url: 'https://DuckDuckGo', param: '', name: 'DuckDuckGo', tip: '独立的、不收集用户数据的搜索引擎，目标旨在为用户提供更安全和隐私的搜索体验，并减轻广告的压力，特殊的搜索功能，如直接使用发音搜索、视频播放等' },
-      '9': { url: 'https://search.yahoo.co.jp', param: '/search?p=', name: 'Yahoo', tip: '知名的流传搜索引擎，对多媒体搜索和本地搜索有很明显的优势，并在视频、邮件和社交媒体市场占有一定的地位' },
-      '10': { url: 'https://aistudio.baidu.com/community/app/53767', param: '', name: 'aistudio', tip: '编程助手｜Code Copilot_ERNIE 3.5应用_文生文应用_编程开发_学习提效_AIGC应用-飞桨星河社区应用' },
+      '3': { url: 'https://aistudio.baidu.com/community/app/53767', param: '', name: '百度-aistudio', isNewPage: true, tip: '编程助手｜Code Copilot_ERNIE 3.5应用_文生文应用_编程开发_学习提效_AIGC应用-飞桨星河社区应用' },
+      '4': { url: 'https://kaifa.baidu.com', param: '/searchPage?wd=', name: '开发者', tip: '百度旗下专为开发者提供的搜索引擎' },
+      '5': { url: 'https://cn.bing.com', param: '/search?q=', name: '必应', tip: '微软推出，体验更人性化、全球化，提供了专门的搜索服务，如商业、娱乐、新闻等，并提供了更精准的搜索面板' },
+      '6': { url: 'https://www.so.com', param: '/s?q=', name: '360搜', tip: '偏向于推出精准的一些服务，例如知识层、地图搜索、图片搜索等' },
+      '7': { url: 'https://www.sogou.com', param: '/web?query=', name: '搜狗', tip: '人性化、智能化，提供更精细的搜索结果，如问答搜索、新闻搜索、音乐搜索等。此外，还具有输入法、浏览器、语音识别等领域的产品和服务' },
+      '8': { url: 'https://ts1.m.sm.cn', param: '/s?q=', name: '神马', tip: '专注于智能手机的短搜索服务，搜索结果准确率高。移动用户享受“无感搜索”功能，可以随时直接访问搜索结果' },
+      // '9': { url: 'https://DuckDuckGo', param: '', name: 'DuckDuckGo', tip: '独立的、不收集用户数据的搜索引擎，目标旨在为用户提供更安全和隐私的搜索体验，并减轻广告的压力，特殊的搜索功能，如直接使用发音搜索、视频播放等' },
+      // '10': { url: 'https://search.yahoo.co.jp', param: '/search?p=', name: 'Yahoo', tip: '知名的流传搜索引擎，对多媒体搜索和本地搜索有很明显的优势，并在视频、邮件和社交媒体市场占有一定的地位' },
       '11': { url: 'https://cloud.qianliling.com/main/app-chat/chat?channel=qa', param: '', name: '智能小e', tip: '泛微-智能小e' },
     };
     let websiteKeys = [];
