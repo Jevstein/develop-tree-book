@@ -236,6 +236,75 @@
         }
       }
     }
+
+    .form {
+
+      form {
+        padding: 10px;
+        border: 1px solid blue;
+        border-radius: 5px;
+        text-align: center;
+
+        .login {
+          display: flex;
+          margin-top: 10px;
+          position: relative;
+
+          img {
+            height: 20px;
+            width: 20px;
+            border: 1px solid rgba(215, 209, 209, 1.0);
+            background-color: rgba(215, 209, 209, 1.0);
+          }
+
+          input {
+            height: 16px;
+            width: 100px;
+            font-size: 15px;
+            margin-right: 10px;
+          }
+
+          .ok,
+          .clear {
+            width: 110px;
+            height: 25px;
+            border: none;
+            background-color: #5e9cec;
+            margin: 0 15px;
+            border-radius: 5px;
+          }
+        }
+
+        .item {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px;
+
+          [type='image'] {
+            width: 100px;
+            height: 50px;
+          }
+
+          [type='file'] {
+            width: 200px;
+          }
+
+          .sub-item {
+            margin-right: 10px;
+          }
+        }
+
+        textarea {
+          width: 250px;
+          height: 60px;
+          margin-bottom: 10px;
+        }
+      }
+
+    }
+
+    
   </style>
 </head>
 
@@ -322,7 +391,6 @@
             <ul>
               <li><a href="#rongyao">华为荣耀</a></li>
               <li><a href="#mate">华为mate</a></li>
-              <li><a href="#huaweip9">华为p9</a></li>
             </ul>
             <img src="./image/dragdrop.jpg" alt="" width="200" height="30" />
           </div>
@@ -343,70 +411,6 @@
             width="200" height="30">
         </map>
       </div>
-    </div>
-
-    <div class="box table" style="background-image: url(./image/dragdrop.jpg) no-repeat">
-      <div class="box-title"><b>表格</b></div>
-      <table align="center" border="1px" contenteditable="10%">
-        <!-- colgroup表示样式控制 -->
-        <colgroup>
-          <col style="background-color: #7ed321">
-          </col>
-          <col style="background-color: #5d9cec">
-          </col>
-          <col style="background-color: red">
-          </col>
-          <col style="background-color: wheat">
-          </col>
-        </colgroup>
-        <caption>课程表</caption>
-        <!-- tr表示行 -->
-        <tr bgcolor="#A5FEDE" align="center">
-          <!-- th表示表头 -->
-          <th></th>
-          <th></th>
-          <th>星期一</th>
-          <th>星期二</th>
-          <th>星期三</th>
-          <th>星期四</th>
-          <th>星期五</th>
-        </tr>
-        <tr align="center">
-          <!-- td表示普通单元格； 使用rowspan进行列合并-->
-          <td bgcolor="#FCD1C0" rowspan="2">上午</td>
-          <td bgcolor="#FCD1C0">1</td>
-          <td>语文</td>
-          <td>数学</td>
-          <td>英语</td>
-          <td>体育</td>
-          <td>音乐</td>
-        </tr>
-        <tr align="center">
-          <td bgcolor="#FCD1C0">2</td>
-          <td>美术</td>
-          <td>数学</td>
-          <td>英语</td>
-          <td>语文</td>
-          <td>政治</td>
-        </tr>
-        <tr align="center">
-          <td bgcolor="#FCD1C0" rowspan="2">下午</td>
-          <td bgcolor="#FCD1C0">1</td>
-          <td>语文</td>
-          <td>数学</td>
-          <td>英语</td>
-          <td>体育</td>
-          <td>音乐</td>
-        </tr>
-        <tr align="center">
-          <td bgcolor="#FCD1C0">2</td>
-          <td>美术</td>
-          <td>数学</td>
-          <td>英语</td>
-          <td>语文</td>
-          <td>政治</td>
-        </tr>
-      </table>
     </div>
 
     <div class="box list1">
@@ -485,7 +489,6 @@
             <li>
               职场精英
               <ul>
-                <li>职业招聘</li>
                 <li>职场风云</li>
                 <li>职场趣闻</li>
               </ul>
@@ -495,10 +498,8 @@
               <ul>
                 <li>考研讲师</li>
                 <li>学长/姐说</li>
-                <li>百家讲坛</li>
               </ul>
             </li>
-
           </ul>
         </div>
         <div class="beautify">
@@ -517,6 +518,106 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="box table" style="background-image: url(./image/dragdrop.jpg) no-repeat">
+      <div class="box-title"><b>表格</b></div>
+      <table align="center" border="1px" contenteditable="10%">
+        <!-- colgroup表示样式控制 -->
+        <colgroup>
+          <col style="background-color: #7ed321">
+          </col>
+          <col style="background-color: #5d9cec">
+          </col>
+          <col style="background-color: red">
+          </col>
+          <col style="background-color: wheat">
+          </col>
+        </colgroup>
+        <caption>课程表</caption>
+        <!-- tr表示行 -->
+        <tr bgcolor="#A5FEDE" align="center">
+          <!-- th表示表头 -->
+          <th></th>
+          <th></th>
+          <th>星期一</th>
+          <th>星期二</th>
+          <th>星期三</th>
+          <th>星期四</th>
+          <th>星期五</th>
+        </tr>
+        <tr align="center">
+          <!-- td表示普通单元格； 使用rowspan进行列合并-->
+          <td bgcolor="#FCD1C0" rowspan="2">上午</td>
+          <td bgcolor="#FCD1C0">1</td>
+          <td>语文</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>体育</td>
+          <td>音乐</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0">2</td>
+          <td>美术</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>语文</td>
+          <td>政治</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0" rowspan="2">下午</td>
+          <td bgcolor="#FCD1C0">1</td>
+          <td>语文</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>体育</td>
+          <td>音乐</td>
+        </tr>
+        <tr align="center">
+          <td bgcolor="#FCD1C0">2</td>
+          <td>美术</td>
+          <td>数学</td>
+          <td>英语</td>
+          <td>语文</td>
+          <td>政治</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="box form">
+      <div class="box-title"><b>表单</b></div>
+      <form action="keyboard-listen.html" method="get" target="_blank">
+        <label class="item" for="">
+          <select class="sub-item" name="select">
+            <!-- <select name="select" id="" size="" multiple="" selected=""> -->
+            <option value="">实验室</option>
+            <option value="">工具箱</option>
+            <option value="">演播厅</option>
+          </select>
+          <input class="sub-item" type="radio" value="单选按钮取值" checked> 单选按钮 </input>
+          <input class="sub-item" type="checkbox" value="复选按钮取值" checked> 复选按钮 </input>
+        </label>
+        <textarea class="text-area" placeholder="请输入" rows="3" cols="20" ></textarea>
+        <label class="item" for="">
+          <input class="image" type="image" src="./image/dragdrop.jpg" name="button"> </input>
+          <input class="file" type="file" accept="" value="" name="button"> </input>
+        </label>
+        <div class="item">
+          <label class="login">
+            <img src="./image/dragdrop.jpg" />
+            <input type="text" placeholder="user name">
+          </label>
+          <label class="login">
+            <img src="./image/dragdrop.jpg" />
+            <input type="password" placeholder="password">
+          </label>
+        </div>
+        <hr>
+        <label class="login" for="">
+          <input id="" class="ok" type="submit" value="ok" size="" maxlength="6">
+          <input id="" class="clear" type="reset" value="clear" size="" maxlength="6">
+        </label>
+      </form>
     </div>
 
   </div>

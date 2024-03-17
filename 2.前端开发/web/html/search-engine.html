@@ -372,7 +372,7 @@
       let value = localStorage.getItem('weblab-search-engine-website');
       if (!value) {
         websiteKeys = ['2', '3'];
-        return
+        return;
       }
 
       websiteKeys = value === 'empty' ? [] : value.split(",");
