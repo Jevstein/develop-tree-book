@@ -352,7 +352,7 @@
   <!-- 蒙版 -->
   <div class="website-mask" onclick="handleClickSelectMask(event)"></div>
   <script>
-    const websites = [
+    const websiteMap = [
       // { url: 'http://www.google.com', param: '/search?hl=zh-CN&q=', name: '谷歌', tip: '行业领先，不仅致力于帮助用户找到内容，还能对搜索结果进行精细的排序和分类' },
       { url: 'https://www.baidu.com', param: '/s?wd=', name: '百度', isNewPage: true, tip: '国内最大搜索引擎，也是全球范围内知名的搜索引擎之一' },
       { url: 'https://aistudio.baidu.com/community/app/53767', param: '', name: '百度-aistudio', isNewPage: true, tip: '编程助手｜Code Copilot_ERNIE 3.5应用_文生文应用_编程开发_学习提效_AIGC应用-飞桨星河社区应用' },
@@ -364,14 +364,16 @@
       // { url: 'https://DuckDuckGo', param: '', name: 'DuckDuckGo', tip: '独立的、不收集用户数据的搜索引擎，目标旨在为用户提供更安全和隐私的搜索体验，并减轻广告的压力，特殊的搜索功能，如直接使用发音搜索、视频播放等' },
       // { url: 'https://search.yahoo.co.jp', param: '/search?p=', name: 'Yahoo', tip: '知名的流传搜索引擎，对多媒体搜索和本地搜索有很明显的优势，并在视频、邮件和社交媒体市场占有一定的地位' },
       { url: 'https://cloud.qianliling.com/main/app-chat/chat?channel=qa', param: '', name: '智能小e', tip: '泛微-智能小e' },
-    ];
-    let websiteMap = {};
+    ].reduce((prev, cur, index) => {
+      prev[index + 1] = cur;
+      return prev;
+    }, {});
     let websiteKeys = [];
 
     function readWebsiteKeys() {
       let value = localStorage.getItem('weblab-search-engine-website');
       if (!value) {
-        websiteKeys = ['2', '3'];
+        websiteKeys = ['3', '4'];
         return;
       }
 
@@ -636,10 +638,6 @@
 
     // ------------------ main ------------------
     function main() {
-      websites.forEach((item, index) => {
-        websiteMap[index + 1] = item;
-      });
-
       this.readWebsiteKeys();
       this.updateSearch();
     }
