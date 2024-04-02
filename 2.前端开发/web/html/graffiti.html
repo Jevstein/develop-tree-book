@@ -80,6 +80,10 @@
       .text-math-formula {
         line-height: 0;
       }
+
+      .text-dbcopy {
+        user-select: auto;
+      }
     }
 
     .image {
@@ -309,17 +313,21 @@
         /* color: #7ed321; */
         font-size: 14px;
         font-weight: 500;
-        line-height: 30px; /*行高*/
+        line-height: 30px;
+        /*行高*/
         /* text-align: center; */
-        text-transform: capitalize; /*每个单词首字母大写*/
-        letter-spacing: 3px; /*字间距*/
-        text-decoration: underline; /*下划线*/
-        text-indent: 1px; /*文本缩进*/
+        text-transform: capitalize;
+        /*每个单词首字母大写*/
+        letter-spacing: 3px;
+        /*字间距*/
+        text-decoration: underline;
+        /*下划线*/
+        text-indent: 1px;
+        /*文本缩进*/
         cursor: help;
 
       }
     }
-
   </style>
 </head>
 
@@ -366,6 +374,10 @@
       <div class="text-mutil" title="溢出换行">
         溢出换行（如：长长长长长长长长长长长长长长长长长长长长长长长长长长长长长
         长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长）
+      </div>
+      <div class="text-dbcopy" title="双击选中复制" onclick="handleDbClickCopy(event)">
+        请双击此处，将选中文本并复制
+        <a href="https://www.jb51.net/javascript/298940aca.htm">参考地址</a>
       </div>
     </div>
 
@@ -433,8 +445,8 @@
       <div>
         <span>无序列表</span>
         <ul>
-          <li>666</li>
-          <li>666</li>
+          <li>白发如新</li>
+          <li>倾盖如故</li>
         </ul>
       </div>
       <div>
@@ -612,7 +624,7 @@
           <input class="sub-item" type="radio" value="单选按钮取值" checked> 单选按钮 </input>
           <input class="sub-item" type="checkbox" value="复选按钮取值" checked> 复选按钮 </input>
         </label>
-        <textarea class="text-area" placeholder="请输入" rows="3" cols="20" ></textarea>
+        <textarea class="text-area" placeholder="请输入" rows="3" cols="20"></textarea>
         <label class="item" for="">
           <input class="image" type="image" src="./image/dragdrop.jpg" name="button"> </input>
           <input class="file" type="file" accept="" value="" name="button"> </input>
@@ -646,6 +658,33 @@
   </div>
 
   <script>
+    function handleDbClickCopy(event) {
+      if (event.detail !== 2) {
+        return;
+      }
+
+      const selection = window.getSelection();
+      if (selection) {
+        const node = event.target.childNodes[0];
+        const range = document.createRange();
+        range.selectNodeContents(node);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      setTimeout(() => {
+        const inputDom = document.createElement('input');
+        inputDom.value = event.target.innerText;
+        document.body.appendChild(inputDom);
+        inputDom.select();
+        document.execCommand('Copy');
+        inputDom.remove();
+
+        alert('复制成功');
+      }, 100);
+
+    }
   </script>
 </body>
 
