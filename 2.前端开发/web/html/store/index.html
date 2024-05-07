@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>本地存储</title>
+
+  <style>
+    .box {
+      margin: 10px;
+
+      .box-title {
+        font-size: 16px;
+        line-height: 22px;
+        /* font-weight: 500; */
+        color: #111;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+        border-left: 3px solid #7ed321;
+        margin-bottom: 8px;
+      }
+
+      .box-subtitle {
+        position: relative;
+        width: 100%;
+        font-size: 12px;
+        color: #999999;
+        word-wrap: break-word;
+        margin: 5px 0;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body text="blue">
+  <div><a href="https://blog.csdn.net/weiCong_Ling/article/details/131437456" target="_blank">浏览器存储--IndexedDB数据库的使用</a>
+  </div>
+  <div class="box">
+    <div class="box-title"><b>IndexedDB</b></div>
+    <div class="box-subtitle">
+      <h4>背景：</h4>
+      现有的浏览器数据储存方案，都不适合储存大量数据：Cookie 的大小不超过4KB，且每次请求都会发送回服务器；localStorage 和 sessionStorage 在 2.5MB 到
+      10MB之间（各家浏览器不同），而且不提供搜索功能，不能建立自定义的索引。所以，需要一种新的解决方案，于是诞生了IndexedDB。</br>
+      <h4>特点：</h4>IndexedDB 就是浏览器提供的本地数据库(接近 NoSQL)，它可以被网页脚本创建和操作。IndexedDB 允许储存大量数据，提供查找接口，还能建立索引。
+      <ul>
+        <li>
+          键值对储存: IndexedDB 内部采用对象仓库（object store）存放数据。所有类型的数据都可以直接存入，包括
+          JavaScript对象。对象仓库中，数据以"键值对"的形式保存，每一个数据记录都有对应的主键，主键是独一无二的，不能有重复，否则会抛出一个错误。
+        </li>
+        <li>
+          异步: IndexedDB 操作时不会锁死浏览器，用户依然可以进行其他操作，这与 LocalStorage 形成对比，后者的操作是同步的。异步设计是为了防止大量数据的读写，拖慢网页的表现
+        </li>
+        <li>
+          事务: IndexedDB 支持事务（transaction），这意味着一系列操作步骤之中，只要有一步失败，整个事务就都取消，数据库回滚到事务发生之前的状态，不存在只改写一部分数据的情况。
+        </li>
+        <li>
+          同源限制: IndexedDB 受到同源限制，每一个数据库对应创建它的域名。网页只能访问自身域名下的数据库，而不能访问跨域的数据库。
+        </li>
+        <li>
+          储存空间大: IndexedDB 的储存空间比 LocalStorage 大得多，一般来说不少于 250MB，甚至没有上限。
+        </li>
+        <li>
+          二进制储存: IndexedDB 不仅可以储存字符串，还可以储存二进制数据（ArrayBuffer 对象和 Blob 对象）。
+        </li>
+      </ul>
+    </div>
+    <div>
+      <button onclick="handleClickIndexedDbInit(event)">初始化</button>
+      <button onclick="handleClickIndexedDbAdd(event)">添加数据</button>
+      <button onclick="handleClickIndexedDbUpdate(event)">更新数据</button>
+      <button onclick="handleClickIndexedDbQuery1(event)">查询数据-主键</button>
+      <button onclick="handleClickIndexedDbQuery2(event)">查询数据-索引</button>
+      <button onclick="handleClickIndexedDbDelete1(event)">删除数据-删除主键</button>
+      <button onclick="handleClickIndexedDbDelete2(event)">删除数据-清空数据</button>
+      <button onclick="handleClickIndexedDbClose(event)">关闭数据库</button>
+    </div>
+  </div>
+</body>
+
+<script src="indexedDbCache.js"></script>
+<script>
+  function handleClickIndexedDbInit(event) {
+    initIndexDB();
+  }
+  function handleClickIndexedDbAdd(event) {
+    changeVal();
+  }
+  function handleClickIndexedDbUpdate(event) {
+    updateIndexDB();
+  }
+  function handleClickIndexedDbQuery1(event) {
+    getImageByName();
+  }
+  function handleClickIndexedDbQuery2(event) {
+    getDataByIndexDB();
+  }
+  function handleClickIndexedDbDelete1(event) {
+    removeIndexDB();
+  }
+  function handleClickIndexedDbDelete2(event) {
+    clearIndexDB();
+  }
+  function handleClickIndexedDbClose(event) {
+    closeIndexDB();
+  }
+
+  
+</script>
+
+</html>

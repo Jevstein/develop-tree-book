@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>多线程-webworker</title>
+
+  <style>
+    .box {
+      margin: 10px;
+
+      .box-title {
+        font-size: 16px;
+        line-height: 22px;
+        /* font-weight: 500; */
+        color: #111;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+        border-left: 3px solid #7ed321;
+        margin-bottom: 8px;
+      }
+
+      .box-subtitle {
+        position: relative;
+        width: 100%;
+        font-size: 12px;
+        color: #999999;
+        word-wrap: break-word;
+        margin: 5px 0;
+        display: flex;
+      }
+    }
+  </style>
+</head>
+
+<body text="blue">
+  <div><a href="https://juejin.cn/post/7139718200177983524" target="_blank">一文彻底学会使用web worker</a></div>
+  <div class="box">
+    <div class="box-title"><b>利用SharedWorker实现多页面数据共享</b></div>
+    <div class="box-subtitle">
+      1、index 页面的 add 按钮，每点击一次，向 sharedWorker 发送一次 add 数据，页面 count 增加1；</br>
+      2、iframe 页面的 reduce 按钮，每点击一次，向 sharedWorker 发送一次 reduce 数据，页面count 减少1；</br>
+      3、sharedWorker 在接收到数据后，根据数据类型处理 num 计数，然后返回给每个已连接的主线程</br>
+    【注意】：本地执行需设置跨域 e.g. open -n /Applications/Google\ Chrome.app/ --args --disable-web-security  --user-data-dir=/Users/xxx/MyChromeDevUserData/
+    </div>
+    <div>
+      <div>
+        count: <span id="container">0</span>
+      </div>
+      <button id="add">add</button>
+      <br>
+      <iframe src="./iframe.html"></iframe>
+    </div>
+  </div>
+</body>
+
+<script>
+  function testShareWorker() {
+    if (!!window.SharedWorker) {
+      const container = document.getElementById('container');
+      const add = document.getElementById('add');
+
+      const myWorker = new SharedWorker('./sharedWorker.js');
+      myWorker.port.start();
+      myWorker.port.addEventListener('message', msg => {
+        container.innerText = msg.data;
+      });
+
+      add.addEventListener('click', () => {
+        myWorker.port.postMessage('add');
+      });
+    }
+  }
+
+  function main() {
+    testShareWorker();
+  }
+
+  main();
+  
+</script>
+
+</html>

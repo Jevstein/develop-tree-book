@@ -296,133 +296,179 @@
   </div>
   <!-- 蒙版 -->
   <div class="weblab-urlnavi-mask" onclick="handleClickMask(event)"> </div>
+</body>
 
-  <script>
-    const cfgs = {
-      // 左侧栏
-      left: [
-        {
-          title: '高频网站', show: 12,
-          items: [
-            { name: 'github-Jevstein', url: 'https://github.com/jevstein' },
-          ],
-        },
-        {
-          title: '工作台',
-          items: [
-            { name: 'gitlab-emessage', url: 'http://10.12.101.12/EM/weapp-emmessage' },
-            { name: 'Jenkins-emessage', url: 'http://10.12.101.25:8080/job/weapp-emmessage' },
-            { name: '快捷工作台', url: 'https://www.e-cology.com.cn/sp/doc/docDetail/100500240013412987?type=IM_View&_isEm=1&_emUid=4975624591352436806&_emCid=874152414695915520&weappAuthStr=eyJtc2dpZCI6IjE3MDAyMDUxNDkxNjA0MzYxMTciLCJmbGFnIjowLCJ1c2VyIjp7ImNpZCI6Ijg3NDE1MjQxNDY5NTkxNTUyMCIsInVpZCI6IjQ5NzU2MjQ1OTEzNTI0MzY4MDYifX0=' },
-            { name: 'showdoc', url: 'http://192.168.7.199:4999/web/#/item/index'},
-            { name: 'eteams-icon', url: 'https://weapp.eteams.cn/iconfont/resource/icon'},
-            { name: 'em-develop-main', url: 'http://weapp.develop.cn/sp/em/main'},
-            { name: 'em-develop-web', url: 'http://weapp.develop.cn/sp/em/web'},
-            { name: 'em-develop-mobile', url: 'http://weapp.develop.cn/mobile/em/groupRobots'},
-            { name: 'e-builder', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/716154026911416320/doc/791416753084817408'},
-            // { name: 'e-builder表单', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/746177360030318593/home'},
-            // { name: 'e-builder页面', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/722818617793552384/doc/725747369011814401'},
-            { name: 'ecode', url: 'https://www.e-cology.com.cn/ecode/playground/doc/share/view/916733818655342593'},
-          ],
-        },
-      ],
-      // 中间栏
-      center: [
-        {
-          title: '在线工具', show: 20,
-          items: [
-            { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
-            { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
-            { name: 'c++代码在线运行', url: 'https://cpp.sh' },
-            { name: 'js代码在线运行', url: 'https://www.wetools.com/js-run', icon: 'https://static.wetools.com/assets/images/web/favicon.ico' },
-            { name: 'tinypng-图片压缩', url: 'https://tinypng.com', icon: 'https://tinypng.com/images/apple-touch-icon.png' },
-            { name: '时间戳转换', url: 'https://www.jyshare.com/front-end/852/' },
-            { name: 'url转码', url: 'https://tool.oschina.net/encode?type=4' },
-            { name: '正则测试工具', url: 'https://tool.lu/regex/' },
-            { name: 'MD5在线加密', url: 'https://www.jyshare.com/front-end/703/' },
-          ],
-        },
-        {
-          title: '持续学习',
-          items: [
-            { name: '菜鸟教程-开发手册(html&js&css)', url: 'https://www.runoob.com' },
-            { name: '谈谈JS二进制：File、Blob、FileReader、ArrayBuffer、Base64', url: 'https://zhuanlan.zhihu.com/p/568915443' },
-          ],
-        },
-        {
-          title: '高质生活',
-          items: [
-            { name: '积分管理-上海市居住证', url: 'https://jzzjf.rsj.sh.gov.cn/jzzjf/login.jsp' },
-          ],
-        },
-      ],
+<script>
+  const cfgs = {
+    // 左侧栏
+    left: [
+      {
+        title: '高频网站', show: 12,
+        items: [
+          { name: 'github-Jevstein', url: 'https://github.com/jevstein' },
+        ],
+      },
+      {
+        title: '工作台',
+        items: [
+          { name: 'gitlab-emessage', url: 'http://10.12.101.12/EM/weapp-emmessage' },
+          { name: 'Jenkins-emessage', url: 'http://10.12.101.25:8080/job/weapp-emmessage' },
+          { name: '快捷工作台', url: 'https://www.e-cology.com.cn/sp/doc/docDetail/100500240013412987?type=IM_View&_isEm=1&_emUid=4975624591352436806&_emCid=874152414695915520&weappAuthStr=eyJtc2dpZCI6IjE3MDAyMDUxNDkxNjA0MzYxMTciLCJmbGFnIjowLCJ1c2VyIjp7ImNpZCI6Ijg3NDE1MjQxNDY5NTkxNTUyMCIsInVpZCI6IjQ5NzU2MjQ1OTEzNTI0MzY4MDYifX0=' },
+          { name: 'showdoc', url: 'http://192.168.7.199:4999/web/#/item/index' },
+          { name: 'eteams-icon', url: 'https://weapp.eteams.cn/iconfont/resource/icon' },
+          { name: 'em-develop-main', url: 'http://weapp.develop.cn/sp/em/main' },
+          { name: 'em-develop-web', url: 'http://weapp.develop.cn/sp/em/web' },
+          { name: 'em-develop-mobile', url: 'http://weapp.develop.cn/mobile/em/groupRobots' },
+          { name: 'e-builder', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/716154026911416320/doc/791416753084817408' },
+          // { name: 'e-builder表单', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/746177360030318593/home'},
+          // { name: 'e-builder页面', url: 'https://weapp.eteams.cn/build/techdoc/wdoc/index.html#/online/722818617793552384/doc/725747369011814401'},
+          { name: 'ecode', url: 'https://www.e-cology.com.cn/ecode/playground/doc/share/view/916733818655342593' },
+        ],
+      },
+    ],
+    // 中间栏
+    center: [
+      {
+        title: '在线工具', show: 20,
+        items: [
+          { name: 'sojson-home', url: 'https://www.sojson.com/simple_json.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+          { name: 'sojson-yasuo', url: 'https://www.sojson.com/yasuo.html', icon: 'https://cdn.sojson.com/sojson/favicon16.png' },
+          { name: 'c++代码在线运行', url: 'https://cpp.sh' },
+          { name: 'js代码在线运行', url: 'https://www.wetools.com/js-run', icon: 'https://static.wetools.com/assets/images/web/favicon.ico' },
+          { name: 'tinypng-图片压缩', url: 'https://tinypng.com', icon: 'https://tinypng.com/images/apple-touch-icon.png' },
+          { name: '时间戳转换', url: 'https://www.jyshare.com/front-end/852/' },
+          { name: 'url转码', url: 'https://tool.oschina.net/encode?type=4' },
+          { name: '正则测试工具', url: 'https://tool.lu/regex/' },
+          { name: 'MD5在线加密', url: 'https://www.jyshare.com/front-end/703/' },
+        ],
+      },
+      {
+        title: '持续学习',
+        items: [
+          { name: '菜鸟教程-开发手册(html&js&css)', url: 'https://www.runoob.com' },
+          { name: '谈谈JS二进制：File、Blob、FileReader、ArrayBuffer、Base64', url: 'https://zhuanlan.zhihu.com/p/568915443' },
+        ],
+      },
+      {
+        title: '便捷生活',
+        items: [
+          { name: '积分管理-上海市居住证', url: 'https://jzzjf.rsj.sh.gov.cn/jzzjf/login.jsp' },
+          { name: '上海市一网通办', url: 'https://zwdt.sh.gov.cn/govPortals/index.do' },
+          { name: '中国高等教育学生信息网(学信网)', url: 'https://account.chsi.com.cn' },
+          { name: '学信档案', url: 'https://my.chsi.com.cn/archive/index.jsp' },
+
+        ],
+      },
+    ],
+  }
+
+  let timerOutMore = null;
+  let timerOutMask = null;
+
+  function hideMenu() {
+    const maskElement = document.querySelector('.weblab-urlnavi-mask');
+    maskElement.classList.remove('is-mask');
+
+    const elements = document.getElementsByClassName('weblab-urlnavi-menu');
+    for (const element of elements) {
+      if (element.getAttributeNode('class').value.indexOf('is-menu') > -1) {
+        element.classList.remove('is-menu');
+        return;
+      }
     }
+  }
 
-    let timerOutMore = null;
-    let timerOutMask = null;
+  function handleClickMore(event) {
+    const maskElement = document.querySelector('.weblab-urlnavi-mask');
 
-    function hideMenu() {
-      const maskElement = document.querySelector('.weblab-urlnavi-mask');
+    const id = event.target.getAttributeNode('data-id').value;
+    const menuElement = document.getElementById(id);
+
+    const isMenu = menuElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
+    if (isMenu) {
+      menuElement.classList.remove('is-menu');
       maskElement.classList.remove('is-mask');
-
-      const elements = document.getElementsByClassName('weblab-urlnavi-menu');
-      for (const element of elements) {
-        if (element.getAttributeNode('class').value.indexOf('is-menu') > -1) {
-          element.classList.remove('is-menu');
-          return;
-        }
-      }
+    } else {
+      menuElement.classList.add('is-menu');
+      maskElement.classList.add(`is-mask`);
     }
+  }
 
-    function handleClickMore(event) {
-      const maskElement = document.querySelector('.weblab-urlnavi-mask');
+  function handleClickMask(event) {
+    this.hideMenu();
+  }
 
-      const id = event.target.getAttributeNode('data-id').value;
-      const menuElement = document.getElementById(id);
+  function handleClickUrl(event) {
+    const url = event.target.getAttributeNode('data-url').value;
+    window.open(url, "_blank", "noopener=yes,noreferrer=yes");
 
-      const isMenu = menuElement.getAttributeNode('class').value.indexOf('is-menu') > -1;
-      if (isMenu) {
-        menuElement.classList.remove('is-menu');
-        maskElement.classList.remove('is-mask');
-      } else {
-        menuElement.classList.add('is-menu');
-        maskElement.classList.add(`is-mask`);
-      }
-    }
+    this.hideMenu();
+  }
 
-    function handleClickMask(event) {
-        this.hideMenu();
-    }
+  function main() {
+    Object.keys(cfgs).forEach(key => {
+      const parentElement = document.querySelector(`.weblab-urlnavi-${key}`);
+      parentElement.innerHTML = '';
 
-    function handleClickUrl(event) {
-      const url = event.target.getAttributeNode('data-url').value;
-      window.open(url, "_blank", "noopener=yes,noreferrer=yes");
+      cfgs[key].forEach((box, boxIndex) => {
+        const id = `${key}-${boxIndex}`;
+        const boxElement = document.createElement('div');
+        boxElement.setAttribute('class', 'box');
 
-      this.hideMenu();
-    }
+        const titleElement = document.createElement('div');
+        titleElement.innerHTML = box.title;
+        titleElement.setAttribute('class', 'title');
+        boxElement.appendChild(titleElement);
 
-    function main() {
-      Object.keys(cfgs).forEach(key => {
-        const parentElement = document.querySelector(`.weblab-urlnavi-${key}`);
-        parentElement.innerHTML = '';
+        const isMore = (box.show > 0) && (box.items.length > box.show);
+        const showItems = isMore ? box.items.slice(0, box.show) : box.items;
+        const moreItems = isMore ? box.items.slice(box.show) : [];
 
-        cfgs[key].forEach((box, boxIndex) => {
-          const id = `${key}-${boxIndex}`;
-          const boxElement = document.createElement('div');
-          boxElement.setAttribute('class', 'box');
+        // 1、面板显示
+        const areaElement = document.createElement('div');
+        areaElement.setAttribute('class', 'area');
+        showItems.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.title = `${item.name}:\n${item.url}`
+          itemElement.setAttribute('class', 'item');
 
-          const titleElement = document.createElement('div');
-          titleElement.innerHTML = box.title;
-          titleElement.setAttribute('class', 'title');
-          boxElement.appendChild(titleElement);
+          // logo
+          const urlObj = new URL(item.url);
+          const img = new Image();
+          img.className = "icon";
+          img.src = item.icon || `${urlObj.origin}/favicon.ico`;
+          img.width = '16';
+          img.height = '16';
+          itemElement.appendChild(img);
 
-          const isMore = (box.show > 0) && (box.items.length > box.show);
-          const showItems = isMore ? box.items.slice(0, box.show) : box.items;
-          const moreItems = isMore ? box.items.slice(box.show) : [];
+          // a标签
+          const aElement = document.createElement('a');
+          aElement.innerHTML = item.name;
+          aElement.setAttribute('href', item.url);
+          aElement.setAttribute('target', '_blank');
+          itemElement.appendChild(aElement);
 
-          // 1、面板显示
+          areaElement.appendChild(itemElement);
+
+          boxElement.appendChild(areaElement);
+        });
+
+        // 2、更多显示
+        if (moreItems.length > 0) {
+          const menuId = `menu-${id}`;
+          // 更多
+          const moreElement = document.createElement('div');
+          moreElement.innerHTML = '...';
+          moreElement.setAttribute('class', 'more');
+          moreElement.setAttribute('title', '更多');
+          moreElement.setAttribute('data-id', menuId);
+          moreElement.onclick = (event) => this.handleClickMore(event);
+          boxElement.appendChild(moreElement);
+          // 菜单
           const areaElement = document.createElement('div');
-          areaElement.setAttribute('class', 'area');
-          showItems.forEach(item => {
+          areaElement.setAttribute('class', 'weblab-urlnavi-menu');
+          areaElement.setAttribute('id', menuId);
+          moreItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.title = `${item.name}:\n${item.url}`
             itemElement.setAttribute('class', 'item');
@@ -437,68 +483,26 @@
             itemElement.appendChild(img);
 
             // a标签
-            const aElement = document.createElement('a');
+            const aElement = document.createElement('div');
             aElement.innerHTML = item.name;
-            aElement.setAttribute('href', item.url);
-            aElement.setAttribute('target', '_blank');
+            aElement.setAttribute('class', 'a');
+            aElement.setAttribute('data-url', item.url);
+            aElement.onclick = (event) => this.handleClickUrl(event);
             itemElement.appendChild(aElement);
 
             areaElement.appendChild(itemElement);
 
             boxElement.appendChild(areaElement);
           });
+        }
 
-          // 2、更多显示
-          if (moreItems.length > 0) {
-            const menuId = `menu-${id}`;
-            // 更多
-            const moreElement = document.createElement('div');
-            moreElement.innerHTML = '...';
-            moreElement.setAttribute('class', 'more');
-            moreElement.setAttribute('title', '更多');
-            moreElement.setAttribute('data-id', menuId);
-            moreElement.onclick = (event) => this.handleClickMore(event);
-            boxElement.appendChild(moreElement);
-            // 菜单
-            const areaElement = document.createElement('div');
-            areaElement.setAttribute('class', 'weblab-urlnavi-menu');
-            areaElement.setAttribute('id', menuId);
-            moreItems.forEach(item => {
-              const itemElement = document.createElement('div');
-              itemElement.title = `${item.name}:\n${item.url}`
-              itemElement.setAttribute('class', 'item');
+        parentElement.appendChild(boxElement);
+      })
+    });
+  }
 
-              // logo
-              const urlObj = new URL(item.url);
-              const img = new Image();
-              img.className = "icon";
-              img.src = item.icon || `${urlObj.origin}/favicon.ico`;
-              img.width = '16';
-              img.height = '16';
-              itemElement.appendChild(img);
+  main();
 
-              // a标签
-              const aElement = document.createElement('div');
-              aElement.innerHTML = item.name;
-              aElement.setAttribute('class', 'a');
-              aElement.setAttribute('data-url', item.url);
-              aElement.onclick = (event) => this.handleClickUrl(event);
-              itemElement.appendChild(aElement);
-
-              areaElement.appendChild(itemElement);
-
-              boxElement.appendChild(areaElement);
-            });
-          }
-
-          parentElement.appendChild(boxElement);
-        })
-      });
-    }
-
-    main();
-
-  </script>
-</body>
+</script>
 
 </html>

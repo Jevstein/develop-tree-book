@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>iframe page</title>
+</head>
+
+<body>
+  <p>iframe page: </p>
+  count: <span id="container">0</span>
+  <button id="reduce">reduce</button>
+</body>
+
+<script type="text/javascript">
+  if (!!window.SharedWorker) {
+    const container = document.getElementById('container');
+    const reduce = document.getElementById('reduce');
+
+    const myWorker = new SharedWorker('./sharedWorker.js');
+    myWorker.port.start();
+    myWorker.port.addEventListener('message', msg => {
+      container.innerText = msg.data;
+    })
+
+    reduce.addEventListener('click', () => {
+      myWorker.port.postMessage('reduce');
+    });
+  }
+</script>
+
+</html>
