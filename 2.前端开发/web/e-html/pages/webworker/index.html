@@ -3,9 +3,15 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>多线程-webworker</title>
+  <title>同步异步</title>
 
   <style>
+    .body {
+      display: flex;
+      flex-wrap: wrap;
+      /* justify-content: center; */
+    }
+
     .box {
       margin: 10px;
 
@@ -33,32 +39,134 @@
         display: flex;
       }
     }
+
+    .jvt-ticker {
+
+      .ticker-area {
+        display: flex;
+        margin-top: 10px;
+
+        .ticker-item {
+          position: relative;
+          color: #5d9cec;
+          border: 1px solid #5d9cec;
+          padding: 2px 5px;
+          margin: 0 5px 5px 0;
+          user-select: none;
+
+          border-radius: 3px;
+          font-size: 12px;
+          box-sizing: border-box;
+
+          .close {
+            position: absolute;
+            top: -9px;
+            right: -5px;
+            color: #ffffff;
+            background-color: #999999;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            line-height: 14px;
+            display: none;
+            justify-items: center;
+            flex-direction: column;
+            text-align: center;
+            cursor: pointer;
+            &:hover {
+              background-color: red;
+            }
+          }
+
+          &:hover {
+            .close {
+              display: flex;
+            }
+          }
+        }
+      }
+    }
   </style>
 </head>
 
-<body text="blue">
+<body>
   <div><a href="https://juejin.cn/post/7139718200177983524" target="_blank">一文彻底学会使用web worker</a></div>
-  <div class="box">
-    <div class="box-title"><b>利用SharedWorker实现多页面数据共享</b></div>
-    <div class="box-subtitle">
-      1、index 页面的 add 按钮，每点击一次，向 sharedWorker 发送一次 add 数据，页面 count 增加1；</br>
-      2、iframe 页面的 reduce 按钮，每点击一次，向 sharedWorker 发送一次 reduce 数据，页面count 减少1；</br>
-      3、sharedWorker 在接收到数据后，根据数据类型处理 num 计数，然后返回给每个已连接的主线程</br>
-    【注意】：本地执行需设置跨域 e.g. open -n /Applications/Google\ Chrome.app/ --args --disable-web-security  --user-data-dir=/Users/xxx/MyChromeDevUserData/
-    </div>
-    <div>
-      <div>
-        count: <span id="container">0</span>
+  <div><a href="https://www.ruanyifeng.com/blog/2018/07/web-worker.html" target="_blank">Web Worker 使用教程</a></div>
+  <div><a href="https://blog.csdn.net/qq_44318215/article/details/126927341"
+      target="_blank">解决setInterval和setTimeout越来越慢的问题</a></div>
+  <div class="body">
+    <div class="box">
+      <div class="box-title"><b>线程webworker-利用SharedWorker实现多页面数据共享</b></div>
+      <div class="box-subtitle">
+        1、index 页面的 add 按钮，每点击一次，向 sharedWorker 发送一次 add 数据，页面 count 增加1；</br>
+        2、iframe 页面的 reduce 按钮，每点击一次，向 sharedWorker 发送一次 reduce 数据，页面count 减少1；</br>
+        3、sharedWorker 在接收到数据后，根据数据类型处理 num 计数，然后返回给每个已连接的主线程</br>
+        【注意】：本地执行需设置跨域 e.g. open -n /Applications/Google\ Chrome.app/ --args --disable-web-security
+        --user-data-dir=/Users/xxx/MyChromeDevUserData/
       </div>
-      <button id="add">add</button>
-      <br>
-      <iframe src="./iframe.html"></iframe>
+      <div>
+        <div>
+          count: <span id="container">0</span>
+        </div>
+        <button id="add">add</button>
+        <br>
+        <iframe src="./iframe.html"></iframe>
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-title"><b>定时器</b></div>
+      <div class="box-subtitle">
+        一个定时器，控制多个事件
+      </div>
+      <div class="mock-test">
+        <h5>1、定时器调研 - console</h5>
+        <button onclick="handleClickTickerTestSetTimeout(event)">setTimeout-递归</button>
+        <button onclick="handleClickTickerTestSetInterval(event)">setInterval-webworker</button>
+      </div>
+      <div class="jvt-ticker">
+        <h5>2、定时器试用 - UI</h5>
+        <div class="oper-bar">
+          <button onclick="handleClickTickerStart(event)">启动</button>
+          <button onclick="handleClickTickerAdd(event)">添加</button>
+          <button onclick="handleClickTickerDelete(event)">删除</button>
+        </div>
+        <div class="ticker-area">
+          <div class="ticker-item">
+            <span class="name">倒计时</span>
+            <span class="time">59:32:06</span>
+            <div class="close">x</div>
+          </div>
+          <div class="ticker-item">
+            <span class="name">倒计时</span>
+            <span class="time">59:32:06</span>
+            <div class="close">x</div>
+          </div>
+          <div class="ticker-item">
+            <span class="name">倒计时</span>
+            <span class="time">59:32:06</span>
+            <div class="close">x</div>
+          </div>
+          <div class="ticker-item">
+            <span class="name">倒计时</span>
+            <span class="time">59:32:06</span>
+            <div class="close">x</div>
+          </div>
+          <div class="ticker-item">
+            <span class="name">倒计时</span>
+            <span class="time">59:32:06</span>
+            <div class="close">x</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
 
+<script src="../../base/utils.js"></script>
+<script src="./mock/ticker-countdown-setTimeout.js"></script>
 <script>
-  function testShareWorker() {
+  //========= 1、webWorker =========
+  function demoShareWorker() {
     if (!!window.SharedWorker) {
       const container = document.getElementById('container');
       const add = document.getElementById('add');
@@ -75,12 +183,83 @@
     }
   }
 
+  //========= 2、JvtTicker =========
+  // 1、console - 调研
+  function handleClickTickerTestSetTimeout(event) {
+    const isStop = (event.target.innerText === '停止');
+    if (isStop) {
+      event.target.innerText = 'setTimeout-递归';
+      jvtCountDownTMStop();
+      return;
+    }
+    event.target.innerText = '停止';
+    jvtCountDownTMStart();
+  }
+
+  let _tickerTestWorker = undefined;
+  function handleClickTickerTestSetInterval(event) {
+    if (!window.Worker) {
+      alert('no Worker!');
+      return;
+    }
+
+    if (!_tickerTestWorker) {
+      _tickerTestWorker = new Worker('./mock/ticker-countdown-webworker.js');
+      // _tickerTestWorker.addEventListener('message', msg => {
+      //   console.log('message:', msg)
+      // });
+      _tickerTestWorker.onmessage = (event) => {
+        console.log('main message:', JvtUtils.getFormatTime(event.data).text);
+      }
+    }
+
+    const isStop = (event.target.innerText === '停止');
+    if (isStop) {
+      event.target.innerText = 'setInterval-webworker';
+      _tickerTestWorker.postMessage('stop');
+      _tickerTestWorker = undefined;
+      return;
+    }
+    event.target.innerText = '停止';
+    _tickerTestWorker.postMessage('start');
+  }
+
+  // 2、UI - 试用
+  function handleClickTickerStart(event) {
+    const isStop = (event.target.innerText === '停止');
+    if (isStop) {
+      event.target.innerText = '启动';
+      return;
+    }
+    event.target.innerText = '停止';
+  }
+
+  function handleClickTickerAdd(event) {
+    this.addTickerItems(1000);
+  }
+
+  function handleClickTickerDelete(event) {
+
+  }
+
+  function addTickerItems(count) {
+    for (let i = 0; i < count; i++) {
+
+    }
+  }
+
+  function demoTicker() {
+    this.addTickerItems(10000);
+  }
+
+  //========= *** =========
   function main() {
-    testShareWorker();
+    demoShareWorker();
+    demoTicker();
   }
 
   main();
-  
+
 </script>
 
 </html>
