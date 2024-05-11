@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>信手涂鸦</title>
+
+  <style>
+    body {
+      /* display: flex;
+      flex-wrap: wrap;
+      justify-content: center; */
+
+      .body {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+
+    .box {
+      margin: 10px;
+
+      .box-title {
+        font-size: 16px;
+        line-height: 22px;
+        /* font-weight: 500; */
+        color: #111;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+        border-left: 3px solid #7ed321;
+        margin-bottom: 8px;
+      }
+    }
+
+    .open-exe {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body text="blue">
+  <div class="body">
+
+    <div class="box open-exe">
+      <div class="box-title"><b>打开本地程序</b></div>
+      <div class="area">
+        <input name="exe" type="text" size="20" value="D:\a.doc">
+        <button onclick="handleClickOpenActiveXObject(exe.value)">ActiveXObject</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function handleClickOpenActiveXObject(event) {
+      try {
+        const objShell = new ActiveXObject("wscript.shell");
+        if (!objShell) {
+          alert('Could not get reference to WScript.Shell');
+          return;
+        }
+        objShell.exec(strPath);
+        objShell = null;
+      } catch (errorObject) {
+        alert('Error:' + errorObject.message);
+      }
+    }
+  </script>
+</body>
+
+</html>

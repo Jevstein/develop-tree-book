@@ -44,7 +44,7 @@ let _isStop = false;
 
 const _run = () => {
   let time = 3670000;
-  
+
   _isStop = false;
 
   const intervalId = setInterval(() => {
@@ -65,14 +65,12 @@ const _run = () => {
 
 self.addEventListener('message', e => { // 接收到消息
   console.log('worker message:', e.data);
-  // self.postMessage('Greeting from Worker.js'); // 向主线程发送消息
-
-  if (e.data === 'start') {
-    _run();
-    return;
-  }
-
-  if (e.data === 'stop') {
-    _isStop = true;
+  const cmd = e.data;
+  switch(cmd) {
+    case 'start': _run(); break;
+    case 'stop': _isStop = true; break;
+    default:
+      console.error('unknown cmd:', cmd);
+      break;
   }
 });

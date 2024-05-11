@@ -67,7 +67,7 @@
             border-radius: 50%;
             width: 14px;
             height: 14px;
-            line-height: 14px;
+            line-height: 13px;
             display: none;
             justify-items: center;
             flex-direction: column;
@@ -95,7 +95,7 @@
   <div><a href="https://blog.csdn.net/qq_44318215/article/details/126927341"
       target="_blank">解决setInterval和setTimeout越来越慢的问题</a></div>
   <div class="body">
-    <div class="box">
+    <div class="box sharedWorker">
       <div class="box-title"><b>线程webworker-利用SharedWorker实现多页面数据共享</b></div>
       <div class="box-subtitle">
         1、index 页面的 add 按钮，每点击一次，向 sharedWorker 发送一次 add 数据，页面 count 增加1；</br>
@@ -110,10 +110,10 @@
         </div>
         <button id="add">add</button>
         <br>
-        <iframe src="./iframe.html"></iframe>
+        <iframe src="./iframe.html" frameborder="1" ></iframe>
       </div>
     </div>
-    <div class="box">
+    <div class="box ticker">
       <div class="box-title"><b>定时器</b></div>
       <div class="box-subtitle">
         一个定时器，控制多个事件
@@ -126,6 +126,10 @@
       <div class="jvt-ticker">
         <h5>2、定时器试用 - UI</h5>
         <div class="oper-bar">
+          <select onchange="handleChangeSelectTicker(event)" style="height: 25px">
+            <option value="./雪1.png">setTimeout-递归</option>
+            <option value="./雪2.png">setInterval-webworker</option>
+          </select>
           <button onclick="handleClickTickerStart(event)">启动</button>
           <button onclick="handleClickTickerAdd(event)">添加</button>
           <button onclick="handleClickTickerDelete(event)">删除</button>
@@ -134,27 +138,7 @@
           <div class="ticker-item">
             <span class="name">倒计时</span>
             <span class="time">59:32:06</span>
-            <div class="close">x</div>
-          </div>
-          <div class="ticker-item">
-            <span class="name">倒计时</span>
-            <span class="time">59:32:06</span>
-            <div class="close">x</div>
-          </div>
-          <div class="ticker-item">
-            <span class="name">倒计时</span>
-            <span class="time">59:32:06</span>
-            <div class="close">x</div>
-          </div>
-          <div class="ticker-item">
-            <span class="name">倒计时</span>
-            <span class="time">59:32:06</span>
-            <div class="close">x</div>
-          </div>
-          <div class="ticker-item">
-            <span class="name">倒计时</span>
-            <span class="time">59:32:06</span>
-            <div class="close">x</div>
+            <div class="close">×</div>
           </div>
         </div>
       </div>
@@ -225,6 +209,10 @@
   }
 
   // 2、UI - 试用
+  function handleChangeSelectTicker(event) {
+    console.log('onchangeTicker:', event);
+  }
+
   function handleClickTickerStart(event) {
     const isStop = (event.target.innerText === '停止');
     if (isStop) {

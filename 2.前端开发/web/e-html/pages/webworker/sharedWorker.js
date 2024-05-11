@@ -1,6 +1,21 @@
 let num = 0;
 const workerList = [];
 
+
+// // 在Service Worker中
+// // 打开一个cache存储空间
+// caches.open('my-cache').then(function(cache) {
+//   // 存储请求和响应
+//   cache.put(request, response);
+// });
+
+// // 在Service Worker中
+// // 获取一个cache存储空间
+// caches.open('my-cache').then(function(cache) {
+//   // 获取请求的响应
+//   cache.match(request);
+// });
+
 self.addEventListener('connect', e => {
   const port = e.ports[0];
 
