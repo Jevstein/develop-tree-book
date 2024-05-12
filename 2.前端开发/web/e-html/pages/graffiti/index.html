@@ -7,10 +7,10 @@
 
   <style>
     body {
+
       /* display: flex;
       flex-wrap: wrap;
       justify-content: center; */
-
       .body {
         display: flex;
         flex-wrap: wrap;
@@ -33,6 +33,16 @@
         border-left: 3px solid #7ed321;
         margin-bottom: 8px;
       }
+
+      .box-subtitle {
+        position: relative;
+        width: 100%;
+        font-size: 12px;
+        color: #999999;
+        word-wrap: break-word;
+        margin: 5px 0;
+        display: flex;
+      }
     }
 
     .open-exe {
@@ -45,29 +55,143 @@
   <div class="body">
 
     <div class="box open-exe">
-      <div class="box-title"><b>打开本地程序</b></div>
+      <div class="box-title"><b>打开本地应用程序</b></div>
+      <div class="box-subtitle">
+        1、macOS中查看已注册的URL模式（即scheme）: <br>
+        cat /etc/services | grep -E '^[^ ]+[ ]+[^/]+/' > scheme.txt<br>
+        2、macOS查看某个特定应用程序注册的scheme： <br>
+        plutil -convert xml1 -o - /Applications/YourApp.app/Contents/Info.plist | grep URLSchemes -A 1 <br>
+      </div>
       <div class="area">
-        <input name="exe" type="text" size="20" value="D:\a.doc">
-        <button onclick="handleClickOpenActiveXObject(exe.value)">ActiveXObject</button>
+        <div class="invalid">
+          <input id="inputIdOpenExePath" type="text" size="25" value="D:\Program Files (x86)\ToDesk\ToDesk.exe">
+          <button onclick="handleClickOpenActiveXObject(event)">ActiveXObject</button>
+          <button onclick="handleClickOpenRegistry(event)">Registry</button>
+          <button onclick="handleClickOpenWechat(event)">微信-open</button>
+          <button onclick="handleClickOpenHref(event)">微信-href</button>
+          <button onclick="handleClickOpenTry(event)">试一试</button>
+        </div>
+        <div class="valid">
+          <a href="weixin:" target="_self">weixin:</a>
+          <a href="wechat:" target="_self">wechat:</a>
+          <a href="wemeet:" target="_self">wemeet:</a>
+          <a href="todesk:" target="_self">todesk:</a>
+          <a href="https://meet.xylink.com/#/" target="_blank">小鱼易连</a>
+          <a href="sunflower:" target="_self" onclick="handleClickHref" onerror="alert('no sunflower!')">向日葵</a>
+          <a href="http://example.com/404" target="_self" onerror="alert('url error')">其他</a>
+        </div>
       </div>
     </div>
 
   </div>
 
   <script>
+    // 打开本地程序
+    function getOpenexePath() {
+      const element = document.getElementById("inputIdOpenExePath");
+      return element.value;
+    }
+
     function handleClickOpenActiveXObject(event) {
+      const path = getOpenexePath();
       try {
+        // if (window.ActiveXObject) {
         const objShell = new ActiveXObject("wscript.shell");
         if (!objShell) {
           alert('Could not get reference to WScript.Shell');
           return;
         }
-        objShell.exec(strPath);
+        objShell.exec(path);
         objShell = null;
-      } catch (errorObject) {
-        alert('Error:' + errorObject.message);
+        // } else if (window.XMLHttpRequest) {
+        //   // 非IE浏览器的代码
+        //   const xmlhttp = new XMLHttpRequest();
+        //   alert('xmlhttp');
+        // }
+      } catch (error) {
+        alert('Error(only in the IE-browser of windows):' + error.message);
       }
     }
+
+    function handleClickOpenRegistry(event) {
+      // 1.使用记事本（或其他文本编辑器）创建一个protocal.reg文件，并写入以下内容
+      /*
+        Windows Registry Editor Version 5.00
+        [HKEY_CLASSES_ROOT\universalLink]
+        @="universalLink Protocol"
+        "URL Protocol"= ""
+        [HKEY_CLASSES_ROOT\universalLink\DefaultIcon]
+        @="D:\\Program Files (x86)\\ToDesk\\ToDesk.exe"
+        [HKEY_CLASSES_ROOT\universalLink\shell]
+        @= ""
+        [HKEY_CLASSES_ROOT\universalLink\shell\open]
+        @= ""
+        [HKEY_CLASSES_ROOT\universalLink\shell\open\command]
+        @="\"D:\\Program Files (x86)\\ToDesk\\ToDesk.exe\" \"%1\""
+      */
+
+      // 2.双击运行protocal.reg
+
+      // 3.实现
+      // <a href="universalLink://">打开应用程序</a> // 方法一
+      // window.location.href="universalLink://";// 方法二
+      window.open("universalLink://", "_self");// 方法三
+
+      alert('only open "wexin:" from registry in windows!');
+    }
+
+    function handleClickOpenWechat(event) {
+      window.open("wexin:", "_self", "noopener=yes,noreferrer=yes");
+      alert('faild to open "wexin:" !');
+    }
+
+    function handleClickOpenHref(event) {
+      // document.querySelector('a').href = 'http://example.com/404';
+      try {
+        window.location.href = 'sunflower:';
+        window.location.reload();
+
+      } catch (e) {
+        alert('无法打开链接，请确认URL正确无误。');
+      }
+    }
+
+    function handleClickOpenTry(event) {
+      try {
+
+      } catch (e) {
+        alert('无法打开链接，请确认URL正确无误。');
+      }
+    }
+
+    function handleClickHref(event) {
+      event.preventDefault(); // 阻止默认行为
+      try {
+        // 尝试打开链接或执行其他操作
+        // 但由于 'todesk:' 不是标准的 URL 协议，这里实际上没有什么可以做的
+      } catch (error) {
+        // 这里不会捕获到错误，因为浏览器不会抛出异常
+        console.error('无法处理 todesk: 协议');
+        // 显示错误消息或其他处理逻辑
+        alert('无法处理 todesk: 协议');
+      }
+    }
+
+    // window.addEventListener('error', function (event) {
+    //   var element = event.target;
+    //   // if (element.tagName.toLowerCase() === 'a') {
+    //   //   event.preventDefault();
+    //   console.log('a标签地址错误被捕获:', element.href);
+    //   // 这里可以执行其他逻辑，比如导航到错误页面或者提示用户
+    //   // }
+    // });
+
+    window.onerror = function (sMessage, sUrl, sLine) {
+      alert("发生错误！\n" + sMessage + "\nURL:" + sUrl + "\nLine Number:" + sLine);
+      return true;
+    }
+
+
   </script>
 </body>
 
