@@ -20,18 +20,18 @@ let timer = 0; //  定时器id
 const _run = (nextTime) => {
   if (nextTime <= 0) {
     isStop = true;
-    console.log(JvtUtils.getFormatTime(leftTime).text); // 拿到data更新页面数据
+    console.log(JvtUtils.formatTime(leftTime).text); // 拿到data更新页面数据
   }
 
   if (isStop) {
-    console.log('the end!', JvtUtils.getFormatTime(leftTime).text, leftTime, nextTime); // 拿到data更新页面数据
+    console.log('the end!', JvtUtils.formatTime(leftTime).text, leftTime, nextTime); // 拿到data更新页面数据
     clearTimeout(timer);
     return;
   }
 
   timer = setTimeout(() => {
     leftTime = leftTime - 1000;
-    console.log(JvtUtils.getFormatTime(leftTime).text); // 拿到data更新页面数据
+    console.log(JvtUtils.formatTime(leftTime).text); // 拿到data更新页面数据
 
     clearTimeout(timer);
 
@@ -43,21 +43,6 @@ const _run = (nextTime) => {
 
 // _run(1000);
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    clearTimeout(timer)
-  } else {
-    totalTime = totalTime - (new Date().getTime() - startTime)
-    if (totalTime < 0) {
-      return;
-    }
-    leftTime = totalTime
-    startTime = new Date().getTime()
-    count = 0
-    _run(1000);
-  }
-})
-
 const jvtCountDownTMStart = () => {
   totalTime = 3670000; // 总时间
   leftTime = totalTime; // 剩余时间
@@ -67,6 +52,23 @@ const jvtCountDownTMStart = () => {
   count = 0; // 计时器的执行次数
 
   timer = 0; //  定时器id
+
+  document.addEventListener('visibilitychange', () => {
+    console.log('visibilitychange', document.visibilityState);
+
+    if (document.visibilityState === 'hidden') {
+      clearTimeout(timer)
+    } else {
+      totalTime = totalTime - (new Date().getTime() - startTime)
+      if (totalTime < 0) {
+        return;
+      }
+      leftTime = totalTime
+      startTime = new Date().getTime()
+      count = 0
+      _run(1000);
+    }
+  });
 
   _run(1000);
 }

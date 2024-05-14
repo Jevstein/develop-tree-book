@@ -42,9 +42,22 @@
 
     .jvt-ticker {
 
-      .ticker-area {
+      .oper-bar {
+        >select {
+          height: 25px;
+        }
+
+        >input {
+          width: 120px; 
+          text-align: center;
+        }
+      }
+
+      .weblab-ticker-area {
         display: flex;
         margin-top: 10px;
+        flex-wrap: wrap;
+        width: 100%;
 
         .ticker-item {
           position: relative;
@@ -53,10 +66,33 @@
           padding: 2px 5px;
           margin: 0 5px 5px 0;
           user-select: none;
+          width: 102px;
 
           border-radius: 3px;
           font-size: 12px;
           box-sizing: border-box;
+
+          &.stop {
+            color: #cccccc;
+            border: 1px solid #cccccc;
+          }
+          &.start {
+            color: #5d9cec;
+            border: 1px solid #5d9cec;
+          }
+          &.remove {
+            color: red;
+            border: 1px solid red;
+            
+            .close {
+              display: flex;
+              background-color: red;
+            }
+          }
+
+          .time {
+            margin-left: 2px;
+          }
 
           .close {
             position: absolute;
@@ -126,15 +162,19 @@
       <div class="jvt-ticker">
         <h5>2、定时器试用 - UI</h5>
         <div class="oper-bar">
-          <select onchange="handleChangeSelectTicker(event)" style="height: 25px">
-            <option value="./雪1.png">setTimeout-递归</option>
-            <option value="./雪2.png">setInterval-webworker</option>
+          <select onchange="handleChangeSelectTicker(event)">
+            <option value="1">[单个]setTimeout-递归</option>
+            <option value="2">[单个]setInterval-webworker</option>
+            <option value="3">[组合]setTimeout-递归</option>
+            <option value="4">[组合]setInterval-webworker</option>
           </select>
           <button onclick="handleClickTickerStart(event)">启动</button>
-          <button onclick="handleClickTickerAdd(event)">添加</button>
-          <button onclick="handleClickTickerDelete(event)">删除</button>
+          <button onclick="handleClickTickerAdd(event)" title="批量添加">添加</button>
+          <button onclick="handleClickTickerDelete(event)" title="随机批量删除">删除</button>
+          <button onclick="handleClickTickerReset(event)">重置</button>
+          <input onchange="handleChangeTickerCount(event)" type="text" placeholder="请输入计时器个数" value="100">
         </div>
-        <div class="ticker-area">
+        <div class="weblab-ticker-area">
           <div class="ticker-item">
             <span class="name">倒计时</span>
             <span class="time">59:32:06</span>
@@ -147,7 +187,9 @@
 </body>
 
 <script src="../../base/utils.js"></script>
+<script src="../../base/ticker/countdown-timer.js"></script>
 <script src="./mock/ticker-countdown-setTimeout.js"></script>
+<script src="./ticker-demo.js"></script>
 <script>
   //========= 1、webWorker =========
   function demoShareWorker() {
@@ -155,11 +197,15 @@
       const container = document.getElementById('container');
       const add = document.getElementById('add');
 
-      const myWorker = new SharedWorker('./sharedWorker.js');
-      myWorker.port.start();
-      myWorker.port.addEventListener('message', msg => {
-        container.innerText = msg.data;
-      });
+      try {
+        const myWorker = new SharedWorker('./sharedWorker.js');
+        myWorker.port.start();
+        myWorker.port.addEventListener('message', msg => {
+          container.innerText = msg.data;
+        });
+      } catch (error) {
+        console.error(error)
+      }
 
       add.addEventListener('click', () => {
         myWorker.port.postMessage('add');
@@ -167,7 +213,7 @@
     }
   }
 
-  //========= 2、JvtTicker =========
+  //========= 2、JvtTicker gTickerDemoInstance ./ticker-demo.js =========
   // 1、console - 调研
   function handleClickTickerTestSetTimeout(event) {
     const isStop = (event.target.innerText === '停止');
@@ -193,7 +239,7 @@
       //   console.log('message:', msg)
       // });
       _tickerTestWorker.onmessage = (event) => {
-        console.log('main message:', JvtUtils.getFormatTime(event.data).text);
+        console.log('main message:', JvtUtils.formatTime(event.data).text);
       }
     }
 
@@ -209,35 +255,56 @@
   }
 
   // 2、UI - 试用
+  let _tickerCount = 100;
+  function handleChangeTickerCount(event) {
+    _tickerCount = parseInt(event.target.value);
+  }
+
   function handleChangeSelectTicker(event) {
     console.log('onchangeTicker:', event);
+    gTickerDemoInstance.create(1);
   }
 
   function handleClickTickerStart(event) {
     const isStop = (event.target.innerText === '停止');
     if (isStop) {
       event.target.innerText = '启动';
+      gTickerDemoInstance.stop();
       return;
     }
+    gTickerDemoInstance.start();
     event.target.innerText = '停止';
   }
 
-  function handleClickTickerAdd(event) {
-    this.addTickerItems(1000);
-  }
-
   function handleClickTickerDelete(event) {
-
+    gTickerDemoInstance.deleteItems({
+      count: _tickerCount / 10,
+    });
   }
 
-  function addTickerItems(count) {
-    for (let i = 0; i < count; i++) {
+  function handleClickTickerAdd(event) {
+    const parentElement = document.querySelector(`.weblab-ticker-area`);
+      // parentElement.innerHTML = '';
+    gTickerDemoInstance.addItems({ 
+      count: _tickerCount,
+      totalTime: 1 * 50 * 1000, 
+      parentElement
+    });
+  }
 
-    }
+  function handleClickTickerReset(event) {
+    const parentElement = document.querySelector(`.weblab-ticker-area`);
+    parentElement.innerHTML = '';
+    gTickerDemoInstance.clear();
+    gTickerDemoInstance.addItems({ 
+      count: _tickerCount, 
+      totalTime: 1 * 50 * 1000, 
+      parentElement
+    });
   }
 
   function demoTicker() {
-    this.addTickerItems(10000);
+    this.handleClickTickerReset();
   }
 
   //========= *** =========

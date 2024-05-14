@@ -17,11 +17,15 @@
     const container = document.getElementById('container');
     const reduce = document.getElementById('reduce');
 
-    const myWorker = new SharedWorker('./sharedWorker.js');
-    myWorker.port.start();
-    myWorker.port.addEventListener('message', msg => {
-      container.innerText = msg.data;
-    })
+    try {
+      const myWorker = new SharedWorker('./sharedWorker.js');
+      myWorker.port.start();
+      myWorker.port.addEventListener('message', msg => {
+        container.innerText = msg.data;
+      })
+    } catch (error) {
+      console.error(error)
+    }
 
     reduce.addEventListener('click', () => {
       myWorker.port.postMessage('reduce');

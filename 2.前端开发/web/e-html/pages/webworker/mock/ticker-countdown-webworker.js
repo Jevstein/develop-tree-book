@@ -4,7 +4,7 @@
  */
 
 // const workercode = () => {
-  // const getFormatTime = (durTime) => {
+  // const formatTime = (durTime) => {
   //   let remain = durTime;
   //   const hour = Math.floor(remain / (60 * 60 * 1000));
   //   remain = remain % 3600000;
@@ -26,7 +26,7 @@
   //     close(); // 关闭worker线程
   //     return;
   //   }
-  //   // const data = getFormatTime(time);
+  //   // const data = formatTime(time);
   //   // postMessage(JSON.stringify(data)); // 向主线程发送消息
   //   postMessage(time); // 向主线程发送消息
   // }, 1000);
