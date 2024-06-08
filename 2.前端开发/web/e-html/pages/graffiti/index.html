@@ -41,7 +41,7 @@
         color: #999999;
         word-wrap: break-word;
         margin: 5px 0;
-        display: flex;
+        /* display: flex; */
       }
     }
 
@@ -57,10 +57,30 @@
     <div class="box open-exe">
       <div class="box-title"><b>打开本地应用程序</b></div>
       <div class="box-subtitle">
+        一、macOS <br>
         1、macOS中查看已注册的URL模式（即scheme）: <br>
         cat /etc/services | grep -E '^[^ ]+[ ]+[^/]+/' > scheme.txt<br>
         2、macOS查看某个特定应用程序注册的scheme： <br>
-        plutil -convert xml1 -o - /Applications/YourApp.app/Contents/Info.plist | grep URLSchemes -A 1 <br>
+        plutil -convert xml1 -o - /Applications/YourApp.app/Contents/Info.plist | grep URLSchemes -A 1 <br><br>
+
+        二、Windows <br>
+        注册表：计算机\HKEY_CLASSES_ROOT\weixin\shell\open\command，默认如: <br>
+        "D:\Program Files (x86)\Tencent\WeChat\WeChat.exe" "%1"<br>
+        ---新建一个protocal.reg文件，写入以下内容，并双击执行:<br>
+        <span>
+          Windows Registry Editor Version 5.00<br>
+          [HKEY_CLASSES_ROOT\universalLink]<br>
+          @="universalLink Protocol"<br>
+          "URL Protocol"= ""<br>
+          [HKEY_CLASSES_ROOT\universalLink\DefaultIcon]<br>
+          @="D:\\Program Files (x86)\\ToDesk\\ToDesk.exe"<br>
+          [HKEY_CLASSES_ROOT\universalLink\shell]<br>
+          @= ""<br>
+          [HKEY_CLASSES_ROOT\universalLink\shell\open]<br>
+          @= ""<br>
+          [HKEY_CLASSES_ROOT\universalLink\shell\open\command]<br>
+          @="\"D:\\Program Files (x86)\\ToDesk\\ToDesk.exe\" \"%1\""<br>
+        </span>
       </div>
       <div class="area">
         <div class="invalid">
@@ -72,13 +92,17 @@
           <button onclick="handleClickOpenTry(event)">试一试</button>
         </div>
         <div class="valid">
-          <a href="weixin:" target="_self">weixin:</a>
-          <a href="wechat:" target="_self">wechat:</a>
-          <a href="wemeet:" target="_self">wemeet:</a>
-          <a href="todesk:" target="_self">todesk:</a>
+          <!-- <a href="weixin://hello" target="_self">weixin:</a> -->
+          <a href="weixin://" target="_self">weixin:</a>
+          <a href="wechat://" target="_self">wechat:</a>
+          <a href="emobile10://" target="_self">emobile10:</a>
+          <a href="wemeet://" target="_self">wemeet:</a>
+          <a href="todesk://" target="_self" onclick="return confirm('请检查是否安装了ToDesk')">todesk:</a>
           <a href="https://meet.xylink.com/#/" target="_blank">小鱼易连</a>
-          <a href="sunflower:" target="_self" onclick="handleClickHref" onerror="alert('no sunflower!')">向日葵</a>
-          <a href="http://example.com/404" target="_self" onerror="alert('url error')">其他</a>
+          <a href="SunloginClient://" target="_self" onclick="handleClickHref(event)"
+            onerror="alert('no sunflower!')">向日葵</a>
+          <a href="http://example.com/404" target="_self" onclick="return confirm('请检查是否安装了ToDesk')"
+            onerror="alert('url error')">其他</a>
         </div>
       </div>
     </div>
@@ -129,13 +153,26 @@
         [HKEY_CLASSES_ROOT\universalLink\shell\open\command]
         @="\"D:\\Program Files (x86)\\ToDesk\\ToDesk.exe\" \"%1\""
       */
-
       // 2.双击运行protocal.reg
-
       // 3.实现
       // <a href="universalLink://">打开应用程序</a> // 方法一
       // window.location.href="universalLink://";// 方法二
       window.open("universalLink://", "_self");// 方法三
+      // var a = document.createElement('a');// 方法四
+      // if (a) {
+      //   a.href = url;
+      //   var event;
+      //   if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") != -1) {
+      //     event = new MouseEvent('click', {
+      //       'view': window,
+      //       'bubbles': true,
+      //       'cancelable': true
+      //     });
+      //   } else if (navigator.userAgent.indexOf("Safari") != -1) {
+      //     // Safari中可能需要额外的处理
+      //   }
+      //   a.dispatchEvent(event);
+      // }
 
       alert('only open "wexin:" from registry in windows!');
     }
@@ -169,12 +206,18 @@
       try {
         // 尝试打开链接或执行其他操作
         // 但由于 'todesk:' 不是标准的 URL 协议，这里实际上没有什么可以做的
+        console.log('ret1');
+        const ret = window.open("SunloginClient://", "_self");
+        console.log('ret2:', ret);
+
       } catch (error) {
         // 这里不会捕获到错误，因为浏览器不会抛出异常
         console.error('无法处理 todesk: 协议');
         // 显示错误消息或其他处理逻辑
         alert('无法处理 todesk: 协议');
       }
+
+      return false;
     }
 
     // window.addEventListener('error', function (event) {
@@ -185,7 +228,6 @@
     //   // 这里可以执行其他逻辑，比如导航到错误页面或者提示用户
     //   // }
     // });
-
     window.onerror = function (sMessage, sUrl, sLine) {
       alert("发生错误！\n" + sMessage + "\nURL:" + sUrl + "\nLine Number:" + sLine);
       return true;

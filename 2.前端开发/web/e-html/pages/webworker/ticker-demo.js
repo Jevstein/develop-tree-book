@@ -43,7 +43,7 @@ class TickerDemo {
         totalTime,
         onChange: function () {
           --this.totalTime;
-          node.onUpdateTime(JvtUtils.formatTime(this.totalTime).text);
+          data.onUpdateTime(JvtUtils.formatTime(this.totalTime).text);
         },
       };
     }
@@ -81,6 +81,9 @@ class TickerDemo {
         onChange: (time) => {
           const strtime = JvtUtils.formatTime(time).text;
           this._nodeMap[key].onUpdateTime(strtime);
+          if (time <= 0) {
+            this._nodeMap[key].onStart(false);
+          }
         },
       });
       this._nodeMap[key]['timer'].start();
