@@ -137,13 +137,8 @@ Hello, world!
 
 
 
-
-
-
-
 > 巨人的肩膀：
 >
 > [快速配置 Rust 开发环境并编写一个小应用](https://www.rust-lang.org/zh-CN/learn/get-started) 
->
 > [Rust 语言从入门到实战](https://view.inews.qq.com/k/20231205A0544100?no-redirect=1&web_channel=wap&openApp=false)
 

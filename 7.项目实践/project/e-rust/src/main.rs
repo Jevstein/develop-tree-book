@@ -1,13 +1,15 @@
-use ferris_says::say; // from the previous step
-use std::io::{stdout, BufWriter};
+
+mod mock; 
 
 fn main() {
-    println!("Hello, world!");
+    mock::crates::ferris_says();  // 调用 ferris_says
+    println!("====== Hello, world! This is Rustaceans. ======");
 
-    let stdout = stdout();
-    let message = String::from("Hello fellow Rustaceans!");
-    let width = message.chars().count();
+    
+    let result = mock::math::add(3, 5);  // 调用 add 函数 
+    println!("Result1: {}", result);
 
-    let mut writer = BufWriter::new(stdout.lock());
-    say(&message, width, &mut writer).unwrap();
+
+
+    println!("=================== the end ===================");
 }

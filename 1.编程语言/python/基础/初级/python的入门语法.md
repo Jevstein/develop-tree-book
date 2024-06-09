@@ -281,7 +281,7 @@ def dict_usage():
 #### 9) input
 
 ```python
-#iput的用法
+#input的用法
 def input_usage():
     #age: 通过input传进来的值，无论是什么，一律作为字符串类型，比如输入21，它其实就是"21"
     age = input("how old are you: ")
