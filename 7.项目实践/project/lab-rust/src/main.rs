@@ -1,15 +1,15 @@
 
-mod mock; 
+mod mock;
+mod base;
 
 fn main() {
     mock::crates::ferris_says();  // 调用 ferris_says
-    println!("====== Hello, world! This is Rustaceans. ======");
-
-    
-    let result = mock::math::add(3, 5);  // 调用 add 函数 
-    println!("Result1: {}", result);
+    base::utils::jvt_print_title("\n====== Hello, world! This is Rustaceans. ======\n");
 
 
+    base::utils::jvt_print_title(">>>>>> 一、Rust 基本语法 <<<<<<");
+    mock::grammar::run();  // 调用 rust_basic_grammar 函数
 
-    println!("=================== the end ===================");
+
+    base::utils::jvt_print_title("\n=================== the end ===================\n");
 }

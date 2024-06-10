@@ -53,10 +53,10 @@ hello, world!
 
 ```shell
 #1、创建命令
-cargo new e-rust
+cargo new lab-rust
 
 自动生成目录结构 =>
-e-rust				-- 根目录
+lab-rust				-- 根目录
 |- Cargo.toml	-- Rust 的清单文件。其中包含了项目的元数据和依赖库
 |- src				-- 源码
 	 |- main.rs
@@ -66,7 +66,7 @@ cargo run
 
 运行结果 =>
 Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.02s
-     Running `target/debug/e-rust`
+     Running `target/debug/lab-rust`
 Hello, world!
 
 ```

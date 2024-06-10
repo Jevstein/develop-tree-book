@@ -1,7 +1,9 @@
 [package]
-name = "e-rust"
+name = "lab-rust"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 ferris-says = "0.3.1"
+crossterm = "0.20"
+ansi_term = "0.12.1"
