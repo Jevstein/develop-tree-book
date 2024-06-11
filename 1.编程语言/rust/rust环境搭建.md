@@ -10,19 +10,19 @@
 
 ```shell
 #1、执行命令
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+$ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 
 【注意】执行这步后，要重启shell！
 
 #2、检测安装成功
-rustc --version
-cargo --version
+$ rustc --version
+$ cargo --version
 
 #3、更新
-rustup update
+$ rustup update
 
 #4、卸载
-rustup self uninstall
+$ rustup self uninstall
 ```
 
 **Cargo：Rust 的构建工具和包管理器**
@@ -53,7 +53,7 @@ hello, world!
 
 ```shell
 #1、创建命令
-cargo new lab-rust
+$ cargo new lab-rust
 
 自动生成目录结构 =>
 lab-rust				-- 根目录
@@ -62,7 +62,7 @@ lab-rust				-- 根目录
 	 |- main.rs
 	 
 #2、运行命令
-cargo run
+$ cargo run
 
 运行结果 =>
 Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.02s
@@ -88,7 +88,7 @@ Hello, world!
 * 2、执行命令
 
   ```shell
-  cargo build
+  $ cargo build
   ```
 
 * 3、使用依赖库（crates）
@@ -101,7 +101,7 @@ Hello, world!
 
   完整的main.rs文件，如下：
 
-  ```shell
+  ```rust
   use ferris_says::say; // from the previous step
   use std::io::{stdout, BufWriter};
   
@@ -119,7 +119,7 @@ Hello, world!
 
   ```shell
    # 执行命令
-   cargo run
+   $ cargo run
    
    # 执行结果
    __________________________

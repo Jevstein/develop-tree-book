@@ -6,22 +6,26 @@
 
 ​	输入终端命令，注意空格和大小写 
 
-### 1.1.显示隐藏文件
-
 ```shell
+#1、显示隐藏文件
 $ defaults write com.apple.finder AppleShowAllFiles -bool true 
-#或者
+#或
 $ defaults write com.apple.finder AppleShowAllFiles YES
-```
 
-### 1.2.不显示隐藏文件
-
-```shell
+#2、不显示隐藏文件
 $ defaults write com.apple.finder AppleShowAllFiles -bool false
-#或者
+#或
 $ defaults write com.apple.finder AppleShowAllFiles NO
 ```
 
 ​	**重启Finder即可！**
 
  
+
+## 2、解决在网页上下载的软件, 不在启动台出现的问题
+
+```shell
+$ defaults write com.apple.dock ResetLaunchPad -bool true
+$ killall Dock
+```
+
