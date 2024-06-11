@@ -3,7 +3,7 @@
 // use ansi_term::Colour::{Red, Green, Yellow, Blue, Purple, Cyan};
 use ansi_term::Colour::Blue;
 
-pub fn jvt_print_title(msg: &str) {
+pub fn lab_print_title(msg: &str) {
     // // 启用 ANSI 颜色代码
     // execute!(std::io::stdout(), crossterm::terminal::EnableAnsiColor).unwrap();
     // // 打印红色文本
