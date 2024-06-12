@@ -267,7 +267,7 @@ fn check_if_usage() {
     let b = 20;
 
     // if/else条件判断
-    println!("1、if/else条件判断 => a={}, b={}", a, b);
+    println!("\n1、if/else条件判断 => a={}, b={}", a, b);
     if a > b {
         println!("a > b");
     } else if a < b {
@@ -277,15 +277,192 @@ fn check_if_usage() {
     }
 
     // if let模式匹配
-    println!("2、if let模式匹配 => ");
+    println!("\n2、if let模式匹配 => ");
     let config_max = Some(3u8);
     if let Some(max) = config_max {
         println!("The maximum is configured to be {}", max);
     } else {
         println!("No maximum is configured");
     }
+
+    // match多分支条件判断
+    println!("\n3、match多分支条件判断 => ");
+    let value = 2;
+    match value {
+        1 => {
+            // code block to execute if value matches pattern1
+            println!("one");
+        },
+        2 => {
+            // code block to execute if value matches pattern2
+            println!("two");
+        },
+        _ => {
+            // code block to execute if value matches none of the patterns
+            println!("other...");
+        }
+    }
+    
+    // assert断言
+    println!("\n4、assert断言 => ");
+    let x = 5;
+    let y = 10;
+    assert!(x < y);
+
+    // // assert_eq断言
+    // println!("\n5、assert_eq断言 => ");
+    // {
+    //     let a = 10;
+    //     let b = 20;
+    //     assert_eq!(a, b);
+    // }
+
+    println!("\n --- 以上产生断言，导致以下代码不再执行 --- ");
+
+    // // assert_ne断言
+    // {
+    //     println!("\n6、assert_ne断言 => ");
+    //     let a = 10;
+    //     let b = 20;
+    //     assert_ne!(a, b);
+    // }
+
+    // // debug_assert断言
+    // println!("8、debug_assert断言 => ");
+    // {
+    //     let x = 5;
+    //     let y = 10;
+    //     debug_assert!(x < y);
+    // }
+
+    // // debug_assert_eq断言
+    // println!("9、debug_assert_eq断言 => ");
+    // {
+    //     let a = 10;
+    //     let b = 20;
+    //     debug_assert_eq!(a, b);
+    // }
+
+    // // debug_assert_ne断言
+    // println!("10、debug_assert_ne断言 => ");
+    // {
+    //     let a = 10;
+    //     let b = 20;
+    //     debug_assert_ne!(a, b);
+    // }
+
+    // println!("\n --- 以下断言功能已被弃用 --- ");
+
+    // // assert_eq_size断言
+    // // {
+    // //     println!("7、assert_eq_size断言 => ");
+    // //     let a = [1, 2, 3];
+    // //     let b = [1, 2, 3, 4];
+    // //     assert_eq_size!(a, b);
+    // // }
+
+    // // // debug_assert_eq_size断言
+    // // println!("11、debug_assert_eq_size断言 => ");
+    // // {
+    // //     let a = [1, 2, 3];
+    // //     let b = [1, 2, 3, 4];
+    // //     debug_assert_eq_size!(a, b);
+    // // }
 }
 
+fn check_loop_usage() {
+    // for循环
+    println!("\n1、for循环 => ");
+    let v = vec![1, 2, 3, 4, 5];
+    for i in &v {
+        println!("{}", i);
+    }
+
+    // while循环
+    println!("\n2、while循环 => ");
+    let mut i = 0;
+    while i < 5 {
+        println!("{}", i);
+        i += 1;
+    }
+
+    // loop无限循环
+    println!("\n3、loop无限循环 => ");
+    loop {
+        println!("loop");
+        break;
+    }
+
+    // // 标签
+    // println!("\n4、标签 => ");
+    // 'outer: for i in 0..3 {
+    //     'inner: for j in 0..3 {
+    //         if i == 1 && j == 1 {
+    //             break 'outer;
+    //         }
+    //         println!("({}, {})", i, j);
+    //     }
+    // }
+
+    // 跳过当前循环
+    println!("\n5、跳过当前循环 => ");
+    let mut i = 0;
+    while i < 5 {
+        if i == 3 {
+            i += 1;
+            continue;
+        }
+        println!("{}", i);
+        i += 1;
+    }
+
+    // 循环返回值
+    println!("\n6、循环返回值 => ");
+    let mut i = 0;
+    let result = loop {
+        if i == 5 {
+            break i * 2;
+        }
+        i += 1;
+    };
+    println!("result: {}", result);
+
+    // 宏
+    println!("\n7、宏 => ");
+    macro_rules! print_result {
+        ($x:expr) => {
+            println!("result: {}", $x);
+        }
+    }
+    print_result!(10);
+
+    // 异步函数
+    println!("\n8、异步函数 => ");
+    // async fn async_add(a: i32, b: i32) -> i32 {
+    //     a + b
+    // }
+    // let mut rt = tokio::runtime::Runtime::new().unwrap();
+    // let result = rt.block_on(async_add(3, 5));
+    // println!("async_add(3, 5): {}", result);
+
+    // 闭包
+    println!("\n9、闭包 => ");
+    let closure = |a, b| a + b;
+    println!("closure(3, 5): {}", closure(3, 5));
+
+    // 常量
+    println!("\n10、常量 => ");
+    const MAX_SIZE: usize = 100;
+    println!("MAX_SIZE: {}", MAX_SIZE);
+
+    // // 动态trait对象
+    // println!("\n11、动态trait对象 => ");
+    // trait Animal {
+    //     fn speak(&self);
+    // }
+
+
+}
 
 /**
  * 函数的使用
@@ -319,8 +496,11 @@ pub fn run() {
     lab_print_title("\n>>> 4、HashTable(Map):");
     hash_map_usage();
 
-    lab_print_title("\n>>> 5、if/match条件判断:");
+    lab_print_title("\n>>> 5、if/match/assert条件判断:");
     check_if_usage();
+
+    lab_print_title("\n>>> 6、循环:");
+    check_loop_usage();
 
     lab_print_title("\n>>> *、函数的使用:");
     func_uage();
