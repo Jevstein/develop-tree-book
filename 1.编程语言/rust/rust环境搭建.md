@@ -1,6 +1,6 @@
 [TOC]
 
-# rust的环境搭建
+# Rust的环境搭建
 
 
 
@@ -12,6 +12,7 @@
 #1、执行命令
 $ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 
+这个命令将下载一个脚本并开始安装 rustup 工具，此工具将安装 Rust 的最新稳定版本。可能会提示你输入管理员密码
 【注意】执行这步后，要重启shell！
 
 #2、检测安装成功
@@ -24,6 +25,22 @@ $ rustup update
 #4、卸载
 $ rustup self uninstall
 ```
+
+
+
+**[安装 C 语言编译器：（非必需）](http://course.rs/first-try/installation.html#安装-c-语言编译器非必需)**
+
+​		Rust 对运行环境的依赖和 Go 语言很像，几乎所有环境都可以无需安装任何依赖直接运行。但是，Rust 会依赖 `libc` 和链接器 `linker`。所以如果遇到了提示链接器无法执行的错误，你需要再手动安装一个 C 语言编译器：
+
+```shell
+# macOS 下：
+$ xcode-select --install
+
+# Linux 下：
+Linux 用户一般应按照相应发行版的文档来安装 `GCC` 或 `Clang`。Ubuntu，则可安装 `build-essential`
+```
+
+
 
 **Cargo：Rust 的构建工具和包管理器**
 
@@ -43,7 +60,9 @@ $ rustup self uninstall
 
 ### 2）windows系统
 
-略
+略。
+
+参考：[在 Windows 上安装`rustup`](http://course.rs/first-try/installation.html#在-windows-上安装-rustup)
 
 
 
@@ -133,7 +152,20 @@ Hello, world!
             / '-----' \
   ```
 
-  
+
+
+
+## 4.推荐VSCode 的几个Rust 插件
+
+```shell
+1、The Rust Programming Language
+2、rust-analyzer
+
+1、Even Better TOML，支持 .toml 文件完整特性
+2、Error Lens, 更好的获得错误展示
+3、One Dark Pro, 非常好看的 VSCode 主题
+4、CodeLLDB, Debugger 程序
+```
 
 
 

@@ -1,6 +1,197 @@
-use crate::base::utils::lab_print_title;
-use crate::mock::math::add;
+[TOC]
 
+# rust的基础入门
+
+
+
+**Rust 学习资料**
+1、[Rust](https://rust.p2hp.com/)
+2、[Rust 程序设计](https://www.rust-lang.org/zh-CN/)
+3、[Rust语言圣经(Rust Course)](http://course.rs/into-rust.html)
+
+
+
+## 一、rust语言简介
+
+为何又来一门新语言？
+	**因为还缺一门无 GC 且无需手动内存管理、性能高、工程性强、语言级安全性以及能同时得到工程派和学院派认可的语言**，而 Rust 就是这样的语言。
+
+```shell
+大家知道 Rust 的作者到底因为何事才痛下决心开发一门新的语言吗？
+	说来挺有趣，在 2006年的某天，作者工作到精疲力尽后，本想回公寓享受下生活，结果发现电梯的程序出 Bug 崩溃了，要知道在国外，修理工可不像在中国那样随时待岗，还要知道，他家在 20 多楼！
+	最后，他选择了妥协，去酒店待几天等待电梯的修理。
+	当然，一般人可能就这样算了，毕竟忍几天就过去了嘛。但是这名伟大的程序员显然也不是一般人，他面对害他流离失所的电梯拿起了屠龙宝刀 - Rust。
+自此，劈开一个全新的编程世界。
+```
+
+ Rust 核心概念：所有权、借用、生命周期、智能指针等
+
+- 1、特点
+
+
+
+
+
+
+## 二、rust项目结构
+
+```shell
+$ tree -L 2
+
+.lab-rust				-- 工程根目录
+├── Cargo.lock	-- 项目依赖详细清单：无需手动修改。当项目是一个可运行的程序时，应上传git；若是一个依赖库项目，则添加到.gitignore中
+├── Cargo.toml	-- 项目数据描述文件：其中包含了项目的元数据和依赖库，按照期望的方式进行构建、测试和运行
+├── src					-- 源码
+│   └── main.rs
+└── target			-- cargo run后生成的可执行文件和编译文件
+    ├── doc
+    ├── test
+    ├── release
+    └── debug
+    
+    
+经典结构-Cargo 推荐的目录结构  
+.
+├── Cargo.lock
+├── Cargo.toml
+├── src/
+│   ├── lib.rs						-- 默认的 lib 包根
+│   ├── main.rs 					-- 默认的二进制包根
+│   └── bin/							-- 其它二进制包根
+│       ├── named-executable.rs
+│       ├── another-executable.rs
+│       └── multi-file-executable/
+│           ├── main.rs
+│           └── some_module.rs
+├── benches/  							-- 基准测试 benchmark
+│   ├── large-input.rs
+│   └── multi-file-bench/
+│       ├── main.rs
+│       └── bench_module.rs
+├── examples/								-- 示例代码
+│   ├── simple.rs
+│   └── multi-file-example/
+│       ├── main.rs
+│       └── ex_module.rs
+└── tests/   								-- 集成测试代码
+    ├── some-integration-tests.rs
+    └── multi-file-test/
+        ├── main.rs
+        └── test_module.rs
+
+```
+
+
+
+## 三、**Cargo：Rust 的构建工具和包管理器**
+
+在终端中执行以下命令：
+
+```shell
+$ cargo new [name]：创建一个新的Rust项目
+$ cargo build [--release]：构建项目(只编译，不运行)，其中 --debug优势：编译速度快， --release优势：运行速度快
+$ cargo run [--release]：运行项目
+$ cargo test：运行测试
+$ cargo doc：生成文档
+$ cargo update：更新依赖项
+$ cargo update -p regex: 只更新 “regex”
+$ cargo clean：清除构建输出
+$ cargo check：快速检查代码能否编译通过。该命令速度比cargo build/run快，能节省大量的编译时间，适用于大项目
+$ cargo publish：将软件包发布到crates.io上
+$ cargo add [name]：新增依赖项（相当于在Cargo.toml中手动添加: [name]=[x.x.x]）, 如：cargo add ansi_term
+$ cargo install [package]: 安装指定软件包
+$ cargo uninstall [package]: 卸载指定软件包
+$ cargo [command] --help: 显示[指定命令]的cargo帮助信息
+```
+
+
+
+## 四、rust语法实践
+
+**语法总览**
+
+```rust
+pub fn run() {
+    lab_print_title("\n>>> 1、变量: let、const、static、mut、drop、ref、ref mut、clone、copy、move");
+    variable_usage();
+
+    lab_print_title("\n>>> 2、字符串: String和&str、String::new()、String::from()、push_str、to_string、to_owned");
+    string_usage();
+
+    lab_print_title("\n>>> 3、可变数组(Vec): Vec::new()、vec![1,2,3]、push、pop、insert、remove、len、is_empty、clear、contains、iter");
+    vec_usage();
+
+    lab_print_title("\n>>> 4、HashTable(Map): HashMap::new()、insert、get、entry、remove、len、is_empty、clear、contains_key、iter、keys、values");
+    hash_map_usage();
+
+    lab_print_title("\n>>> 5、条件判断: if、if let、match、assert");
+    check_if_usage();
+
+    lab_print_title("\n>>> 6、循环: for、while、loop、break、continue、return、label、unsafe、await、yield、const、dyn、move、cfg、宏");
+    check_loop_usage();
+
+    lab_print_title("\n>>> 7、函数: fn、参数、返回值、默认参数、多返回值、impl、pub、unsafe、async、const、dyn、move、cfg、宏");
+    func_uage();
+
+    lab_print_title("\n>>> 8、结构体(struct): struct、impl、pub、unsafe、const、derive、move");
+    struct_usage();
+
+
+    // lab_print_title("\n>>> 9、枚举(enum):");
+    // enum_usage();
+
+    // lab_print_title("\n>>> 9、模块(mod):");
+    // mod_usage();
+
+    // lab_print_title("\n>>> 10、泛型(generic):");
+    // generic_usage();
+
+    // lab_print_title("\n>>> 11、Traits(trait):");
+    // trait_usage();
+
+    // lab_print_title("\n>>> 12、生命周期(lifetime):");
+    // lifetime_usage();
+
+    // lab_print_title("\n>>> 13、异步编程(async/await):");
+    // async_usage();
+
+    // lab_print_title("\n>>> 14、宏(macro):");
+    // macro_usage();
+
+    // lab_print_title("\n>>> 15、单元测试(test):");
+    // test_usage();
+
+    // lab_print_title("\n>>> 16、Cargo(包管理):");
+    // cargo_usage();
+
+    // lab_print_title("\n>>> 17、Cargo(发布到crates.io):");
+    // cargo_publish_usage();
+
+    // lab_print_title("\n>>> 18、Cargo(发布到其他平台):");
+    // cargo_publish_other_platform_usage();
+
+    // lab_print_title("\n>>> 19、Cargo(依赖):");
+    // cargo_dependencies_usage();
+
+    // lab_print_title("\n>>> 20、Cargo(发布到本地):");
+    // cargo_publish_local_usage();
+
+    // lab_print_title("\n>>> 21、Cargo(发布到私有仓库):");
+    // cargo_publish_private_repository_usage();
+
+    // lab_print_title("\n>>> 22、Cargo(发布到其他平台):");
+    // cargo_publish_other_platform_usage();
+
+    // lab_print_title("\n>>> 23、Cargo(发布到其他平台):");
+    // cargo_publish_other_platform_usage();
+}
+```
+
+
+
+### 1、变量
+
+```rust
 /**
  * 变量的使用
  * 1、Rust中的变量声明不需要指定类型，编译器会自动推断变量类型。
@@ -10,26 +201,6 @@ use crate::mock::math::add;
  * 5、Rust中的变量声明可以用mut关键字声明可变变量。
  * 6、Rust中的变量声明可以用类型注解来指定变量类型。
  * 7、Rust中的变量声明可以用=来指定初始值。
- *
- * 变量的类型
- *  // 数据类型	    描述	       举例	            范围
- *  // i8	    有符号8位整数	let x: i8 = 42;	    -128 到 127
- *  // i16	    有符号16位整数	let x: i16 = 42;	-32,768 到 32,767
- *  // i32	    有符号32位整数	let x: i32 = 42;	-2,147,483,648 到 2,147,483,647
- *  // i64	    有符号64位整数	let x: i64 = 42;	-9,223,372,036,854,775,808 到 9,223,372,036,854,775,807
- *  // i128	    有符号128位整数	let x: i128 = 42;	-170,141,183,460,469,231,731,687,303,715,884,105,728 到 170,141,183,460,469,231,731,687,303,715,884,105,727
- *  // u8	    无符号8位整数	let x: u8 = 42;	    0 到 255
- *  // u16	    无符号16位整数	let x: u16 = 42;	0 到 65,535
- *  // u32	    无符号32位整数	let x: u32 = 42;	0 到 4,294,967,295
- *  // u64	    无符号64位整数	let x: u64 = 42;	0 到 18,446,744,073,709,551,615
- *  // u128	    无符号128位整数	let x: u128 = 42;	0 到 340,282,366,920,938,463,463,374,607,431,768,211,455
- *  // f32	    单精度浮点数	let x: f32 = 3.14;	精度为6-9位
- *  // f64	    双精度浮点数	let x: f64 = 3.14;	精度为15-17位
- *  // bool	    布尔类型	    let x: bool = true;	true 或 false
- *  // char	    Unicode字符类型	let x: char = ‘A’;	单个Unicode字符
- *  // 元组类型	  可包含不同类型的值	let tup: (i32, f64, char) = (42, 3.14, ‘A’);	-
- *  // 数组类型	  包含相同类型的值，长度固定	let arr: [i32; 3] = [1, 2, 3];	-
- *  // 引用类型	  用于引用其他值的指针类型	let x: i32 = 42; let y: &i32 = &x;
  */
 fn variable_usage() {
     let x = 1;      // 其类型会被编译器自动推断为i32类型
@@ -66,6 +237,17 @@ fn variable_usage() {
     }
 }
 
+```
+
+- **Rust数据类型：**
+
+![Rust数据类型](./images/Rust数据类型.png)
+
+
+
+### 2、字符串
+
+```rust
 /*
 * 字符串的使用
 * Rust中的字符串有两种类型：String和&str。
@@ -78,7 +260,7 @@ fn variable_usage() {
 *     3）使用len方法获取字符串长度；
 *     4）使用chars方法获取字符串中的字符等。
 * 4、在Rust中很多字符串处理的库：
-*     1） regex库用于处理正则表达式
+*     1) regex库用于处理正则表达式
 *     2) serde_json库用于处理JSON数据
 *     3) std::collections库提供了很多集合类型，例如HashMap、HashSet、BTreeMap、BTreeSet等
 *     4) std::string库提供了字符串处理的函数，例如split、replace、trim、push_str、len、chars、split_at、starts_with、ends_with等
@@ -116,6 +298,13 @@ fn string_usage() {
     );
 }
 
+```
+
+
+
+### 3、可变数组(Vec)
+
+```rust
 /**
  * 可变数组-Vec
  * 1、Vec是一种动态数组类型，可以存储不同类型的值, 也可以在运行时添加或移除元素。与数组不同，Vec 的大小不是在编译时固定的，而是可以在运行时动态调整。
@@ -186,6 +375,14 @@ fn vec_usage() {
 
     println!("11、vec是否包含元素: {}", v.contains(&2));
 }
+
+```
+
+
+
+### 4、HashTable(Map)
+
+```rust
 
 /**
  * HashTable(Map): -- 用于解决各种问题，如缓存、索引等
@@ -262,6 +459,13 @@ fn hash_map_usage() {
     println!("6、插入元素: {:?}", v);
 }
 
+```
+
+
+
+### 5、条件判断
+
+```rust
 /**
  * 逻辑判断
  * 1、Rust中的逻辑判断有if、if let、match、while、for等关键字。
@@ -393,6 +597,13 @@ fn check_if_usage() {
     // // }
 }
 
+```
+
+
+
+### 6、循环
+
+```rust
 /**
  * 循环
  * 1、Rust中的循环有for、while、loop关键字。
@@ -508,6 +719,13 @@ fn check_loop_usage() {
     // }
 }
 
+```
+
+
+
+### 7、函数
+
+```rust
 /**
  * 函数的使用
  * 1、Rust中的函数声明不需要指定类型，编译器会自动推断函数返回值类型。
@@ -526,158 +744,132 @@ fn func_uage() {
     let result = add(3, 5); // 调用 add 函数
     println!("add(3, 5): {}", result);
 }
+```
 
 
-/**
- * 结构体的使用
- * 1、Rust中的结构体声明不需要指定类型，编译器会自动推断结构体字段类型。
- * 2、Rust中的结构体可以有多个字段，字段类型可以省略。
- * 3、Rust中的结构体可以有方法，方法可以访问结构体的字段。
- * 4、Rust中的结构体可以用impl关键字定义方法，方法可以访问结构体的字段。
- * 5、Rust中的结构体可以用pub关键字来公开结构体，可以用pub(crate)来限制公开范围。
- * 6、Rust中的结构体可以用unsafe关键字来声明不安全结构体。
- * 7、Rust中的结构体可以用const关键字来定义常量。
- * 8、Rust中的结构体可以用derive关键字来自动实现一些trait。
- * 9、Rust中的结构体可以用move关键字来捕获变量的所有权。
- */
-fn struct_usage() {
-    // 定义结构体
-    struct Point {
-        x: i32,
-        y: i32,
-    }
-
-    // 实例化结构体
-    let mut p = Point { x: 10, y: 20 };
-
-    // 访问结构体字段
-    println!("1.访问结构体字段 => p.x = {}, p.y = {}", p.x, p.y);
-
-    // 修改结构体字段
-    p.x = 30;
-    p.y = 40;
-    println!("2.修改结构体字段 => p.x = {}, p.y = {}", p.x, p.y);
-
-    // 结构体方法
-    impl Point {
-        fn distance(&self) -> f64 {
-            let x_sqr = self.x as f64 * self.x as f64;
-            let y_sqr = self.y as f64 * self.y as f64;
-            (x_sqr + y_sqr).sqrt()
-        }
-    }
-
-    // 调用结构体方法
-    let distance = p.distance();
-    println!("3.调用结构体方法 => distance = {}", distance);
-}
-
-/**
- * 接口的使用
- *  Rust中的接口类似于Java中的接口（interface）。在Rust中，面向对象的编程可以通过结构体（structs）和traits（特性）来实现。
- * 结构体类似于类，可以包含数据和方法。Traits定义了方法的签名，可以被实现（implemented）到特定的结构体上。
- * 1、Rust中的接口声明不需要指定类型，编译器会自动推断接口方法签名。
- * 2、Rust中的接口可以有多个方法，方法签名可以省略。
- * 3、Rust中的接口可以用impl关键字定义方法，方法可以访问结构体的字段。
- * 4、Rust中的接口可以用pub关键字来公开接口，可以用pub(crate)来限制公开范围。
- * 5、Rust中的接口可以用unsafe关键字来声明不安全接口。
- * 6、Rust中的接口可以用dyn关键字定义trait对象。
- * 7、Rust中的接口可以用move关键字来捕获变量的所有权。
- */
-fn trait_usage() {
-    // 定义trait
-    trait Animal {
-        fn speak(&self);
-    }
-
-    // 定义结构体
-    struct Dog;
-
-    // 实现trait
-    impl Animal for Dog {
-        fn speak(&self) {
-            println!("Woof!");
-        }
-    }
-
-    // 实例化结构体
-    let dog = Dog;
-
-    // 调用trait方法
-    dog.speak();
-}
 
 
-pub fn run() {
-    lab_print_title("\n>>> 1、变量: let、const、static、mut、drop、ref、ref mut、clone、copy、move");
-    variable_usage();
 
-    lab_print_title("\n>>> 2、字符串: String和&str、String::new()、String::from()、push_str、to_string、to_owned");
-    string_usage();
+### *、`Cargo.toml` 文件示例
 
-    lab_print_title("\n>>> 3、可变数组(Vec): Vec::new()、vec![1,2,3]、push、pop、insert、remove、len、is_empty、clear、contains、iter");
-    vec_usage();
+配置的具体含义可以查看 Rust 官方文档：[Cargo.toml 格式讲解](http://course.rs/cargo/reference/manifest.html#cargotoml-格式讲解)，其中：
+`[lib]` 表示库的配置
+`[[bin]]` 表示可执行文件的配置
+`[features]` 表示特性的配置
+`[dependencies.mydependency]` 表示依赖的配置
+`[workspace]` 表示工作空间的配置
 
-    lab_print_title("\n>>> 4、HashTable(Map): HashMap::new()、insert、get、entry、remove、len、is_empty、clear、contains_key、iter、keys、values");
-    hash_map_usage();
+```toml
+[package]
+name = "myproject"
+version = "0.1.0"
+authors = ["Your Name <you@example.com>"]
+edition = "2018"
 
-    lab_print_title("\n>>> 5、条件判断: if、if let、match、assert");
-    check_if_usage();
+[dependencies]
+serde = "1.0"
+// 引入依赖的4种方式
+rand = "0.7.0"
+hammer = { version = "0.5.0"}
+color = { git = "https://github.com/bjz/color-rs" }
+geometry = { path = "crates/geometry" }
 
-    lab_print_title("\n>>> 6、循环: for、while、loop、break、continue、return、label、unsafe、await、yield、const、dyn、move、cfg、宏");
-    check_loop_usage();
 
-    lab_print_title("\n>>> 7、函数: fn、参数、返回值、默认参数、多返回值、impl、pub、unsafe、async、const、dyn、move、cfg、宏");
-    func_uage();
+[lib]
+name = "mylib"
+path = "src/mylib.rs"
 
-    lab_print_title("\n>>> 8、结构体(struct): struct、impl、pub、unsafe、const、derive、move");
-    struct_usage();
+[[bin]]
+name = "mybin"
+path = "src/mybin.rs"
 
-    lab_print_title("\n>>> 9、接口(trait)-面向对象: trait、impl、pub、unsafe、dyn、move");
-    trait_usage();
+[[bin]]
+name = "myotherbin"
+path = "src/myotherbin.rs"
 
-    // lab_print_title("\n>>> 9、枚举(enum):");
-    // enum_usage();
+[features]
+default = ["myfeature1"]
+myfeature1 = []
+myfeature2 = []
 
-    // lab_print_title("\n>>> 9、模块(mod):");
-    // mod_usage();
+[dependencies.mydependency]
+version = "1.0"
+features = ["myfeature1"]
 
-    // lab_print_title("\n>>> 10、泛型(generic):");
-    // generic_usage();
+[workspace]
+members = [
+    "mylib",
+    "mybin",
+    "myotherbin",
+]
 
-    // lab_print_title("\n>>> 12、生命周期(lifetime):");
-    // lifetime_usage();
+```
 
-    // lab_print_title("\n>>> 13、异步编程(async/await):");
-    // async_usage();
 
-    // lab_print_title("\n>>> 14、宏(macro):");
-    // macro_usage();
 
-    // lab_print_title("\n>>> 15、单元测试(test):");
-    // test_usage();
+### Rust常用库
 
-    // lab_print_title("\n>>> 16、Cargo(包管理):");
-    // cargo_usage();
+好的，以下是一些常用的 Rust 库及其常用方法的举例：
 
-    // lab_print_title("\n>>> 17、Cargo(发布到crates.io):");
-    // cargo_publish_usage();
+```shell
 
-    // lab_print_title("\n>>> 18、Cargo(发布到其他平台):");
-    // cargo_publish_other_platform_usage();
+# std 库
+println!(): 打印输出信息到控制台
+Vec<T>: 动态数组类型
+String: 可变字符串类型
+HashMap<K, V>: 哈希表类型
 
-    // lab_print_title("\n>>> 19、Cargo(依赖):");
-    // cargo_dependencies_usage();
+# serde 库
+serde_json::to_string(): 将 Rust 结构体序列化为 JSON 字符串
+serde_json::from_str(): 将 JSON 字符串反序列化为 Rust 结构体
+serde_yaml::to_string(): 将 Rust 结构体序列化为 YAML 字符串
+serde_yaml::from_str(): 将 YAML 字符串反序列化为 Rust 结构体
 
-    // lab_print_title("\n>>> 20、Cargo(发布到本地):");
-    // cargo_publish_local_usage();
+# actix 库
+actix_web::get(): 注册一个 GET 请求处理器
+actix_web::post(): 注册一个 POST 请求处理器
+actix_web::web::Json<T>: 解析请求体中的 JSON 数据
 
-    // lab_print_title("\n>>> 21、Cargo(发布到私有仓库):");
-    // cargo_publish_private_repository_usage();
+# tokio 库
+tokio::net::TcpListener: 创建一个 TCP 监听器
+tokio::net::TcpStream: 创建一个 TCP 连接
+tokio::spawn(): 在异步任务池中启动一个新的异步任务
 
-    // lab_print_title("\n>>> 22、Cargo(发布到其他平台):");
-    // cargo_publish_other_platform_usage();
+# reqwest 库
+reqwest::get(): 发送一个 GET 请求
+reqwest::post(): 发送一个 POST 请求
+reqwest::Client::new(): 创建一个 HTTP 客户端对象
 
-    // lab_print_title("\n>>> 23、Cargo(发布到其他平台):");
-    // cargo_publish_other_platform_usage();
-}
+# rusoto 库
+rusoto_s3::S3Client::new(): 创建一个 AWS S3 客户端对象
+rusoto_ec2::Ec2Client::new(): 创建一个 AWS EC2 客户端对象
+rusoto_lambda::LambdaClient::new(): 创建一个 AWS Lambda 客户端对象
+
+# diesel 库
+diesel::prelude::*: 导入 Diesel 的预定义类型和函数
+diesel::insert_into(): 插入一条新的记录
+diesel::load(): 加载一组记录
+
+# log 库
+log::info(): 记录一条信息级别的日志
+log::error(): 记录一条错误级别的日志
+log::warn(): 记录一条警告级别的日志
+
+# rand 库
+rand::thread_rng(): 创建一个随机数生成器对象
+rand::Rng::gen_range(): 生成一个指定范围内的随机数
+rand::Rng::shuffle(): 随机打乱一个数组
+
+# image 库
+image::open(): 打开一个图像文件
+image::save(): 保存一个图像文件
+image::DynamicImage::resize(): 调整图像尺寸大小
+
+```
+
+
+
+> 巨人的肩膀：
+>
+> [Rust 全面指南：从基础到高级，一网打尽 Rust 的编程知识](https://blog.csdn.net/qq_36678837/article/details/131371856)
+> [Rust的面向对象（五）——面向对象](https://blog.csdn.net/zhmh326/article/details/108366339)

@@ -1,4 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+/7.项目实践/01.纵横实验室/lab-c/algorithm/Debug
 /7.项目实践/01.纵横实验室/lab-rust/target
