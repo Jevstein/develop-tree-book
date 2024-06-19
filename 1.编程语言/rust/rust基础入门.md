@@ -14,17 +14,17 @@
 ## 一、rust语言简介
 
 为何又来一门新语言？
-	**因为还缺一门无 GC 且无需手动内存管理、性能高、工程性强、语言级安全性以及能同时得到工程派和学院派认可的语言**，而 Rust 就是这样的语言。
+-- **因为还缺一门无 GC 且无需手动内存管理、性能高、工程性强、语言级安全性以及能同时得到工程派和学院派认可的语言**，而 Rust 就是这样的语言。
 
 ```shell
 大家知道 Rust 的作者到底因为何事才痛下决心开发一门新的语言吗？
 	说来挺有趣，在 2006年的某天，作者工作到精疲力尽后，本想回公寓享受下生活，结果发现电梯的程序出 Bug 崩溃了，要知道在国外，修理工可不像在中国那样随时待岗，还要知道，他家在 20 多楼！
 	最后，他选择了妥协，去酒店待几天等待电梯的修理。
 	当然，一般人可能就这样算了，毕竟忍几天就过去了嘛。但是这名伟大的程序员显然也不是一般人，他面对害他流离失所的电梯拿起了屠龙宝刀 - Rust。
-自此，劈开一个全新的编程世界。
+自此，劈开了一个全新的编程世界。
 ```
 
- Rust 核心概念：所有权、借用、生命周期、智能指针等
+ Rust 核心概念：**所有权**、**借用**、**生命周期**、**智能指针**等
 
 - 1、特点
 
@@ -38,12 +38,12 @@
 ```shell
 $ tree -L 2
 
-.lab-rust				-- 工程根目录
-├── Cargo.lock	-- 项目依赖详细清单：无需手动修改。当项目是一个可运行的程序时，应上传git；若是一个依赖库项目，则添加到.gitignore中
-├── Cargo.toml	-- 项目数据描述文件：其中包含了项目的元数据和依赖库，按照期望的方式进行构建、测试和运行
-├── src					-- 源码
+.lab-rust       -- 工程根目录
+├── Cargo.lock  -- 项目依赖详细清单：无需手动修改。当项目是一个可运行的程序时，应上传git；若是一个依赖库项目，则添加到.gitignore中
+├── Cargo.toml  -- 项目数据描述文件：其中包含了项目的元数据和依赖库，按照期望的方式进行构建、测试和运行
+├── src         -- 源码
 │   └── main.rs
-└── target			-- cargo run后生成的可执行文件和编译文件
+└── target      -- cargo run后生成的可执行文件和编译文件
     ├── doc
     ├── test
     ├── release
@@ -55,25 +55,25 @@ $ tree -L 2
 ├── Cargo.lock
 ├── Cargo.toml
 ├── src/
-│   ├── lib.rs						-- 默认的 lib 包根
-│   ├── main.rs 					-- 默认的二进制包根
-│   └── bin/							-- 其它二进制包根
+│   ├── lib.rs            -- 默认的 lib 包根
+│   ├── main.rs           -- 默认的二进制包根
+│   └── bin/              -- 其它二进制包根
 │       ├── named-executable.rs
 │       ├── another-executable.rs
 │       └── multi-file-executable/
 │           ├── main.rs
 │           └── some_module.rs
-├── benches/  							-- 基准测试 benchmark
+├── benches/  						-- 基准测试 benchmark
 │   ├── large-input.rs
 │   └── multi-file-bench/
 │       ├── main.rs
 │       └── bench_module.rs
-├── examples/								-- 示例代码
+├── examples/             -- 示例代码
 │   ├── simple.rs
 │   └── multi-file-example/
 │       ├── main.rs
 │       └── ex_module.rs
-└── tests/   								-- 集成测试代码
+└── tests/                -- 集成测试代码
     ├── some-integration-tests.rs
     └── multi-file-test/
         ├── main.rs
