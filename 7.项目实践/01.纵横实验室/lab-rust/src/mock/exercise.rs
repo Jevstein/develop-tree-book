@@ -44,7 +44,7 @@ fn variable_usage() {
     const PI: f64 = 3.14159265358979323846; // 常量声明，常量的值不能被修改
     println!("3、声明常量=> PI: {}", PI);
 
-    let mut _a = 10;// 使用下划线开头忽略未使用的变量
+    let mut _a = 10;// 使用下划线开头，忽略未使用的变量，否则将警告
     println!("4、使用下划线开头忽略未使用的变量=> _a: {}", _a);
 
     let (a, mut _b): (bool,bool) = (true, false);
