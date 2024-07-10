@@ -60,9 +60,7 @@ Linux 用户一般应按照相应发行版的文档来安装 `GCC` 或 `Clang`�
 
 ### 2）windows系统
 
-略。
-
-参考：[在 Windows 上安装`rustup`](http://course.rs/first-try/installation.html#在-windows-上安装-rustup)
+略。参考：[在 Windows 上安装`rustup`](http://course.rs/first-try/installation.html#在-windows-上安装-rustup)
 
 
 

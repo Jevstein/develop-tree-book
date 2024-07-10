@@ -1,0 +1,8 @@
+# Ignore everything in this directory
+*
+# Don't ignore directories, so we can recurse into them
+!*/
+!learning_log/*
+!learning_logs/*
+# Except this file
+!.gitignore
