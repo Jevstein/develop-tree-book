@@ -33,10 +33,10 @@ $ git config --global core.editor /usr/bin/vim
 $ git config --global credential.helper store
 $ git config --global credential.helper wincred
 $ git config --global core.ignorecase false
-$ git config --global pull.rebase false #此时拉取，Git会默认使用merge来合并代码，而不是rebase。注意：rebase=改变历史，merge=保留历史
+$ git config --global pull.rebase false #此时拉取，默认使用merge合并代码，而不是rebase（rebase:改变历史，merge:保留历史）
 
-#附注：windows下可通过git的配置文件编辑和修改信息，目录如：
-C:\Users\用户名\.gitconfig文件
+--附注：
+windows下可通过git的配置文件，直接编辑和修改信息，目录如：C:\Users\用户名\.gitconfig文件
 ```
 
 
