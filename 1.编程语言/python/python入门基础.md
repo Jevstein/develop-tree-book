@@ -1,8 +1,32 @@
 [TOC]
 
-# python的入门语法
+# python的基础入门
 
-## 1.总览	
+
+
+## 一、灵魂三问
+
+
+### 1.为什么而生？
+
+### 2.能做些什么？
+
+### 3.有什么利弊？
+
+
+
+
+
+## 二、python简介
+
+
+
+
+
+
+## 三、语法实践
+
+### 1.总览	
 
 ​	三个源码文件，描述python的基本用法，如下：
 
@@ -40,17 +64,17 @@ audi.py			#子类
 
 
 
-## 2.详解
+### 2.详解
 
-### 2.1. grammar.py
+#### 2.1. grammar.py
 
 ​	此处从`if __name__ == '__main__'`作为入口，请看代码：
 
-#### 1) 头部: 注释、import
+##### 1) 头部: 注释、import
 
 ```python
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 #grammar.py
 """
 note: the basic usage for json
@@ -60,16 +84,16 @@ note: the basic usage for json
 import os
 import json
 
-# from car import Car
+## from car import Car
 from audi import Audi
 
-# print("hello world")
+## print("hello world")
 
 def log_title1(title):
     print("\n--------- " + title + " ---------")
 ```
 
-#### 2) 变量
+##### 2) 变量
 
 ```python
 #描述变量的用法
@@ -91,7 +115,7 @@ def var_usage(a, b):
     return 1
 ```
 
-#### 3) 列表（数组）
+##### 3) 列表（数组）
 
 ```python
 #列表/数组: 增、删、改、查
@@ -123,7 +147,7 @@ def arr_usage():
     print("反转:" + str(cars))
 ```
 
-#### 4) for循环
+##### 4) for循环
 
 ```python
 #for循环: 遍历、创建
@@ -146,10 +170,10 @@ def for_usage():
     print(even_numbers)
 ```
 
-#### 5) 元组（只读）
+##### 5) 元组（只读）
 
 ```python
-# 元组：只读
+## 元组：只读
 def tuple_usage():
     dimensions = (200, 50, 10)
     print("输出元组：")
@@ -165,7 +189,7 @@ def tuple_usage():
     # print(dimensions)
 ```
 
-#### 6).if条件
+##### 6).if条件
 
 ```python
 #if的用法
@@ -207,7 +231,7 @@ def if_usage():
         print("y")
 ```
 
-#### 7) 函数
+##### 7) 函数
 
 ```python
 def describe_pet(animal_type, pet_name="dog"):
@@ -224,7 +248,7 @@ def func_usage():
     describe_pet(animal_type='willie')
 ```
 
-#### 8) 字典
+##### 8) 字典
 
 ```python
 #字典的用法: 增、删、改、查
@@ -278,7 +302,7 @@ def dict_usage():
         print("依次遍历字典中的字典：key: " + k + ", value: " + str(v))
 ```
 
-#### 9) input
+##### 9) input
 
 ```python
 #input的用法
@@ -292,7 +316,7 @@ def input_usage():
     #     print("age[" + age + "]是小于或等于18岁的！")
 ```
 
-#### 10) while循环
+##### 10) while循环
 
 ```python
 #while循环的用法
@@ -323,7 +347,7 @@ def while_usage():
             break
 ```
 
-#### 11) class类
+##### 11) class类
 
 ```python
 #用于组合
@@ -441,7 +465,7 @@ def class_usage():
     girlfriend.dance()
 ```
 
-#### 12) 不同文件的调用
+##### 12) 不同文件的调用
 
 ```shell
 #见头部：
@@ -454,7 +478,7 @@ def diff_files_usage():
     audi.run()
 ```
 
-#### 13) 文件读写
+##### 13) 文件读写
 
 ```python
 def file_write(file_name):
@@ -498,7 +522,7 @@ def fileop_usage():
             print("文件" + file_name + "已删除")
 ```
 
-#### 14) 异常处理
+##### 14) 异常处理
 
 ```python
 #异常的处理
@@ -543,7 +567,7 @@ def exception_usage():
             break
 ```
 
-#### 15) json格式
+##### 15) json格式
 
 ```python
 #json的处理
@@ -570,7 +594,7 @@ def json_usage():
 
 ```
 
-#### 16) from_book
+##### 16) from_book
 
 ```python
 def from_book():
@@ -620,7 +644,7 @@ def from_book():
     print(pets) 
 ```
 
-#### 17) main
+##### 17) main
 
 ```python
 def main():
@@ -693,7 +717,7 @@ if __name__ == "__main__":
     main()
 ```
 
-### 2.2. car.py
+#### 2.2. car.py
 
 ```python
 #!/usr/bin/python
@@ -708,7 +732,7 @@ class Car():
         print("[Car.run]: I can run")
 ```
 
-### 2.3. audi.py
+#### 2.3. audi.py
 
 ```python
 #!/usr/bin/python
@@ -725,7 +749,7 @@ class Audi(Car):
 
 
 
-## 3.运行
+### 3.运行
 
 ​	命令行执行：
 
