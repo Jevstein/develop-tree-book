@@ -1,0 +1,14 @@
+{
+  "name": "lab-electron",
+  "version": "1.0.0",
+  "description": "electron 实验室",
+  "main": "./src/main.js",
+  "author": "Jevstein",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.3.0"
+  }
+}

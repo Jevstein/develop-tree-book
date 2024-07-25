@@ -51,6 +51,7 @@ $ git init
 # 2、切换分支
 $ git checkout <分支名称>
 $ git checkout -b <分支名称> # 新建分支
+$ git push --set-upstream origin <分支名称> # 将新建分支推送到git服务
 
 # 3、添加文件
 $ git add .
