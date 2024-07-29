@@ -22,18 +22,25 @@
 
 ### 1、项目示例
 
-```shell
-.lab-electron
-├── .forge
-│   └── config.js
-├── doc
-│   └── readme.md
-├── package.json
-├── src
-│   ├── index.html
-│   └── main.js
-└── yarn.lock
-```
+* 目录结构
+
+  ```shell
+  .lab-electron
+  ├── .forge
+  │   └── config.js
+  ├── doc
+  │   └── readme.md
+  ├── package.json
+  ├── src
+  │   ├── index.html
+  │   ├── main.js
+  │   └── reload.js
+  └── yarn.lock
+  ```
+
+* 运行示例
+
+![lab-electron-demo](./images/lab-electron-demo.png)
 
 
 
@@ -73,7 +80,10 @@ $ electron -v
 }
 
 #5、创建main.js、index.html等文件
--- 见下面文件
+-- 见下文文件
+-- 附加：
+-- 1、添加预加载：preload.js
+-- 2、vscode 调试: 
 
 #6、启动
 $ npm start 
@@ -88,19 +98,100 @@ $ npm start
 $ npm install --save-dev @electron-forge/cli 或
 $ yarn add --dev @electron-forge/cli
 
--- 3.使用 Forge 的 make 命令来创建可分发的应用程序
-npx electron-forge package
-$ npm run make 或 
-$ yarn make
-$ npx electron-forge package 
+-- 3.打包
+$ npx electron-forge package 或
+$ yarn package
 
 ```
 
 
 
-### 3、项目文件
+### 3、预加载
 
-#### 	1) main.js
+​	通过预加载脚本从渲染器访问Node.js。仔细观察index.html文本中，您会发现主体文本中丢失了版本编号。 现在，将使用 JavaScript 动态插入它们，最后要做的是输出Electron的版本号和它的依赖项到你的web页面上。
+
+​	在主进程通过Node的全局 `process` 对象访问这个信息是微不足道的。 然而，你不能直接在主进程中编辑DOM，因为它无法访问渲染器 `文档` 上下文。 它们存在于完全不同的进程（您需要更深入地了解Electron进程，请参阅 [进程模型](https://www.electronjs.org/zh/docs/latest/tutorial/process-model) 文档）！
+
+​	这是将 **预加载** 脚本连接到渲染器时派上用场的地方。 预加载脚本在渲染器进程加载之前加载，并有权访问两个 渲染器全局 (例如 `window` 和 `document`) 和 Node.js 环境。
+
+* 1、创建`preload.js` 的新脚本
+
+  ```javascript
+  // 所有的 Node.js API接口 都可以在 preload 进程中被调用.
+  // 它拥有与Chrome扩展一样的沙盒。
+  window.addEventListener('DOMContentLoaded', () => {
+    const replaceText = (selector, text) => {
+      const element = document.getElementById(selector)
+      if (element) element.innerText = text
+    }
+  
+    for (const dependency of ['chrome', 'node', 'electron']) {
+      replaceText(`${dependency}-version`, process.versions[dependency])
+    }
+  })
+  ```
+  
+  
+  
+* 2、在现有的 `BrowserWindow` 构造器中，将路径中的预加载脚本传入 `webPreferences.preload` 选项
+
+  ```javascript
+  const { app, BrowserWindow } = require('electron')
+  // 在你文件顶部导入 Node.js 的 path 模块
+  const path = require('node:path')
+  
+  // 修改已有的 createWindow() 方法
+  const createWindow = () => {
+    const win = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js')
+      }
+    })
+  
+    win.loadFile('index.html')
+  }
+  // ...
+  ```
+
+  
+
+* 3、由于渲染器运行在正常的 Web 环境中，因此需在 `index.html` 文件关闭 `</body>` 标签之前添加一个 `<script>` 标签，来包括您想要的任意脚本：
+
+  ```html
+  <script src="./renderer.js"></script>
+  ```
+
+  
+
+### 4、项目文件
+
+#### 1） index.html
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <title>lab electron</title>
+  </head>
+  <body>
+    <h1>👋 Hello, world! This is Electron.</h1>
+    We are using Node.js <span id="node-version"></span>,
+    Chromium <span id="chrome-version"></span>,
+    and Electron <span id="electron-version"></span>.
+  </body>
+  <script src="./renderer.js"></script>
+</html>
+```
+
+
+
+####  2） main.js
 
 ```javascript
 /**
@@ -114,6 +205,7 @@ $ npx electron-forge package
  *  - 2024/07/25 Jevstein 创建
  */
 
+// electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow } = require('electron/main')
 
 /**
@@ -123,13 +215,22 @@ const { app, BrowserWindow } = require('electron/main')
  * @returns
  */
 const createWindow = () => {
+  // 导入 Node.js 的 path 模块
+  const path = require('node:path')
+
   const win = new BrowserWindow({
-    width: 800,
-    height: 600
+    width: 1800,
+    height: 1600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   })
 
+  // 加载文件
   win.loadFile('./src/index.html')
-  // win.loadURL('http://xxx')
+
+  // 打开浏览器页面开发调试工具
+  win.webContents.openDevTools()
 }
 
 /**
@@ -138,9 +239,8 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow()
 
-  // 当 Linux 和 Windows 应用在没有窗口打开时退出了，
-  // macOS 应用通常即使在没有打开任何窗口的情况下也继续运行，并且在没有窗口可用的情况下激活应用时会打开新的窗口
-  // 所以为了实现这一特性，监听 app 模块的 activate 事件 -- 当应用激活时，如果没有已打开的窗口，则创建一个新的窗口
+  // 在 macOS 系统内, 如果没有已开启的应用窗口
+  // 点击托盘图标时通常会重新创建一个新窗口
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {// 没有已打开的窗口
       createWindow()
@@ -149,12 +249,10 @@ app.whenReady().then(() => {
 })
 
 /**
- * 当所有窗口都被关闭时退出应用程序:
- * 在Windows和Linux上，关闭所有窗口通常会完全退出一个应用程序。
- * 为了实现这一点，需要监听 app 模块的 'window-all-closed' 事件。
- * 如果用户不是在 macOS(darwin) 上运行程序，则调用 app.quit()
+ * 当所有窗口都被关闭时，退出应用程序
  */
 app.on('window-all-closed', () => {
+  // 在 macOS X 上，通常用户在明确地按下 Cmd + Q 之前，应用会保持活动状态
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -163,35 +261,28 @@ app.on('window-all-closed', () => {
 
 
 
-#### 	2)  index.html
+#### 	3） preload.js
 
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <title>Hello from Electron renderer!</title>
-  </head>
-  <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-    <p id="info"></p>
-  </body>
-  <script src="./renderer.js"></script>
-</html>
+```javascript
+// 所有的 Node.js API接口 都可以在 preload 进程中被调用.
+// 它拥有与Chrome扩展一样的沙盒。
+window.addEventListener('DOMContentLoaded', () => {
+  const replaceText = (selector, text) => {
+    const element = document.getElementById(selector)
+    if (element) element.innerText = text
+  }
+
+  for (const dependency of ['chrome', 'node', 'electron']) {
+    replaceText(`${dependency}-version`, process.versions[dependency])
+  }
+})
 ```
 
-#### 	3) .forge/config.js
 
-```
+
+#### 	4）.forge/config.js
+
+```javascript
 module.exports = {
   packagerConfig: {
     // 配置打包选项，例如应用程序名称、版本等
@@ -223,7 +314,26 @@ module.exports = {
 
 
 
-### 4、打包发布
+### 5、vscode 调试
+
+
+
+```shell
+# 1、打开浏览器页面开发调试工具
+  win.webContents.openDevTools()
+
+# 2、Electron 调试
+$ electron --inspect=9229 your/app：Electron将监听指定port上的V8调试协议消息，外部调试器需要连接到此端口上。 port 默认为 9229
+$ electron --inspect-brk=[port]：和--inspector 一样，但是会在JavaScript 脚本的第一行暂停运行
+
+# 3、vscode 调试
+```
+
+
+
+
+
+### 6、打包发布
 
 
 

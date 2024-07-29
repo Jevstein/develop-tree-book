@@ -6,38 +6,10 @@
   <title>动画</title>
 
   <style>
-    .rotating-infinite-box {
-      margin: 20px;
+    .links {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      color: yellow;
-
-      width: 100px;
-      height: 100px;
-      background-color: red;
-      animation: rotating-infinite-animation 3s linear infinite;
-    }
-    @keyframes rotating-infinite-animation {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      25% {
-        transform: rotate(90deg);
-      }
-
-      50% {
-        transform: rotate(180deg);
-      }
-
-      75% {
-        transform: rotate(270deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+      flex-direction: column;
+      margin-bottom: 10px;
     }
 
     .rotating-click {
@@ -50,6 +22,7 @@
 
       &:hover {
         color: blue;
+
         .rotating-click-arrow {
           border-color: transparent transparent transparent blue;
         }
@@ -72,14 +45,162 @@
         }
       }
     }
+
+    .animated-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100px;
+      height: 100px;
+      color: yellow;
+      background-color: red;
+      margin: 20px;
+    }
+    
+    /* 无限旋转 */
+    @keyframes kf-rotating {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(90deg); }
+      50% { transform: rotate(180deg); }
+      75% { transform: rotate(270deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 定义名为"move-right"的关键帧动画 */
+    @keyframes kf-move-right {
+      0% { transform: translateX(0); }/* 初始状态（0%）：元素位于左侧 */
+      100% { transform: translateX(100px); }/* 结束状态（100%）：元素移动到右侧 */
+    }
+
+    /* 淡入淡出动画 */
+    @keyframes kf-fade {
+      0% { opacity: 0; } /* 开始时元素完全透明 */
+      100% { opacity: 1; } /* 结束时元素完全不透明 */
+    }
+
+    /* 多阶段动画 */
+    @keyframes kf-multi-stage {
+      0%, 50% { background-color: red; } /* 0%至50%期间背景色为红色 */
+      50%, 100% { background-color: blue; } /* 50%至100%期间背景色变为蓝色 */
+    }
+
+    /* 动画展开 */
+    @keyframes kf-slide {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100px; /* 或者你想要的任何宽度 */
+      }
+    }
+
+    .animated-box {
+      display: flex;
+      
+      .animated-rotating {
+        animation: kf-rotating 3s linear infinite;
+      }
+
+      /* 
+        绑定"kf-move-right"动画，animation参数如下：
+        名称：指定要使用的@keyframes名称（如kf-move-right）。
+        持续时间：动画执行一次所需的时间（如2s表示2秒）。
+        timing-function：动画的速度曲线（如linear表示匀速）。
+        延迟（可选）：动画开始前的等待时间（如animation-delay: 0.5s）。
+        次数（可选）：动画播放次数。默认为1，即只播放一次。使用infinite表示无限循环。
+        方向（可选）：动画播放的方向。默认为normal，即正向播放。使用alternate表示来回交替播放。
+        填充模式（可选）：动画结束后元素的样式状态。默认为none。使用forwards保留最后一帧样式，backwards保留第一帧样式，both同时保留首尾帧样式。 
+      */
+      .animated-move-right {
+        animation: kf-move-right 2s linear infinite;
+      }
+
+      .animated-fade {
+        animation: kf-fade 2s linear infinite;
+      }
+
+      .animated-multi-stage {
+        animation: kf-multi-stage 2s linear infinite; /* 动画持续2秒，匀速播放，无限循环 */
+      }
+
+      /* 三个元素分别设置不同的动画延迟 */
+      .animated-delay {
+        .animated-area {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+        }
+        .first {
+          animation: kf-fade 1s ease-in-out 1;
+          animation-delay: 1s;
+        }
+        .second {
+          animation: kf-fade 1s ease-in-out 1;
+          animation-delay: 2s;
+        }
+        .third {
+          animation: kf-fade 1s ease-in-out 1;
+          animation-delay: 3s;
+        }
+      }
+
+      .animated-slide {
+        animation: kf-slide 2s infinite;
+        /* animation: kf-slide 2s forwards; */
+      }
+
+      .animated-slide-inverse {
+        /* animation-duration: .5s;
+        transition: all .3s ease-in-out 0s; */
+
+        transform: scale(1);
+        transition: transform 0.3s ease;
+      }
+
+      .animated-slide-card  {
+        transition: width 0.5s, transform 0.5s;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="rotating-infinite-box">无限旋转</div>
+  <div class="links">
+    <a href="https://zhuanlan.zhihu.com/p/695419241" target="_blank">CSS动画入门：新手小白也能轻松掌握的全面教程</a>
+    <a href="https://download.csdn.net/blog/column/12524484/135227422" target="_blank">利用CSS3制作网页动画</a>
+  </div>
   <div class="rotating-click" onclick="handleClickRotating(this)">
     <span>点击旋转</span>
     <div class="rotating-click-arrow"></div>
+  </div>
+  <div class="animated-box">
+    <div class="animated-rotating animated-area">
+      无限旋转
+    </div>
+    <div class="animated-move-right animated-area">
+      向右移动
+    </div>
+    <div class="animated-fade animated-area">
+      淡入淡出
+    </div>
+    <div class="animated-multi-stage animated-area">
+      多阶段动画
+    </div>
+    <div class="animated-delay">
+      动画序列
+      <div class="frist animated-area"> 一 </div>
+      <div class="second animated-area"> 二 </div>
+      <div class="third animated-area"> 三 </div>
+    </div>
+    <div class="animated-slide-card animated-area">
+      从右到左
+    </div>
+    <div class="animated-slide-inverse animated-area">
+      从右到左
+    </div>
+    <div class="animated-slide animated-area">
+      从左到右
+    </div>
   </div>
   <script>
     let rotateVisible = false;

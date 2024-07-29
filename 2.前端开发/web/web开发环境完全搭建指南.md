@@ -10,27 +10,29 @@
 
 ### 1、node.js
 
+​	Node.js® 是一个免费、开源、跨平台的 JavaScript 运行时环境，它让开发人员能够创建服务器、Web 应用、命令行工具和脚本。号称在任何地方都可运行 JavaScript。
+
 ​	Node.js发布于2009年5月，由Ryan Dahl开发，是一个基于[Chrome](https://baike.baidu.com/item/Chrome/5633839?fromModule=lemma_inlink) [V8](https://baike.baidu.com/item/V8/6178125?fromModule=lemma_inlink)引擎的[JavaScript](https://baike.baidu.com/item/JavaScript/321142?fromModule=lemma_inlink)[运行环境](https://baike.baidu.com/item/运行环境/6555199?fromModule=lemma_inlink)，使用了一个[事件驱动](https://baike.baidu.com/item/事件驱动/9597519?fromModule=lemma_inlink)、非阻塞式I/O模型， [1]让JavaScript 运行在[服务端](https://baike.baidu.com/item/服务端/6492316?fromModule=lemma_inlink)的[开发平台](https://baike.baidu.com/item/开发平台/8956190?fromModule=lemma_inlink)，它让JavaScript成为与[PHP](https://baike.baidu.com/item/PHP/9337?fromModule=lemma_inlink)、[Python](https://baike.baidu.com/item/Python/407313?fromModule=lemma_inlink)、[Perl](https://baike.baidu.com/item/Perl/851577?fromModule=lemma_inlink)、[Ruby](https://baike.baidu.com/item/Ruby/11419?fromModule=lemma_inlink)等服务端语言平起平坐的[脚本语言](https://baike.baidu.com/item/脚本语言/1379708?fromModule=lemma_inlink)。 [2]
 
 ​	Node.js对一些特殊[用例](https://baike.baidu.com/item/用例/163511?fromModule=lemma_inlink)进行优化，提供替代的[API](https://baike.baidu.com/item/API/10154?fromModule=lemma_inlink)，使得V8在非浏览器环境下运行得更好，V8引擎执行Javascript的速度非常快，性能非常好，基于Chrome JavaScript[运行时](https://baike.baidu.com/item/运行时/3335184?fromModule=lemma_inlink)建立的平台， 用于方便地搭建响应速度快、易于扩展的[网络应用](https://baike.baidu.com/item/网络应用/2196523?fromModule=lemma_inlink)。
 
 
 
-#### 1、下载安装
+#### 1）下载安装
 
-* [官网下载](https://nodejs.org/zh-cn)安装 - 比较适用于windows
+* [官网下载](https://nodejs.org/zh-cn)安装 - 适用于windows
 
 * 使用命令下载安装
 
   ```shell
-  # 方法一：brew命令
+  # 方法一：brew命令 - 适用于macOS
   $ brew install node
   
   # 方法二：nvm命令
   $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   $ nvm install node
   
-  # 方法三：apt命令 - 比较适用于linux
+  # 方法三：apt命令 - 适用于linux
   $ sudo apt-get update
   $ sudo apt-get install node
   或者：
@@ -42,13 +44,19 @@
 node.js安装成功后，将自动安装上npm。检查如下：
 
 ```shell
+# 查看版本号，检查是否安装成功
 $ node -v
 $ npm -v
+
+# 卸载
+$ brew uninstall node
+$ npm uninstall npm -g
+$ sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
 ```
 
 
 
-#### 2、多版本管理器
+#### 2）多版本管理器
 
 * **1）n命令**
 
@@ -80,25 +88,37 @@ $ npm -v
 
 * **2）nvm**
 
+  ```shell
   略
+  ```
 
   
 
-### 2、web常规项目的搭建步骤
+  
+
+### 2、nginx
+
+
+
+
+
+
+
+### 3、web常规项目的搭建步骤
 
 ```shell
 # 1、拉取工程代码，或新建工程目录
 $ git clone 'xxx'
 
 # 2、安装nodejs
--- 官网下载
+-- 官网下载：https://nodejs.org/zh-cn
 $ node -v
 $ npm -v
 
 # 3、切换nodejs版本
 $ npm view node versions
 $ npm install n
-$ n xx.xx
+$ n xx.xx.xx
 
 # 4、切换镜像仓库
 $ yarn config get registry # 查看
@@ -107,10 +127,10 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 # 5、安装node_modules依赖
 $ yarn install
 
-# 6、更新脚手架
+# 6、更新weapp脚手架
 $ yarn upwedep
 
--- 若部分库安装失败，可单独安装
+-- 若部分模块安装失败，可单独安装
 $ yarn add xxx
 
 # 7、运行项目
@@ -136,8 +156,22 @@ $ yarn build
 
 ```shell
 # 1、安装与卸载
-$ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-$ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+-- 1、官网推荐命令：
+$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+-- 2、官网安装包（https://github.com/Homebrew/brew/releases/tag/4.1.4）：
+运行Homebrew.4.14.pkg，最后配置环境命令：
+$ echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.bash_profile 
+$ source ~/.bash_profile
+$ echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc   
+$ source ~/.zshrc
+
+-- 3、ruby命令
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+
+-- 4、zsh命令
+$ /bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
 
 # 2、常规使用
 $ echo "$(brew --repo)" : 查看默认安装目录：/usr/local/Homebrew
@@ -171,6 +205,8 @@ $ brew unpin <包名>：解除锁定
 
 
 
+
+
 ### 3、npm
 
 ```shell
@@ -189,6 +225,7 @@ $ npm i
 # 常用命令
 $ npm run install xxx: 安装指定模块
 $ npm run start: 运行项目
+$ npm uninstall npm -g: 卸载
 
 
 ```
@@ -223,7 +260,54 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 
 
 
+### 6、code
+
+​	使用 `zsh` （一个 Unix shell）时尝试运行 `code` 命令，比如：
+
+$ code electron-quick-start， 即可用vscode 打开code electron-quick-start项目。
+
+```shell
+# 1、确认是否安装了 code 命令对应的程序，比如： Visual Studio Code 编辑器
+
+# 2、若已安装Visual Studio Code，则确保它的安装目录被加入到你的 PATH 环境变量中。你可以通过编辑 &#126;/.zshrc 文件来永久添加路径
+$ export PATH=$PATH:/path/to/visual-studio-code/folder/
+
+# 3、设置别名在 zsh 配置文件中
+$ alias code='/path/to/visual-studio-code/folder/code'
+
+# 4、重启 zsh 或重新打开终端后，再次尝试运行 code 命令
+$ code electron-quick-start
+```
+
+
+
+
+
 ## 三、打包、发布
+
+
+
+## 四、常见命令错误
+
+### 1、brew-在更新或安装时报root权限的错误
+
+```shell
+Running Homebrew as root is extremely dangerous and no longer supported.
+As Homebrew does not drop privileges on installation you would be giving all
+build scripts full access to your system.
+
+
+解决：
+$ sudo chown -R $(whoami) /usr/local
+把/use/local的owner换成自己，就有write权限了
+
+$ whoami就是一个命令，会echo当前登录用戶的名字。比如erica,就直接
+$ sudo chown -R erica /usr/local
+$ brew install 或者 
+$ brew update 
+
+链接：https://www.jianshu.com/p/0b40983e5727
+```
 
 
 
@@ -231,4 +315,5 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 
 >巨人的肩膀：
 >[Mac安装npm全面指南](https://blog.csdn.net/m0_60437766/article/details/132116277)
+>[mac安装brew小白指引](https://blog.csdn.net/ganyingxie123456/article/details/132182152)
 

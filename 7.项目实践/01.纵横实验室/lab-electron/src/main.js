@@ -19,21 +19,36 @@ const { app, BrowserWindow } = require('electron/main')
  * @returns
  */
 const createWindow = () => {
+  // 导入 Node.js 的 path 模块
+  const path = require('node:path')
+
   const win = new BrowserWindow({
     width: 1800,
-    height: 1600
+    height: 1600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   })
 
+  // alert(path.join(__dirname, 'src/preload.js'))
+
   // 加载文件
-  // win.loadFile('./src/index.html')
+  win.loadFile('./src/index.html')
   // win.loadFile(path.resolve(__dirname,'src/index.html'))
-  win.loadFile('./../lab-html/src/index.html')
+  // win.loadFile('./../lab-html/src/index.html')
   // 或 
   // 加载URL
   // win.loadURL('file:///Users/yiwenqiang/Desktop/studio/jvtstudio/develop-tree-book/7.%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/01.%E7%BA%B5%E6%A8%AA%E5%AE%9E%E9%AA%8C%E5%AE%A4/lab-html/src/index.html')
 
   // 打开开发调试工具
   win.webContents.openDevTools()
+
+  // // 当 window 被关闭，这个事件会被发出
+  // win.on("closed", function () {
+  //   // 取消引用 window 对象，如果你的应用支持多窗口的话，
+  //   // 通常会把多个 window 对象存放在一个数组里面，但这次不是
+  //   win = null;
+  // })
 }
 
 /**
@@ -52,12 +67,10 @@ app.whenReady().then(() => {
 })
 
 /**
- * 当所有窗口都被关闭时退出应用程序:
- * 在Windows和Linux上，关闭所有窗口通常会完全退出一个应用程序。
- * 为了实现这一点，需要监听 app 模块的 'window-all-closed' 事件。
- * 如果用户不是在 macOS(darwin) 上运行程序，则调用 app.quit()
+ * 当所有窗口都被关闭时，退出应用程序
  */
 app.on('window-all-closed', () => {
+  // 在 macOS X 上，通常用户在明确地按下 Cmd + Q 之前，应用会保持活动状态
   if (process.platform !== 'darwin') {
     app.quit()
   }
