@@ -1,5 +1,6 @@
-class ElectronCommulator {
+class ElectronApiDemo {
   _iframeCommunicator = null;
+  _electronApi = new JvtElectronApi();
 
   _recvMap = {
     [IFRAME_TYPE_ELECTRON_SIMPLE]: (data) => this._handleSimple(data),
@@ -12,9 +13,21 @@ class ElectronCommulator {
 
   _handleSimple = (data) => {
     console.log(data);
+
+    // this._electronApi.xxx();
+
+
+    this._send({
+      ...data,
+      data: 'hello from electron',
+    });
   }
 
-  bindIframeCommunicator = (communicator) => {
+  _send = (data) => {
+    this._iframeCommunicator.send(data);
+  }
+
+  bindCommunicator = (communicator) => {
     this._iframeCommunicator = communicator;
   }
 

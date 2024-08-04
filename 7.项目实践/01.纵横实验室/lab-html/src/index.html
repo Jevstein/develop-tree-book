@@ -267,7 +267,8 @@
   </div>
   <script src="./base/iframe/communicator.js"></script>
   <script src="./base/iframe/protocol.js"></script>
-  <script src="./pages/electron.js"></script>
+  <script src="./base/electron/api.js"></script>
+  <script src="./base/electron/demo.js"></script>
   <script>
     const treeItems = [{
       name: 'WEB 研究院（html&css&js）', url: '', children: [
@@ -413,9 +414,9 @@
     function main() {
       this.buildDirTree(treeItems, document.querySelector('.weblab-dir-tree'));
 
-      const electronCommunicator = new ElectronCommulator();
-      const iframeCommunicator = this.createIframeCommunicator(electronCommunicator);
-      electronCommunicator.bindIframeCommunicator(iframeCommunicator);
+      const electronDemo = new ElectronApiDemo();
+      const iframeCommunicator = this.createIframeCommunicator(electronDemo);
+      electronDemo.bindCommunicator(iframeCommunicator);
     }
 
     this.main();

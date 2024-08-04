@@ -12,36 +12,27 @@
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow } = require('electron/main')
 
-/**
- * 创建浏览器窗口: 
- * 将index.html或url，加载进一个新的BrowserWindow实例
- * @param 
- * @returns
- */
-const createWindow = () => {
-  // 导入 Node.js 的 path 模块
-  const path = require('node:path')
+const _createWindowSimple = () => {
+    // 导入 Node.js 的 path 模块
+    const path = require('node:path')
 
-  const win = new BrowserWindow({
-    width: 1800,
-    height: 1600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
-
-  // const url = path.join(__dirname, 'preload.js')
-
-  // 加载文件
-  // win.loadFile('./src/index.html')
+    const win = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js')
+      }
+    })
+  
+  // 1) 加载文件
+  win.loadFile('./src/index.html')
   // win.loadFile(path.resolve(__dirname,'src/index.html'))
-  win.loadFile('./../lab-html/src/index.html')
-  // 或 
-  // 加载URL
+  // win.loadFile('./../lab-html/src/index.html')
+  // 2)加载URL
   // win.loadURL('file:///Users/yiwenqiang/Desktop/studio/jvtstudio/develop-tree-book/7.%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/01.%E7%BA%B5%E6%A8%AA%E5%AE%9E%E9%AA%8C%E5%AE%A4/lab-html/src/index.html')
 
-  // 打开开发调试工具
-  win.webContents.openDevTools()
+  // // 打开开发调试工具
+  // win.webContents.openDevTools()
 
   // // 当 window 被关闭，这个事件会被发出
   // win.on("closed", function () {
@@ -49,6 +40,33 @@ const createWindow = () => {
   //   // 通常会把多个 window 对象存放在一个数组里面，但这次不是
   //   win = null;
   // })
+}
+
+const _createWindowLabHtml = () => {
+  const path = require('node:path')
+  const win = new BrowserWindow({
+    width: 1800,
+    height: 1600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+  win.loadFile('./../lab-html/src/index.html')
+  win.webContents.openDevTools()
+}
+
+/**
+ * 创建浏览器窗口: 
+ * 将index.html或url，加载进一个新的BrowserWindow实例
+ * @param 
+ * @returns
+ */
+const createWindow = () => {
+  // 简易demo
+  // _createWindowSimple()
+
+  // lab-html 实验室
+  _createWindowLabHtml()
 }
 
 /**
