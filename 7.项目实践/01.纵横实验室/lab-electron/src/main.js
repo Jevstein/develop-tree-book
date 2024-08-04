@@ -30,12 +30,12 @@ const createWindow = () => {
     }
   })
 
-  // alert(path.join(__dirname, 'src/preload.js'))
+  // const url = path.join(__dirname, 'preload.js')
 
   // 加载文件
-  win.loadFile('./src/index.html')
+  // win.loadFile('./src/index.html')
   // win.loadFile(path.resolve(__dirname,'src/index.html'))
-  // win.loadFile('./../lab-html/src/index.html')
+  win.loadFile('./../lab-html/src/index.html')
   // 或 
   // 加载URL
   // win.loadURL('file:///Users/yiwenqiang/Desktop/studio/jvtstudio/develop-tree-book/7.%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/01.%E7%BA%B5%E6%A8%AA%E5%AE%9E%E9%AA%8C%E5%AE%A4/lab-html/src/index.html')
@@ -52,7 +52,8 @@ const createWindow = () => {
 }
 
 /**
- * 在 Electron 中，只有在 app 模块的 ready 事件被激发后才能创建浏览器窗口。 可以通过使用 app.whenReady() API来监听此事件
+ * 在 Electron 中，只有在 app 模块的 ready 事件被激发后才能创建浏览器窗口。 
+ * 可以通过使用 app.whenReady() API来监听此事件
  */
 app.whenReady().then(() => {
   createWindow()

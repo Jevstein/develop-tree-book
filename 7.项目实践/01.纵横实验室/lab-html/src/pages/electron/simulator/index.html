@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>基础指南</title>
+
+  <style>
+    body {
+
+      /* display: flex;
+      flex-wrap: wrap;
+      justify-content: center; */
+      .body {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+
+    .box {
+      margin: 10px;
+
+      .box-title {
+        font-size: 16px;
+        line-height: 22px;
+        /* font-weight: 500; */
+        color: #111;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+        border-left: 3px solid #7ed321;
+        margin-bottom: 8px;
+      }
+
+      .box-subtitle {
+        position: relative;
+        width: 100%;
+        font-size: 12px;
+        color: #999999;
+        word-wrap: break-word;
+        margin: 5px 0;
+        /* display: flex; */
+      }
+    }
+
+  </style>
+</head>
+
+<body text="blue">
+  <div class="body">
+    <div class="box iframe-test">
+      <div class="box-title"><b>iframe交互</b></div>
+      <div class="box-subtitle">
+        <p>
+          iframe嵌入页面，通过postmessage、onmessage等方式实现页面间的交互
+          </br> 可打开控制台，查看完整交互流程。。。
+      </p>
+      </div>
+      <div class="area">
+        <button onclick="handleClickSend(event)">异步获取宿主数据</button>
+        <button onclick="handleClickGet(event)">同步获取宿主数据</button>
+      </div>
+    </div>
+    <div class="box electron-api">
+      <div class="box-title"><b>electron api</b></div>
+      <div class="box-subtitle">
+      </div>
+      <div class="area">
+        <button onclick="handleClickTest(event)">测试</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../../../base/iframe/communicator.js"></script>
+  <script src="../../../base/iframe/protocol.js"></script>
+  <script src="../../../base/utils.js"></script>
+  <script>
+    _iframeCommunicator = null;
+
+    async function getElectronApi(data) {
+      return await this._iframeCommunicator?.get(data);
+    }
+
+    function handleClickSend(event) {
+      this._iframeCommunicator?.send({
+        type: IFRAME_TYPE_SIMPLE,
+        data: 'hello, host, I am an iframe!'
+      }, (data) => {
+        // console.log('[child] get response:', data);
+        alert(`response - ${data.data}`);
+      });
+    }
+
+    async function handleClickGet(event) {
+      const data = await this._iframeCommunicator?.get({
+        type: IFRAME_TYPE_SIMPLE,
+        data: 'hello, host, I am an iframe!'
+      });
+      alert(`get - ${data.data}`);
+    }
+
+    async function handleClickTest(event) {
+      const data = await this.getElectronApi({
+        type: IFRAME_TYPE_ELECTRON_SIMPLE,
+        data: 'hello, host, I am an electron api!'
+      });
+    }
+
+    function main() {
+      this._iframeCommunicator = new JvtIframeCommunicator({
+        name: 'iframe-client',
+        target: window.parent,
+        onRecv: (message) => {
+          // console.log('[child] recv:', message);
+        }
+      });
+    }
+
+    main();
+  </script>
+</body>
+
+</html>

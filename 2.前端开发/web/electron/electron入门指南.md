@@ -1,7 +1,3 @@
-
-
-
-
 [TOC]
 
 # electron 快速入门指南
@@ -83,7 +79,7 @@ $ electron -v
 -- 见下文文件
 -- 附加：
 -- 1、添加预加载：preload.js
--- 2、vscode 调试: 
+-- 2、vscode 调试: .vscode/launch.json
 
 #6、启动
 $ npm start 
@@ -314,22 +310,146 @@ module.exports = {
 
 
 
-### 5、vscode 调试
+#### 5）.vscode/launch.json
 
-
-
-```shell
-# 1、打开浏览器页面开发调试工具
-  win.webContents.openDevTools()
-
-# 2、Electron 调试
-$ electron --inspect=9229 your/app：Electron将监听指定port上的V8调试协议消息，外部调试器需要连接到此端口上。 port 默认为 9229
-$ electron --inspect-brk=[port]：和--inspector 一样，但是会在JavaScript 脚本的第一行暂停运行
-
-# 3、vscode 调试
+```json
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Main + renderer",
+      "configurations": ["Main", "Renderer"],
+      "stopAll": true
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Renderer",
+      "port": 9222,
+      "request": "attach",
+      "type": "chrome",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Main",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "args": [".", "--remote-debugging-port=9222"],
+      "outputCapture": "std",
+      "console": "integratedTerminal"
+    }
+  ]
+}
 ```
 
 
+
+### 5、代码调试
+
+#### 1. 浏览器页面开发调试
+
+```javascript
+const win = new BrowserWindow(...)
+win.webContents.openDevTools()
+```
+
+
+
+#### 2. Electron 调试
+
+```shell
+$ electron --inspect=9229 your/app：	Electron将监听指定port上的V8调试协议消息，外部调试器需要连接到此端口上。 port 默认为 9229
+$ electron --inspect-brk=[port]：	和--inspector 一样，但是会在JavaScript 脚本的第一行暂停运行
+```
+
+
+
+#### 3.vscode 调试
+
+##### 1）调试web前端项目
+
+```shell
+# 1.可利用electron-quick-start项目做尝试
+$ git clone git@github.com:electron/electron-quick-start.git
+$ code electron-quick-start
+
+# 2.添加文件: .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Main Process",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "args" : ["."]
+    }
+  ]
+}
+
+# 3.断点调试
+	在 main.js 中设置一些断点，参考调试视图(https://code.visualstudio.com/docs/editor/debugging) ，开始调试. 便能点击断点。
+	这是一个预先配置好了的项目，可下载并直接在 VSCode 中调试：https://github.com/octref/vscode-electron-debug/tree/master/electron-quick-start
+```
+
+
+
+##### 2）调试 electron 
+
+​	如果您想从源代码构建 Electron 并修改 native Electron 代码库，本节将帮助您测试您的修改。对于那些不确定在哪里获得代码或如何构建它， [Electron 的构建工具](https://github.com/electron/build-tools) 自动化并解释此过程的大部分。 如果你想手动设置环境，你可以使用这些 [构建指令](https://www.electronjs.org/zh/docs/latest/development/build-instructions-gn)。
+
+​	**重新配置.vscode/launch.json**
+
+```shell
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(Windows) Launch",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}\\out\\your-executable-location\\electron.exe",
+      "args": ["your-electron-project-path"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+          {"name": "ELECTRON_ENABLE_LOGGING", "value": "true"},
+          {"name": "ELECTRON_ENABLE_STACK_DUMPING", "value": "true"},
+          {"name": "ELECTRON_RUN_AS_NODE", "value": ""},
+      ],
+      "externalConsole": false,
+      "sourceFileMap": {
+          "o:\\": "${workspaceFolder}",
+      },
+    },
+  ]
+}
+```
+
+​	**配置说明**
+
+- `cppvsdbg` 需要启用 [内置的 C/C++ 扩展](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)。
+
+- `${workspaceFolder}` 是 Chromium 的 `源` 的完整路径。
+
+- your-executable-location
+
+  将是以下几项之一：
+
+  - `Testing`：如果您使用的是默认的 [Electron 构建工具](https://github.com/electron/build-tools) 设置，或默认的 [从源端构建](https://www.electronjs.org/zh/docs/latest/development/build-instructions-gn#building) 的设置。
+  - `Release`：如果你构建了一个发布版本，而不是测试版本。
+  - `your-directory-name`：如果你在构建过程中修改， 这将是你指定的。
+
+- `args` 数组字符串 `"your electron-project-path"` 应为您正在用于测试的 Electron 项目或 `main.js` 的绝对路径。 在本示例中，它应该是您的 `electron-quick-start` 的路径。
 
 
 
@@ -339,7 +459,14 @@ $ electron --inspect-brk=[port]：和--inspector 一样，但是会在JavaScript
 
 
 
+## 三、electron 开发应用
+
+### 1、ipc交互
+
+
+
 >巨人的肩膀：
-> [深入理解Electron（一）Electron架构介绍](https://zhuanlan.zhihu.com/p/604169213)
-> [深入理解Electron系列](https://www.zhihu.com/column/c_1606275988706549760)
-> [Electron简介及快速入门](https://zhuanlan.zhihu.com/p/661319459)
+>[深入理解Electron（一）Electron架构介绍](https://zhuanlan.zhihu.com/p/604169213)
+>[深入理解Electron系列](https://www.zhihu.com/column/c_1606275988706549760)
+>[Electron简介及快速入门](https://zhuanlan.zhihu.com/p/661319459)
+>[第九讲使用VSCODE调试Electron程序](https://blog.csdn.net/fwj380891124/article/details/119796450)

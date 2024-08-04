@@ -265,6 +265,9 @@
       <iframe id='id-weblab-iframe' name="top" frameborder="0" scrolling="yes"></iframe>
     </div>
   </div>
+  <script src="./base/iframe/communicator.js"></script>
+  <script src="./base/iframe/protocol.js"></script>
+  <script src="./pages/electron.js"></script>
   <script>
     const treeItems = [{
       name: 'WEB 研究院（html&css&js）', url: '', children: [
@@ -287,7 +290,8 @@
             { name: '网络通讯', url: 'pages/websocket.html' },
             {
               name: 'electron', url: '', children: [
-                { name: '托盘通知', url: 'pages/notice/index.html' },
+                { name: '仿真指南', url: 'pages/electron/simulator/index.html' },
+                { name: '托盘通知', url: 'pages/electron/notice/index.html' },
               ]
             },
           ]
@@ -386,8 +390,32 @@
       foldElement.classList.add(isFold ? 'right' : 'left');
     }
 
+    function createIframeCommunicator(electrionCommunicator) {
+      const communicator = new JvtIframeCommunicator({
+        name: 'iframe-server',
+        target: document.getElementById('id-weblab-iframe').contentWindow,
+        onRecv: (data) => {
+          // console.log('[main] recv:', message);
+
+          if (data.type === IFRAME_TYPE_SIMPLE) {
+            return communicator.send({
+              ...data,
+              data: 'hi, iframe!'
+            });
+          }
+
+          electrionCommunicator?.onRecv(data);
+        }
+      });
+      return communicator;
+    }
+
     function main() {
       this.buildDirTree(treeItems, document.querySelector('.weblab-dir-tree'));
+
+      const electronCommunicator = new ElectronCommulator();
+      const iframeCommunicator = this.createIframeCommunicator(electronCommunicator);
+      electronCommunicator.bindIframeCommunicator(iframeCommunicator);
     }
 
     this.main();
