@@ -371,6 +371,8 @@ $ electron --inspect-brk=[port]：	和--inspector 一样，但是会在JavaScrip
 
 #### 3.vscode 调试
 
+详见：[virsual studio code](https://code.visualstudio.com/docs/editor/debugging)
+
 ##### 1）调试web前端项目
 
 ```shell
@@ -462,6 +464,8 @@ $ code electron-quick-start
 ## 三、electron 开发应用
 
 ### 1、ipc交互
+
+
 
 
 

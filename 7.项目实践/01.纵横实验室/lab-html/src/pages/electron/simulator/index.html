@@ -59,8 +59,9 @@
       </p>
       </div>
       <div class="area">
-        <button onclick="handleClickSend(event)">异步获取宿主数据</button>
-        <button onclick="handleClickGet(event)">同步获取宿主数据</button>
+        <button onclick="handleClickIframeSend(event)">send (异步)</button>
+        <button onclick="handleClickIframeExec(event)">exec (同步)</button>
+        <button onclick="handleClickIframePing(event)">api (ping)</button>
       </div>
     </div>
     <div class="box electron-api">
@@ -68,7 +69,7 @@
       <div class="box-subtitle">
       </div>
       <div class="area">
-        <button onclick="handleClickTest(event)">测试</button>
+        <button onclick="handleClickElectronPing(event)">ping</button>
       </div>
     </div>
 
@@ -79,44 +80,65 @@
   <script src="../../../base/utils.js"></script>
   <script>
     _iframeCommunicator = null;
+    _iframeCaller = null;
+    _iframeReceiver = null;
 
-    async function getElectronApi(data) {
-      return await this._iframeCommunicator?.get(data);
+    function _getElectronApi() {
+      return this._iframeCaller;
     }
 
-    function handleClickSend(event) {
+    function handleClickIframeSend(event) {
       this._iframeCommunicator?.send({
-        type: IFRAME_TYPE_SIMPLE,
-        data: 'hello, host, I am an iframe!'
+        type: IFRAME_TYPE_PING,
+        data: 'ping from iframe(send)!'
       }, (data) => {
         // console.log('[child] get response:', data);
         alert(`response - ${data.data}`);
       });
     }
 
-    async function handleClickGet(event) {
-      const data = await this._iframeCommunicator?.get({
-        type: IFRAME_TYPE_SIMPLE,
-        data: 'hello, host, I am an iframe!'
+    async function handleClickIframeExec(event) {
+      const data = await this._iframeCommunicator?.exec({
+        type: IFRAME_TYPE_PING,
+        data: 'ping from iframe(exec)!'
       });
-      alert(`get - ${data.data}`);
+      alert(`exec - ${data.data}`);
     }
 
-    async function handleClickTest(event) {
-      const data = await this.getElectronApi({
-        type: IFRAME_TYPE_ELECTRON_SIMPLE,
-        data: 'hello, host, I am an electron api!'
-      });
+    async function handleClickIframePing(event) {
+      try {
+        const data = await this._iframeCaller?.ping('ping from iframe(api)!');
+        alert(`ping - ${data.data}`);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // electron api
+
+    async function handleClickElectronPing(event) {
+      try {
+        const data = await this._getElectronApi().ping('ping from electron(api)!');
+        alert(`get - ${data.data}`);
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     function main() {
+      this._iframeCaller = new JvtIframeCaller();
+      this._iframeReceiver = new JvtIframeReceiver();
       this._iframeCommunicator = new JvtIframeCommunicator({
         name: 'iframe-client',
         target: window.parent,
+        receiver: this._iframeReceiver,
         onRecv: (message) => {
           // console.log('[child] recv:', message);
         }
       });
+      this._iframeCaller.bind({communicator: this._iframeCommunicator});
+      this._iframeReceiver.bind({communicator: this._iframeCommunicator});
     }
 
     main();

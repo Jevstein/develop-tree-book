@@ -1,13 +1,13 @@
 /**
- * @created : 2024/08/04
+ * @created : 2024/08/07
  * @author  : Jevstein
- * @desc    : iframe-communicator - 用于iframe之间通信的消息交互器
+ * @desc    : native-communicator - 用于客户端（Electron）之间通信的消息交互器
  */
 
-class JvtIframeCommunicator {
-  _name = '';         // iframe名称
-  _target = null;     // 目标iframe
-  _receiver = null;   // 接收方对象-JvtIframeReceiver
+class JvtNativeCommunicator {
+  _name = '';         // native名称
+  _target = null;     // 目标native
+  _receiver = null;   // 接收方对象-JvtNativeReceiver
   _onRecv = null;     // 接收消息回调函数
 
   _seq = 0;           // 用于生成序列号
@@ -15,8 +15,8 @@ class JvtIframeCommunicator {
 
   constructor(props) {
     const {
-      name = 'iframe-server',
-      target = document.getElementById('id-weblab-iframe').contentWindow,
+      name = 'native-server',
+      target = document.getElementById('id-weblab-native').contentWindow,
       onRecv = null,
       receiver = null,
     } = props;
@@ -68,7 +68,7 @@ class JvtIframeCommunicator {
 
   /**
    * 发送消息
-   * @param {*} data : 消息数据, 必须满足./protocol.js中的IframeData格式
+   * @param {*} data : 消息数据, 必须满足./protocol.js中的NativeData格式
    * @param {*} cb :回调函数, 接收消息的响应数据
    */
   send = (data, cb = null) => {

@@ -392,31 +392,38 @@
     }
 
     function createIframeCommunicator(electrionCommunicator) {
+      const iframeCaller = new JvtIframeCaller();
+      const iframeReceiver = new JvtIframeReceiver();
       const communicator = new JvtIframeCommunicator({
         name: 'iframe-server',
         target: document.getElementById('id-weblab-iframe').contentWindow,
+        receiver: iframeReceiver,
         onRecv: (data) => {
           // console.log('[main] recv:', message);
 
-          if (data.type === IFRAME_TYPE_SIMPLE) {
+          if (data.type === IFRAME_TYPE_PING) {
             return communicator.send({
               ...data,
-              data: 'hi, iframe!'
+              data: 'pong from host!'
             });
           }
-
-          electrionCommunicator?.onRecv(data);
         }
       });
-      return communicator;
+      
+      iframeCaller.bind({communicator});
+      iframeReceiver.bind({communicator});
+      return {
+        iframeCaller,
+        communicator
+      };
     }
 
     function main() {
       this.buildDirTree(treeItems, document.querySelector('.weblab-dir-tree'));
 
       const electronDemo = new ElectronApiDemo();
-      const iframeCommunicator = this.createIframeCommunicator(electronDemo);
-      electronDemo.bindCommunicator(iframeCommunicator);
+      const data = this.createIframeCommunicator(electronDemo);
+      electronDemo.bind(data);
     }
 
     this.main();
