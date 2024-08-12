@@ -4,11 +4,13 @@
  * @desc    : iframe-communicator - 用于iframe之间通信的消息交互器
  */
 
+const IFRAME_SOURCE = 'iframe';
+
 class JvtIframeCommunicator {
-  _name = '';         // iframe名称
-  _target = null;     // 目标iframe
-  _receiver = null;   // 接收方对象-JvtIframeReceiver
-  _onRecv = null;     // 接收消息回调函数
+  _name = '';               // iframe名称
+  _target = null;           // 目标iframe
+  _onRecv = null;           // 接收消息回调函数
+  _receiver = null;         // 接收方对象-JvtIframeReceiver
 
   _seq = 0;           // 用于生成序列号
   _map = new Map();   // 用于存储回调函数
@@ -23,8 +25,8 @@ class JvtIframeCommunicator {
 
     this._name = name;
     this._target = target;
-    this._receiver = receiver;
     this._onRecv = onRecv;
+    this._receiver = receiver;
 
     this.start();
   }
@@ -41,11 +43,27 @@ class JvtIframeCommunicator {
   }
 
   /**
+   * 首字母大写
+   * @param {string} string 
+   * @returns {string} : 首字母大写的字符串
+   */
+  _toUpperCaseFirstLetter(string) {
+    return string.replace(/^./, function(match) {
+      return match.toUpperCase();
+    });
+  }
+
+  /**
    * 消息分发器
    * @param {*} event 
    */
   _dispatch = (event) => {
     console.log(`[${this._name}] recv:`, event.data);
+
+    if (event.data?.source && event.data.source !== IFRAME_SOURCE) {
+      console.warn(`[${this._name}] source error:`, event.data.source);
+      return;
+    }
 
     if (event.data.seq && this._map.has(event.data.seq)) {
       const cb = this._map.get(event.data.seq);
@@ -56,13 +74,30 @@ class JvtIframeCommunicator {
 
     this._onRecv && this._onRecv(event.data);
 
-    if (this._receiver) {
-      const func = this._receiver[event.data.type];
+    if (this._receiver && event.data.type) {
+      let func = this._receiver._recvApis?.[event.data.type];
+      let isOnPrefix = this._receiver._isOnPrefix ? true : false;
+
+      do {
+        if (isOnPrefix) {
+          const funcName = `on${this._toUpperCaseFirstLetter(event.data.type)}`
+          func = this._receiver[funcName];
+          break;
+        }
+
+        func = this._receiver[event.data.type];
+        if (!func && (typeof(this._receiver._isOnPrefix) === 'undefined')) {
+          isOnPrefix = true;
+          continue;
+        }
+      } while(0);
+
       if (func) {
         func(event.data);
-      } else{
-        this._receiver.onRecv?.(event.data);
+        return;
       }
+      
+      this._receiver.onRecv?.(event.data);
     }
   }
 
@@ -74,6 +109,10 @@ class JvtIframeCommunicator {
   send = (data, cb = null) => {
     if (!data.seq) {
       data.seq = this._createSeq();
+    }
+
+    if (!data.source) {
+      data.source = IFRAME_SOURCE;
     }
 
     console.log(`[${this._name}] send:`, data);

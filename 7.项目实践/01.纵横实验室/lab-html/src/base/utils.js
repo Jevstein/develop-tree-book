@@ -44,6 +44,7 @@ class JvtUtils {
 
   /**
    * 节流: 在一定时间间隔内只执行第一次回调（控制高频事件执行次数）
+   * https://cloud.tencent.com/developer/article/2218785
    * @param {*} cb 
    * @param {*} wait 
    * @returns 
@@ -61,6 +62,7 @@ class JvtUtils {
 
   /**
    * 防抖: 在一定时间间隔内只执行末次回调（用户触发事件过于频繁）
+   * https://cloud.tencent.com/developer/article/2218785
    * @param {*} cb 
    * @param {*} wait 
    * @param {*} immediate 若为true，则在只执行首次回调，相当于节流

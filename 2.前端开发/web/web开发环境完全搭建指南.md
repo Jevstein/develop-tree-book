@@ -86,14 +86,16 @@ $ sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,m
 
   
 
-* **2）nvm**
+* **2）nvm命令**
 
   ```shell
-  略
+  $ nvm list 或 nvm ls: 查看已安装的node.js
+  $ nvm install 20.11.1: 安装20.11.1版本node
+  $ nvm use 20.11.1: 切换node到指定的nodejs版本
   ```
 
+  详见下文nvm。
   
-
   
 
 ### 2、nginx
@@ -104,7 +106,7 @@ $ sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,m
 
 
 
-### 3、web常规项目的搭建步骤
+### 3、web项目常规搭建步骤
 
 ```shell
 # 1、拉取工程代码，或新建工程目录
@@ -141,6 +143,94 @@ $ yarn build
 ```
 
 
+
+### 4、其他
+
+#### 1）切换镜像源
+
+```shell
+#1、vim 编辑配置文件
+-- 1.编辑
+$ vim ~/.nrmrc # 编辑
+registry=https://registry.npm.taobao.org
+home=https://npm.taobao.org
+sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+phantomjs_cdnurl=http://npm.taobao.org/mirrors/phantomjs
+ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
+electron_custom_dir="7.1.7"
+ 
+$ vim ~/.bashrc # 编辑
+export NVM_NODEJS_ORG_MIRROR=http://npm.taobao.org/mirrors/node
+export NVM_IOJS_ORG_MIRROR=http://npm.taobao.org/mirrors/iojs
+export ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/
+
+-- 2.生效
+$ source ~/.bashrc
+
+-- 3.删除
+$ rm ~/.nrmrc
+$ rm ~/.bashrc
+
+#2、npm config get/set
+-- 1.查看镜像源使用状态：
+$ npm config get registry
+-- 2.全局切换淘宝镜像源：
+$ npm config set registry http://registry.npm.taobao.org
+-- 3.全局切换官方镜像源：
+$ npm config set registry https://registry.npmjs.org/
+-- 4.全局切换华为镜像源：
+$ npm config set registry https://mirrors.huaweicloud.com/repository/npm/
+$ npm config set disturl https://mirrors.huaweicloud.com/nodejs/
+$ npm config set electron_mirror https://mirrors.huaweicloud.com/electron/
+-- 5.清除缓存：
+$ npm cache clean -f
+-- 6.检查：
+$ npm config list
+
+#3、yarn config get/set
+-- 1.查看
+$ yarn config get registry #  查看
+$ yarn config list # 查看所有
+-- 2.设置
+$ yarn config set registry http://10.10.27.63:4873/ # 切换-ecology
+$ yarn config set electron_mirror 'https://mirrors.huaweicloud.com/electron/',
+$ yarn config set electron_builder_binaries_mirror 'https://mirrors.huaweicloud.com/electron-builder-binaries/'
+-- 3.删除
+$ yarn config delete electron_mirror
+```
+
+
+
+* 镜像源示例
+
+  执行 **yarn config list** 后: 
+
+  ```javascript
+  yarn config v1.22.18
+  info yarn config
+  {
+    'version-tag-prefix': 'v',
+    'version-git-tag': true,
+    'version-commit-hooks': true,
+    'version-git-sign': false,
+    'version-git-message': 'v%s',
+    'init-version': '1.0.0',
+    'init-license': 'MIT',
+    'save-prefix': '^',
+    'bin-links': true,
+    'ignore-scripts': false,
+    'ignore-optional': false,
+    registry: 'http://10.10.27.63:4873/',
+    'strict-ssl': true,
+    'user-agent': 'yarn/1.22.18 npm/? node/v16.15.1 darwin arm64',
+    electron_builder_binaries_mirror: 'https://mirrors.huaweicloud.com/electron-builder-binaries/',
+    electron_mirror: 'https://mirrors.huaweicloud.com/electron/',
+    lastUpdateCheck: 1723113503272,
+    'sass-binary-site': 'http://npm.taobao.org/mirrors/node-sass'
+  }
+  ```
+
+  
 
 
 
@@ -210,11 +300,13 @@ $ brew unpin <包名>：解除锁定
 ### 3、npm
 
 ```shell
+# 安装npm
+-- 方法一：下载安装nodejs，即可自动安装npm命令
+-- 方法二：
+
 # 安装node_modules依赖
-$ npm install 或
-$ npm i
+$ npm run install 或 $ npm run i
 	在git clone项目的时候，项目文件中并没有 node_modules文件夹，项目的依赖文件可能很大。直接执行，npm会根据package.json配置文件中的依赖配置下载安装。
-	
 --【参数说明】：
 -global=-g，全局安装，安装后的包位于系统预设目录下
 --save=-S，安装的包将写入package.json里面的dependencies，dependencies：生产环境需要依赖的库
@@ -223,9 +315,11 @@ $ npm i
 --verbose，可以尝试打印更详细的错误信息
 
 # 常用命令
+$ npm -version 或 npm -v: 查看版本号（检查安装是否成功）
 $ npm run install xxx: 安装指定模块
 $ npm run start: 运行项目
 $ npm uninstall npm -g: 卸载
+$ npm cache clean --force: 清理缓存
 
 
 ```
@@ -256,7 +350,25 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 
 ### 5、nvm
 
--- 用于多版本管理
+-- 用于多版本管理, [windows安装包下载地址](https://github.com/coreybutler/nvm-windows/releases)
+
+```shell
+$ nvm list 或 nvm ls: 查看已安装的node.js
+$ nvm install 20.11.1: 安装20.11.1版本node
+$ nvm use 20.11.1: 切换node到指定的nodejs版本
+
+$ nvm ls-remote ：列出所有远程服务器的版本（官方node version list）
+$ nvm list (可简化为nvm ls)：列出所有已安装的 node 版本
+$ nvm list available ：显示所有可下载的版本
+$ nvm install stable ：安装最新版 node
+$ nvm install [node版本号] ：安装指定版本 node
+$ nvm uninstall [node版本号] ：删除已安装的指定版本
+$ nvm use [node版本号] ：切换到指定版本 node
+$ nvm current ：当前 node 版本 nvm alias [别名] [node版本号] ：给不同的版本号添加别名
+$ nvm unalias [别名] ：删除已定义的别名 nvm alias default [node版本号] ：设置默认版本
+```
+
+
 
 
 
@@ -311,9 +423,21 @@ $ brew update
 
 
 
+### 2、error An unexpected error occurred: "https://registry.npmjs.org/[sass](https://so.csdn.net/so/search?q=sass&spm=1001.2101.3001.7020): connect ETIMEDOUT 104.16.19.35:443".
+
+​	出现了上述错误，一般是代理的问题，可尝试将 node-sass 镜像源进行设置成国内的，操作如下
+
+```shell
+$ yarn config set sass-binary-site http://npm.taobao.org/mirrors/node-sass
+$ yarn add sass node-sass -dev
+```
+
+
+
 
 
 >巨人的肩膀：
 >[Mac安装npm全面指南](https://blog.csdn.net/m0_60437766/article/details/132116277)
 >[mac安装brew小白指引](https://blog.csdn.net/ganyingxie123456/article/details/132182152)
+>[nvm安装教程与nvm常见命令，超详细！](https://blog.csdn.net/2301_78542842/article/details/139241143)
 

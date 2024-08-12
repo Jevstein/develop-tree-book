@@ -70,6 +70,10 @@
       </div>
       <div class="area">
         <button onclick="handleClickElectronPing(event)">ping</button>
+        <div>
+          <button onclick="handleClickElectronOpenFile(event)">Open a File</button>
+          File path: <strong id="filePath"></strong>
+        </div>
       </div>
     </div>
 
@@ -77,18 +81,17 @@
 
   <script src="../../../base/iframe/communicator.js"></script>
   <script src="../../../base/iframe/protocol.js"></script>
+  <script src="./iframe-sdk.js"></script>
   <script src="../../../base/utils.js"></script>
   <script>
-    _iframeCommunicator = null;
-    _iframeCaller = null;
-    _iframeReceiver = null;
+    _iframeApi = null;
 
     function _getElectronApi() {
-      return this._iframeCaller;
+      return this._iframeApi;
     }
 
     function handleClickIframeSend(event) {
-      this._iframeCommunicator?.send({
+      this._iframeApi?._communicator?.send({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(send)!'
       }, (data) => {
@@ -98,7 +101,7 @@
     }
 
     async function handleClickIframeExec(event) {
-      const data = await this._iframeCommunicator?.exec({
+      const data = await this._iframeApi?._communicator?.exec({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(exec)!'
       });
@@ -107,7 +110,7 @@
 
     async function handleClickIframePing(event) {
       try {
-        const data = await this._iframeCaller?.ping('ping from iframe(api)!');
+        const data = await this._iframeApi?.ping('ping from iframe(api)!');
         alert(`ping - ${data.data}`);
       } catch (error) {
         console.error(error);
@@ -126,19 +129,21 @@
       }
     }
 
+    async function handleClickElectronOpenFile(event) {
+      try {
+        const data = await this._getElectronApi().openFile('open a file!');
+        // alert(`get - ${data.data}`);
+
+        const filePathElement = document.getElementById('filePath');
+        filePathElement.innerText = data.data;
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     function main() {
-      this._iframeCaller = new JvtIframeCaller();
-      this._iframeReceiver = new JvtIframeReceiver();
-      this._iframeCommunicator = new JvtIframeCommunicator({
-        name: 'iframe-client',
-        target: window.parent,
-        receiver: this._iframeReceiver,
-        onRecv: (message) => {
-          // console.log('[child] recv:', message);
-        }
-      });
-      this._iframeCaller.bind({communicator: this._iframeCommunicator});
-      this._iframeReceiver.bind({communicator: this._iframeCommunicator});
+      this._iframeApi = IframeClientApi.create();
     }
 
     main();

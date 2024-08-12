@@ -4,30 +4,15 @@
  * @desc    : native-communicator - 用于客户端（Electron）之间通信的消息交互器
  */
 
-const SINGLE_ON_NAME = 'jvt-native-on';
-const NATIVE_SOURCE = 'native';
-
-// class A {
-//   a = () => { console.log('A-a-1'); this.b(); }
-//   b = () => { console.log('A-b-1') }
-// }
-//
-// class B extends A{
-//   b = () => { console.log('B-b-1') }
-// }
-//
-// const o = new B()
-// o.a()
-// A-a-1
-// B-b-1
+const ON_NAME = 'jvt-native-on';
 
 class JvtNativeCommunicator {
   _name = 'native-server' | 'native-client';      // native名称
   _host = 'main' | 'renderer';                    // 宿主类型
   _target = 'ipcMain' | 'ipcRenderer';            // 目标: ipcMain/ipcRenderer
-  _onRecv = null;                                 // 接收消息回调函数
   _receiver = null;                               // 接收方对象-JvtNativeReceiver
- 
+  _onRecv = null;                                 // 接收消息回调函数
+
   _seq = 0;           // 用于生成序列号
   _map = new Map();   // 用于存储回调函数
 
@@ -47,13 +32,13 @@ class JvtNativeCommunicator {
     this.start();
   }
 
-  _getEntity = () => {
+  _getTarget = () => {
     if (this._target === 'ipcMain') {
       return require('electron').ipcMain;
     }
-
+    
     if (this._target === 'ipcRenderer') {
-      if (this._host === 'main') {
+      if (this._host ==='main') {
         return require('electron').ipcRenderer;
       }
 
@@ -75,20 +60,8 @@ class JvtNativeCommunicator {
   }
 
   /**
-   * 首字母大写
-   * @param {string} string 
-   * @returns {string} : 首字母大写的字符串
-   */
-  _toUpperCaseFirstLetter(string) {
-    return string.replace(/^./, function(match) {
-      return match.toUpperCase();
-    });
-  }
-    
-  /**
    * 消息分发器
    * @param {*} event 
-   * @param {*} data 必须满足{seq, type, data}的NativeData格式
    */
   _dispatch = (event, data) => {
     console.log(`[${this._name}] recv:`, event, data);
@@ -102,36 +75,19 @@ class JvtNativeCommunicator {
 
     this._onRecv && this._onRecv(data);
 
-    if (this._receiver && event.data.type) {
-      let func = null;
-      let isOnPrefix = this._receiver._isOnPrefix ? true : false;
-
-      do {
-        if (isOnPrefix) {
-          const funcName = `on${this._toUpperCaseFirstLetter(event.data.type)}`
-          func = this._receiver[funcName];
-          break;
-        }
-
-        func = this._receiver[event.data.type];
-        if (!func && (typeof(this._receiver._isOnPrefix) === 'undefined')) {
-          isOnPrefix = true;
-          continue;
-        }
-      } while(0);
-
+    if (this._receiver) {
+      const func = this._receiver[data.type];
       if (func) {
-        func(event.data);
-        return;
+        func(data);
+      } else{
+        this._receiver.onRecv?.(data);
       }
-      
-      this._receiver.onRecv?.(event.data);
     }
   }
 
   /**
    * 发送消息
-   * @param {*} data : 消息数据, 必须满足{seq, type, data}的NativeData格式
+   * @param {*} data : 消息数据, 必须满足./protocol.js中的NativeData格式
    * @param {*} cb :回调函数, 接收消息的响应数据
    */
   send = (data, cb = null) => {
@@ -139,18 +95,13 @@ class JvtNativeCommunicator {
       data.seq = this._createSeq();
     }
 
-    if (!data.source) {
-      data.source = NATIVE_SOURCE;
-    }
-
     console.log(`[${this._name}] send:`, data);
     // this._target?.postMessage(data, '*');
-    const target = this._getEntity();
-    if (target && target[data?.type]) {
-      target[data.type](data);
-    } else {
-      console.error(`[${this._name}] send: ${data?.type} not found!`, target, data);
+    const target = this._getTarget();
+    if (!target) {
+      return;
     }
+    target[data.type]?.(data);
 
     if (cb) {
       this._map.set(data.seq, cb);
@@ -183,63 +134,22 @@ class JvtNativeCommunicator {
   }
 
   /**
-   * 开始监听
+   * 开始监听消息: 只接受指定域名下的消息
    */
   start = () => {
-    const target = this._getEntity();
-    if (!target?.on) {
-      console.error(`[${this._name}] start: target?.on not found!`, target);
-      return;
+    const target = this._getTarget();
+    if (target) {
+      target.on(ON_NAME, this._dispatch);
     }
-
-    target.on(SINGLE_ON_NAME, this._dispatch);
   }
 
   /**
-   * 停止监听
+   * 停止监听消息
    */
   stop = () => {
-    const target = this._getEntity();
+    const target = this._getTarget();
     if (target) {
-      target.removeAllListeners(SINGLE_ON_NAME);
+      target.removeAllListeners(ON_NAME);
     }
   }
 }
-
-class JvtNativeCommunicatorIpcMain extends JvtNativeCommunicator {
-  constructor(props) {
-    super({
-      ...props,
-      host: 'main',
-      target: 'ipcMain'
-    });
-  }
-
-  _getEntity = () => {
-    return require('electron').ipcMain;
-  }
-}
-
-class JvtNativeCommunicatorIpcRenderer extends JvtNativeCommunicator {
-  constructor(props) {
-    super({
-      ...props,
-      name: 'native-client',
-      host: 'renderer',
-      target: 'ipcRenderer'
-    });
-  }
-
-  _getEntity = () => {
-    if (!window.NativeAPI) {
-      alert('not found window.NativeAPI!');
-    }
-
-    return window.NativeAPI;
-  }
-}
-
-// module.exports = {
-//   JvtNativeIpcMain,
-//   JvtNativeIpcRenderer,
-// };

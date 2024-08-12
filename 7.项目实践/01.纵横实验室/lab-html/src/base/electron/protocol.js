@@ -1,48 +1,29 @@
-
 /**
- * @created : 2024/08/04
+ * @created : 2024/08/07
  * @author  : Jevstein
  * @version : 1.0.0
- * @desc    : iframe-protocol - 消息协议
- *  其中，iframe交互的数据格式，定义如下：
+ * @desc    : ipcMain-ipcRenderer通信接口定义
+ *  其中，交互数据格式，定义如下：
  *  {
- *    seq: '0',                // 序列号（流水号）：默认不传，由JvtIframeCommunicator内部生成
- *    source: 'iframe',        // iframe来源-固定
- *    type: IFRAME_TYPE_PING,  // 消息类型
+ *    seq: '0',                // 序列号（流水号）：默认不传，由JvtNativeCommunicator内部生成
+ *    source: 'native',        // native来源-固定
+ *    type: NATIVE_TYPE_PING,  // 消息类型
  *    data: xxx,               // 消息内容
  *  }
  */
 
-// 消息类型
-const IFRAME_TYPE_PING = 10000; // iframe 回传
+// ------------------------------- API 调用方式 -------------------------------  
+class JvtNativeApiAbstract {
+  openFile = (data) => {
 
-// ------------------------------- API 调用方式 -------------------------------     
-
-class JvtIframeApiAbstract {
-  /**
-   * ping 方法
-   * @param {*} data {
-   *    no: '123',
-   * }
-   * @returns {*} {
-   *    name: 'xxx',
-   *    age: 18,
-   * }
-   */
-  ping = (data) => {
-    return {};
-  }
-
-  onPing = (data) => {
-    // console.error('JvtIframeApi.onPing:', data);
   }
 }
 
 // 接口方法
-class JvtIframeApiEngine extends JvtIframeApiAbstract {
-  _isOnPrefix = undefined;  // 在JvtIframeCommunicator中，是否开仅处理带on开头的函数: true=开, false=关, undefined=全部（默认）-效率较低
-  // _recvApis = undefined;    // 接收到的api列表
-  _communicator = null;     // JvtIframeCommunicator
+class JvtNativeApiEngine extends JvtNativeApiAbstract {
+  _isOnPrefix = undefined;      // 在JvtNativeCommunicator中，是否开仅处理带on开头的函数: true=开, false=关, undefined=全部（默认）-效率较低
+  // _recvApis = undefined;     // 接收到的api列表
+  _communicator = null;         // JvtNativeCommunicator
   _name = '';
 
   constructor(props) {
@@ -76,12 +57,12 @@ class JvtIframeApiEngine extends JvtIframeApiAbstract {
   }
 
   onRecv = (data) => {
-    console.error('JvtIframeApi.onRecv:', data);
+    console.error('JvtNativeApi.onRecv:', data);
   }
 
   _send = (data, cb) => {
     if (!this._communicator) {
-      console.error('JvtIframeApi._send: communicator is not defined');
+      console.error('JvtNativeApi._send: communicator is not defined');
       return;
     }
 
@@ -90,7 +71,7 @@ class JvtIframeApiEngine extends JvtIframeApiAbstract {
 
   _exec = async (data, timeout) => {
     if (!this._communicator) {
-      console.error('JvtIframeApi._exec: communicator is not defined');
+      console.error('JvtNativeApi._exec: communicator is not defined');
       return;
     }
 
@@ -105,21 +86,22 @@ class JvtIframeApiEngine extends JvtIframeApiAbstract {
   }
 }
 
-// ------------------------------- API 调用方式 - 业务继承接口 -------------------------------  
+// ------------------------------- API 调用方式 - 业务继承接口 -------------------------------
+
 // 接口方法 - api(推荐使用)
-class JvtIframeApi extends JvtIframeApiEngine {
+class JvtNativeApi extends JvtNativeApiEngine {
   constructor(props) {
     super({ ...props, isOnPrefix: true });
   }
 
   // ====== 业务调用接口：用于发送方发送 ======
-  ping = async (data) => {
+  openFile = async (data) => {
     const type = this._getType(new Error());
     return await this._exec({ type, data });
   }
 
   // ====== 业务回调接口：用于接收方接收 ======
-  onPing = (data) => {
+  onOpenFile = (data) => {
     this._send({
       ...data,
       data: "pong"
@@ -128,24 +110,24 @@ class JvtIframeApi extends JvtIframeApiEngine {
 }
 
 // 接口方法 - 调用方
-class JvtIframeCaller extends JvtIframeApiEngine {
+class JvtNativeCaller extends JvtNativeApiEngine {
   constructor(props) {
     super(props);
   }
 
-  ping = async (data) => {
+  openFile = async (data) => {
     const type = this._getType(new Error());
     return await this._exec({ type, data });
   }
 }
 
 // 接口方法 - 接收方
-class JvtIframeReceiver extends JvtIframeApiEngine {
+class JvtNativeReceiver extends JvtNativeApiEngine {
   constructor(props) {
     super({ ...props, isOnPrefix: false });
   }
 
-  ping = (data) => {
+  openFile = (data) => {
     this._send({
       ...data,
       data: "pong"
