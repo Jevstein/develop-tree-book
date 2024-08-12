@@ -10,7 +10,15 @@
  */
 
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
-const { app, BrowserWindow } = require('electron/main')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
+// const path = require('node:path')
+
+async function handleFileOpen () {
+  const { canceled, filePaths } = await dialog.showOpenDialog()
+  if (!canceled) {
+    return filePaths[0]
+  }
+}
 
 const _createWindowSimple = () => {
     // 导入 Node.js 的 path 模块
@@ -74,6 +82,9 @@ const createWindow = () => {
  * 可以通过使用 app.whenReady() API来监听此事件
  */
 app.whenReady().then(() => {
+
+  ipcMain.handle('jvt-native-on', handleFileOpen)
+
   createWindow()
 
   // 在 macOS 系统内, 如果没有已开启的应用窗口

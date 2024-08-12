@@ -79,8 +79,8 @@
 
   </div>
 
-  <script src="../../../base/iframe/communicator.js"></script>
-  <script src="../../../base/iframe/protocol.js"></script>
+  <script src="../../../base/iframe/engine.js"></script>
+  <script src="../../../base/iframe/api.js"></script>
   <script src="./iframe-sdk.js"></script>
   <script src="../../../base/utils.js"></script>
   <script>
@@ -91,7 +91,7 @@
     }
 
     function handleClickIframeSend(event) {
-      this._iframeApi?._communicator?.send({
+      this._iframeApi?._engine?.send({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(send)!'
       }, (data) => {
@@ -101,7 +101,7 @@
     }
 
     async function handleClickIframeExec(event) {
-      const data = await this._iframeApi?._communicator?.exec({
+      const data = await this._iframeApi?._engine?.exec({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(exec)!'
       });
@@ -143,7 +143,7 @@
     }
 
     function main() {
-      this._iframeApi = IframeClientApi.create();
+      this._iframeApi = IframeClientApi.create(window.parent);
     }
 
     main();

@@ -1,16 +1,16 @@
 /**
  * @created : 2024/08/04
  * @author  : Jevstein
- * @desc    : iframe-communicator - 用于iframe之间通信的消息交互器
+ * @desc    : iframe-engine - 用于iframe之间通信的消息交互器
  */
 
 const IFRAME_SOURCE = 'iframe';
 
-class JvtIframeCommunicator {
+class JvtIframeEngine {
   _name = '';               // iframe名称
   _target = null;           // 目标iframe
   _onRecv = null;           // 接收消息回调函数
-  _receiver = null;         // 接收方对象-JvtIframeReceiver
+  _receiver = null;         // 接收方对象-JvtIframeApi
 
   _seq = 0;           // 用于生成序列号
   _map = new Map();   // 用于存储回调函数
@@ -44,18 +44,22 @@ class JvtIframeCommunicator {
 
   /**
    * 首字母大写
-   * @param {string} string 
+   * @param {string} funcName 
    * @returns {string} : 首字母大写的字符串
    */
-  _toUpperCaseFirstLetter(string) {
-    return string.replace(/^./, function(match) {
+  _toUpperCaseFirstLetter(funcName) {
+    if (typeof(funcName) !== 'string') {
+      return funcName?.toString() || '';
+    }
+
+    return funcName.replace(/^./, function(match) {
       return match.toUpperCase();
     });
   }
 
   /**
    * 消息分发器
-   * @param {*} event 
+   * @param {*} event event.data 必须满足{seq, source, type, data}的IframeData格式
    */
   _dispatch = (event) => {
     console.log(`[${this._name}] recv:`, event.data);
@@ -75,17 +79,19 @@ class JvtIframeCommunicator {
     this._onRecv && this._onRecv(event.data);
 
     if (this._receiver && event.data.type) {
-      let func = this._receiver._recvApis?.[event.data.type];
+      let func = undefined;
       let isOnPrefix = this._receiver._isOnPrefix ? true : false;
+
+      const recvApiObject = this._receiver._recvApiObject || this._receiver ;
 
       do {
         if (isOnPrefix) {
           const funcName = `on${this._toUpperCaseFirstLetter(event.data.type)}`
-          func = this._receiver[funcName];
+          func = recvApiObject[funcName];
           break;
         }
 
-        func = this._receiver[event.data.type];
+        func = recvApiObject[event.data.type];
         if (!func && (typeof(this._receiver._isOnPrefix) === 'undefined')) {
           isOnPrefix = true;
           continue;

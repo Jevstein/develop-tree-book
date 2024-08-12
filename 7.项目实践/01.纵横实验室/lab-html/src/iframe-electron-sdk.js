@@ -1,39 +1,34 @@
 
 // iframe 交互，并处理 Electron 调用
-class IframeHostElectronApi extends JvtIframeApi {
-  _electronApi = null;
+class IframeServerApi extends JvtIframeApi {
+  _nativeApi = null;
 
   static create(target) {
-    const electronApi = ElectronApi.create();
-
-    const api = new IframeHostElectronApi({name: 'iframe-server-api'});
-    const communicator = new JvtIframeCommunicator({
+    const iframeApi = new IframeServerApi({
       name: 'iframe-server',
-      target, //: document.getElementById('id-weblab-iframe').contentWindow,
-      receiver: api,
+      target,
       onRecv: (data) => {
         // console.log('[main] recv:', message);
         if (data.type === IFRAME_TYPE_PING) {
-          return communicator.send({
+          return iframeApi._send({
             ...data,
             data: 'pong from host!'
           });
         }
       }
     });
-    api.bind({ communicator });
-    api.setElectronApi(electronApi);
-
-    electronApi.setIframeElectronApi(api);
-    return api;
+    const electronApi = NativeApi.create();
+    electronApi.setIframeApi(iframeApi);
+    iframeApi.setNativeApi(electronApi);
+    return iframeApi;
   }
 
   constructor(props) {
     super(props);
   }
 
-  setElectronApi = (api) => {
-    this._electronApi = api;
+  setNativeApi = (api) => {
+    this._nativeApi = api;
   }
 
   //--------------------------- 1.receive: iframe => host -> electron => iframe  ---------------------------
@@ -43,7 +38,7 @@ class IframeHostElectronApi extends JvtIframeApi {
     // const filePath = await window.electronAPI.openFile()
 
     try {
-      filePath = await this._electronApi?.openFile();
+      filePath = await this._nativeApi?.openFile();
     } catch (error) {
       console.error(error);
     }
@@ -59,27 +54,22 @@ class IframeHostElectronApi extends JvtIframeApi {
 }
 
 // electron 交互
-class ElectronApi extends JvtNativeApi {
-  _iframeElectronApi = null;
+class NativeApi extends JvtNativeApi {
+  _iframeApi = null;
 
   static create() {
-    const api = new ElectronApi({name: 'electron-renderer-api'});
-    const communicator = new JvtNativeCommunicatorIpcRenderer({
-      receiver: api,
-      // onRecv: (data) => {
-      //   // console.log('[main] recv:', message);
-      // }
+    return new NativeApi({
+      name: 'electron-renderer',
+      type: 'ipcRendererOn'
     });
-    api.bind({ communicator });
-    return api;
   }
 
   constructor(props) {
     super(props);
   }
 
-  setIframeElectronApi = (api) => {
-    this._iframeElectronApi = api;
+  setIframeApi = (api) => {
+    this._iframeApi = api;
   }
 
   //--------------------------- 1.send: host => electron  ---------------------------

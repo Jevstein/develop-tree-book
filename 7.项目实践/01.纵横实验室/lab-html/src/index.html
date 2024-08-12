@@ -265,12 +265,11 @@
       <iframe id='id-weblab-iframe' name="top" frameborder="0" scrolling="yes"></iframe>
     </div>
   </div>
-  <script src="./base/iframe/communicator.js"></script>
-  <script src="./base/iframe/protocol.js"></script>
-  <script src="./base/electron/communicator.js"></script>
-  <script src="./base/electron/protocol.js"></script>
+  <script src="./base/iframe/engine.js"></script>
+  <script src="./base/iframe/api.js"></script>
+  <script src="./base/electron/engine.js"></script>
+  <script src="./base/electron/api.js"></script>
   <script src="./iframe-electron-sdk.js"></script>
-  <script src="./pages/electron/simulator/electron-sdk.js"></script>
   <script>
     const treeItems = [{
       name: 'WEB 研究院（html&css&js）', url: '', children: [
@@ -393,56 +392,12 @@
       foldElement.classList.add(isFold ? 'right' : 'left');
     }
 
-    // function createElectronCommunicator() {
-    //   const communicator = new JvtNativeIpcRenderer(); 
-    //   const electronCaller = new ElectronCaller({ communicator });
-    //   const electronReceiver = new ElectronNotice({ communicator });
-    //   return { 
-    //     communicator,
-    //     electronCaller,
-    //     electronReceiver,
-    //   };
-    // }
-
-    // function createIframeCommunicator(electronCaller) {
-    //   const iframeCaller = new IframeHostCaller({name: 'iframe-server-caller'}); // new JvtIframeCaller();
-    //   const iframeReceiver = new IframeHostElectronApi({name: 'iframe-server-receiver'});  // new JvtIframeReceiver();
-    //   const communicator = new JvtIframeCommunicator({
-    //     name: 'iframe-server',
-    //     target: document.getElementById('id-weblab-iframe').contentWindow,
-    //     receiver: iframeReceiver,
-    //     onRecv: (data) => {
-    //       // console.log('[main] recv:', message);
-
-    //       if (data.type === IFRAME_TYPE_PING) {
-    //         return communicator.send({
-    //           ...data,
-    //           data: 'pong from host!'
-    //         });
-    //       }
-    //     }
-    //   });
-      
-    //   iframeCaller.bind({communicator});
-    //   iframeReceiver.bind({communicator});
-    //   iframeReceiver.setElectronCaller(electronCaller);
-    //   return {
-    //     iframeCaller,
-    //     communicator
-    //   };
-    // }
-
     const _iframeHostElectronApi = null;
 
     function main() {
       this.buildDirTree(treeItems, document.querySelector('.weblab-dir-tree'));
 
-      // const { electronCaller } = this.createElectronCommunicator();
-      // const data = this.createIframeCommunicator(electronCaller);
-      // // electronDemo.bind(data);
-
-      this._iframeHostElectronApi = IframeHostElectronApi.create(document.getElementById('id-weblab-iframe').contentWindow)
-      
+      this._iframeHostElectronApi = IframeServerApi.create(document.getElementById('id-weblab-iframe').contentWindow)
     }
 
     this.main();

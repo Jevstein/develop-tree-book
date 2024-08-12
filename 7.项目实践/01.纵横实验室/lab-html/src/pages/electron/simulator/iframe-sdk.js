@@ -1,16 +1,9 @@
 class IframeClientApi extends JvtIframeApi {
-  static create() {
-    const api = new IframeClientApi({name: 'iframe-client-api'});
-    const communicator = new JvtIframeCommunicator({
+  static create(target) {
+    return new IframeClientApi({
       name: 'iframe-client',
-      target: window.parent,
-      receiver: api,
-      // onRecv: (message) => {
-      //   console.log('[child] recv:', message);
-      // }
+      target,
     });
-    api.bind({ communicator });
-    return api;
   }
 
   constructor(props) {
