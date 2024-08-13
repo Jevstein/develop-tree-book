@@ -4,100 +4,9 @@
  * @desc    : native-engine - 用于客户端（Electron）之间通信的消息交互器
  */
 
+// import { JvtNativeEntity } from './entity.js';
+
 const NATIVE_SOURCE = 'native';
-const NATIVE_SINGLE_ON = 'jvt-native-on';
-
-/**
- * @desc : 用于客户端（Electron）之间通信的实体-基类
- */
-class JvtNativeEntity {
-  _type = '';
-  _target = null;
-  _onDispatch = undefined;
-
-  constructor(props) {
-    const {
-      type,
-      onDispatch
-    } = props;
-
-    this._type = type;
-    this._onDispatch = onDispatch;
-  }
-
-  getTarget = () => {
-    if (!_target) {
-      console.error('not found _target!');
-    }
-
-    return _target;
-  }
-
-  send = (data) => { 
-    console.log(`JvtNativeEntity.send:`, data);
-  }
-
-  listen = (option) => { 
-    console.log(`JvtNativeEntity.listen:`, option);
-  }
-
-  removeListen = (option) => {
-    console.log(`JvtNativeEntity.removeListen:`, option);
-  }
-}
-
-/**
- * @desc : 用于客户端（Electron）之间通信的实体-ipcMain-on
- */
-class JvtNativeEntityIpcMainOn extends JvtNativeEntity {
-  constructor(props) {
-    super(props);
-    this._target = require('electron').ipcMain;
-  }
-
-  send = (data) => { 
-    const target = this.getTarget();
-    target.emit(NATIVE_SINGLE_ON, data);
-  }
-
-  listen = (option) => {
-    this.getTarget()?.on(NATIVE_SINGLE_ON, this._onDispatch);
-  }
-
-  removeListen = (option) => {
-    this.getTarget()?.removeAllListeners(NATIVE_SINGLE_ON);
-  }
-}
-
-/**
- * @desc : 用于客户端（Electron）之间通信的实体-ipcMain-on
- */
-class JvtNativeEntityIpcRendererOn extends JvtNativeEntity {
-  constructor(props) {
-    super(props);
-  }
-
-  getTarget = () => {
-    if (!window.NativeAPI) {
-      console.error('not found window.NativeAPI!');
-    }
-    return window.NativeAPI;
-  }
-
-  send = (data) => { 
-    const target = this.getTarget();
-    if (!target || !target[data?.type]) {
-      console.error(`failed to send as invalid target:`, data, target);
-      return;
-    }
-    target[data.type](data);
-  }
-
-  listen = (option) => {
-    // const target = this.getTarget();
-    // target.on(NATIVE_SINGLE_ON, this._onDispatch);
-  }
-}
 
 /**
  * @desc : 用于客户端（Electron）之间通信的消息交互器
@@ -122,27 +31,9 @@ class JvtNativeEngine {
     this._name = name;
     this._receiver = receiver;
     this._onRecv = onRecv;
-    this._entity = this._createEntity(type);
+    this._entity = JvtNativeEntity.create(type);
 
     this.start();
-  }
-
-  _createEntity = (type) => {
-    switch (type) {
-      case 'ipcMainOn':
-        return new JvtNativeEntityIpcMainOn({
-          type,
-          onDispatch: this._dispatch,
-        });
-      case 'ipcRendererOn':
-        return new JvtNativeEntityIpcRendererOn({
-          type,
-          onDispatch: this._dispatch,
-        });
-      default:
-        console.error(`JvtNativeEngine._createEntity: invalid type(${type})!`);
-        return null;
-    }
   }
 
   /**

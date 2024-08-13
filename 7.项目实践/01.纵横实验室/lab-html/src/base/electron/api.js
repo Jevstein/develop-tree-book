@@ -88,7 +88,7 @@ class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
 
   _send = (data, cb) => {
     if (!this._engine) {
-      console.error('JvtNativeApi._send: communicator is not defined');
+      console.error('JvtNativeApi._send: engine is not defined');
       return;
     }
 
@@ -97,7 +97,7 @@ class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
 
   _exec = async (data, timeout) => {
     if (!this._engine) {
-      console.error('JvtNativeApi._exec: communicator is not defined');
+      console.error('JvtNativeApi._exec: engine is not defined');
       return;
     }
 

@@ -31,12 +31,10 @@ class IframeServerApi extends JvtIframeApi {
     this._nativeApi = api;
   }
 
-  //--------------------------- 1.receive: iframe => host -> electron => iframe  ---------------------------
+  // 1.receive: iframe => host -> electron => iframe
 
   onOpenFile = async (data) => {
     let filePath = 'xxx/xxx/xxx';
-    // const filePath = await window.electronAPI.openFile()
-
     try {
       filePath = await this._nativeApi?.openFile();
     } catch (error) {
@@ -49,7 +47,7 @@ class IframeServerApi extends JvtIframeApi {
     });
   }
 
-  //--------------------------- 2.send: host => iframe  ---------------------------
+  // 2.send: host => iframe
 
 }
 
@@ -72,12 +70,12 @@ class NativeApi extends JvtNativeApi {
     this._iframeApi = api;
   }
 
-  //--------------------------- 1.send: host => electron  ---------------------------
+  // 1.send: host => electron
 
   openFile = async (data) => {
     const type = this._getType(new Error());
     return await this._exec({ type, data });
   }
 
-  //--------------------------- 2、notice: electron => host => iframe  ---------------------------
+  // 2、notice: electron => host => iframe
 }
