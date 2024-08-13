@@ -11,8 +11,35 @@
 //   }
 // })
 
+// const { contextBridge, ipcRenderer } = require('electron/renderer')
+// contextBridge.exposeInMainWorld('JvtNativeAPI', {
+//   openFile: (data) => ipcRenderer.send('jvt-native-on', data)
+// })
+
 const { contextBridge, ipcRenderer } = require('electron/renderer')
 
-contextBridge.exposeInMainWorld('NativeAPI', {
-  openFile: (data) => ipcRenderer.send('jvt-native-on', data)
-})
+class JvtBridge {
+  static create = (type) => {
+    let bridge = undefined;
+    switch (type) {
+      case 'ipcOn': bridge = new JvtBridgeOn(); break;
+      default:
+        console.error(`JvtBridge.create: invalid type(${type})!`);
+        break;
+    }
+
+    bridge?.expose();
+  }
+
+  expose = () => {}
+}
+
+class JvtBridgeOn {
+  expose = () => {
+    contextBridge.exposeInMainWorld('JvtNativeAPI', {
+      openFile: (data) => ipcRenderer.send('jvt-native-on', data)
+    })
+  }
+}
+
+JvtBridge.create('ipcOn');
