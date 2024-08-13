@@ -83,7 +83,7 @@ const createWindow = () => {
  */
 app.whenReady().then(() => {
 
-  ipcMain.handle('jvt-native-on', handleFileOpen)
+  ipcMain.on('jvt-native-on', handleFileOpen);
 
   createWindow()
 
