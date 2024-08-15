@@ -8,67 +8,56 @@ const NATIVE_SINGLE_ON = 'jvt-native-on';
 
 // 基类
 class JvtNativeEntity {
-  _type = '';
+  _hostType = 'client'; // client、server
+  _ipcType = 'ipcOnSingle'; // ipcOnSingle、ipcOnMutil
   _target = null;
   _onDispatch = undefined;
 
-  static create = (type) => {
-    switch (type) {
-      case 'ipcMainOn':
-        return new JvtNativeEntityIpcMainOn({
-          type,
-          onDispatch: this._dispatch,
-        });
-      case 'ipcRendererOn':
-        return new JvtNativeEntityIpcRendererOn({
-          type,
-          onDispatch: this._dispatch,
-        });
+  static create = (props) => {
+    const isServer = props.hostType ==='server';
+    switch (props.ipcType) {
+      case 'ipcOnSingle':     return isServer ? new JvtNativeIpcOnSingleServer(props) : new JvtNativeIpcOnSingleClient(props);
+      // case 'ipcOnMutil':      return isServer ? new JvtNativeIpcOnMutilServer(props) : new JvtNativeIpcOnMutilClient(props);
       default:
-        console.error(`JvtNativeEngine._createEntity: invalid type(${type})!`);
-        return null;
+        console.error(`JvtNativeEngine._createEntity: invalid type(${props.ipcType})!`);
+      break;
     }
+    return null;
   }
 
   constructor(props) {
     const {
-      type,
+      hostType, 
+      ipcType,
       onDispatch
     } = props;
 
-    this._type = type;
+    this._hostType = hostType;
+    this._ipcType = ipcType;
     this._onDispatch = onDispatch;
   }
 
   _getTarget = () => {
-    if (!_target) {
-      console.error('not found _target!');
-    }
-
+    if (!_target) { console.error('not found _target!'); }
     return _target;
   }
 
-  send = (data) => { 
-    console.log(`JvtNativeEntity.send:`, data);
-  }
+  send = (data) => { console.log(`JvtNativeEntity.send:`, data); }
 
-  listen = (option) => { 
-    console.log(`JvtNativeEntity.listen:`, option);
-  }
+  listen = (option) => {  console.log(`JvtNativeEntity.listen:`, option); }
 
-  removeListen = (option) => {
-    console.log(`JvtNativeEntity.removeListen:`, option);
-  }
+  removeListen = (option) => {  console.log(`JvtNativeEntity.removeListen:`, option); }
 }
 
-// ipcMain-on
-class JvtNativeEntityIpcMainOn extends JvtNativeEntity {
+//------------------ ipcMain/ipcRenderer on ------------------
+class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
   constructor(props) {
     super(props);
     this._target = require('electron').ipcMain;
   }
 
   send = (data) => { 
+    // TODO: 待实现
     const target = this._getTarget();
     target.emit(NATIVE_SINGLE_ON, data);
   }
@@ -82,8 +71,7 @@ class JvtNativeEntityIpcMainOn extends JvtNativeEntity {
   }
 }
 
-// ipcRenderer-on
-class JvtNativeEntityIpcRendererOn extends JvtNativeEntity {
+class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
   constructor(props) {
     super(props);
   }

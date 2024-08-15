@@ -23,7 +23,8 @@ class JvtNativeEngine {
   constructor(props) {
     const {
       name,
-      type,   // 实体类型: 'ipcMainOn' | 'ipcRendererOn'
+      hostType,// 实体类型: 'server' | 'client'
+      ipcType,// 实体类型: 'ipcMainOn' | 'ipcRendererOn'
       receiver,
       onRecv,
     } = props;
@@ -31,7 +32,7 @@ class JvtNativeEngine {
     this._name = name;
     this._receiver = receiver;
     this._onRecv = onRecv;
-    this._entity = JvtNativeEntity.create(type);
+    this._entity = JvtNativeEntity.create({hostType, ipcType, onDispatch: this._dispatch });
 
     this.start();
   }

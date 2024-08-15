@@ -9,9 +9,12 @@
  *  - 2024/07/25 Jevstein 创建
  */
 
+// import {ElectronIpcApi} from './electron-ipc-api'
+
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
 // const path = require('node:path')
+
 
 async function handleFileOpen () {
   const { canceled, filePaths } = await dialog.showOpenDialog()
@@ -84,6 +87,8 @@ const createWindow = () => {
 app.whenReady().then(() => {
 
   ipcMain.on('jvt-native-on', handleFileOpen);
+
+  // ElectronIpcApi.create();
 
   createWindow()
 

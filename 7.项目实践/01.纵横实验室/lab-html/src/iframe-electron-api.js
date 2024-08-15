@@ -32,18 +32,38 @@ class IframeServerApi extends JvtIframeApi {
   }
 
   // 1.receive: iframe => host -> electron => iframe
+  onNotifySysMsg = async (data) => {
+    const { title, body, message } = data.data;
 
-  onOpenFile = async (data) => {
-    let filePath = 'xxx/xxx/xxx';
-    try {
-      filePath = await this._nativeApi?.openFile();
-    } catch (error) {
-      console.error(error);
+    new window.Notification(title, { body }).onclick = () => { 
+      alert(message) 
     }
 
     this._send({
       ...data,
-      data: filePath
+      data: {
+        errMsg: this._nativeApi?.isValid() ? '' : '请在Electron环境下运行!'
+      }
+    });
+  }
+
+  onOpenFile = async (data) => {
+    let filePath = 'invalid file path!';
+
+    if (this._nativeApi?.isValid() ) {
+      try {
+        filePath = await this._nativeApi?.openFile();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    this._send({
+      ...data,
+      data: {
+        filePath,
+        errMsg: this._nativeApi?.isValid() ? '' : '请在Electron环境下运行!'
+      }
     });
   }
 
@@ -58,7 +78,8 @@ class NativeApi extends JvtNativeApi {
   static create() {
     return new NativeApi({
       name: 'electron-renderer',
-      type: 'ipcRendererOn'
+      hostType: 'client',
+      ipcType: 'ipcOnSingle'
     });
   }
 
@@ -68,6 +89,10 @@ class NativeApi extends JvtNativeApi {
 
   setIframeApi = (api) => {
     this._iframeApi = api;
+  }
+
+  isValid = () => {
+    return window.JvtNativeAPI ? true : false;
   }
 
   // 1.send: host => electron

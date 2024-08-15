@@ -16,6 +16,11 @@ class IframeClientApi extends JvtIframeApi {
     return await this._exec({ type, data }, 15000);
   }
 
+  notifySysMsg = async (data) => {
+    const type = this._getType(new Error());
+    return await this._exec({ type, data }, 15000);
+  }
+
   //--------------------------- notice: host => iframe  --------------------------- 
   // onOpenFile = (data) => {
   //

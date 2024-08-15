@@ -123,6 +123,7 @@ $ npm install n
 $ n xx.xx.xx
 
 # 4、切换镜像仓库
+$ npm install yarn
 $ yarn config get registry # 查看
 $ yarn config set registry http://10.10.27.63:4873/ # 切换
 
@@ -328,7 +329,13 @@ $ npm cache clean --force: 清理缓存
 
 ### 4、yarn 
 
-​	参考：https://blog.51cto.com/u_16099264/7874185
+Yarn是facebook发布的一款取代npm的包管理工具。主要特点：
+- 速度超快。
+- Yarn 缓存了每个下载过的包，所以再次使用时无需重复下载。 同时利用并行下载以最大化资源利用率，因此安装速度更快。
+- 超级安全。
+- 在执行代码之前，Yarn 会通过算法校验每个安装包的完整性。
+- 超级可靠。
+- 使用详细、简洁的锁文件格式和明确的安装算法，Yarn 能够保证在不同系统上无差异的工作。
 
 ```shell
 # 安装yarn命令
@@ -440,4 +447,6 @@ $ yarn add sass node-sass -dev
 >[Mac安装npm全面指南](https://blog.csdn.net/m0_60437766/article/details/132116277)
 >[mac安装brew小白指引](https://blog.csdn.net/ganyingxie123456/article/details/132182152)
 >[nvm安装教程与nvm常见命令，超详细！](https://blog.csdn.net/2301_78542842/article/details/139241143)
+>[yarn global add 位置 yarn dev](https://blog.51cto.com/u_16099264/7874185)
+>[yarn的安装和使用全网最详细教程](https://www.jb51.net/javascript/306925vlj.htm)
 

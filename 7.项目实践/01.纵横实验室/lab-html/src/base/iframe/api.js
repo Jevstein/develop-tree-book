@@ -21,7 +21,7 @@ const IFRAME_TYPE_PING = 10000; // iframe 回传
 // ------------------------------- 2、API 调用方式（推荐） -------------------------------     
 
 // 接口方法 - 基类
-class JvtIframeApiAbstract {
+class JvtIframeProcotol {
   /**
    * ping 方法
    * @param {*} data {
@@ -42,7 +42,7 @@ class JvtIframeApiAbstract {
 }
 
 // 接口方法 - 实现类
-class JvtIframeCommunicator extends JvtIframeApiAbstract {
+class JvtIframeApiEngine extends JvtIframeProcotol {
   _name = 'iframe-api';               // iframe api 名称
   _isOnPrefix = undefined;            // 在JvtIframeEngine中，是否开仅处理带on开头的函数: true=开, false=关, undefined=全部（默认）-效率较低
 
@@ -127,7 +127,7 @@ class JvtIframeCommunicator extends JvtIframeApiAbstract {
 }
  
 // 接口方法 - 业务实现类（建议在业务层中继承该类后，再实现具体的业务逻辑）
-class JvtIframeApi extends JvtIframeCommunicator {
+class JvtIframeApi extends JvtIframeApiEngine {
   constructor(props) {
     super({ ...props, isOnPrefix: true });
   }

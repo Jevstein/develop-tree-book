@@ -270,7 +270,7 @@
   <script src="./base/electron/entity.js"></script>
   <script src="./base/electron/engine.js"></script>
   <script src="./base/electron/api.js"></script>
-  <script src="./iframe-electron-sdk.js"></script>
+  <script src="./iframe-electron-api.js"></script>
   <script>
     const treeItems = [{
       name: 'WEB 研究院（html&css&js）', url: '', children: [
@@ -291,12 +291,7 @@
             { name: '同步异步', url: 'pages/webworker/index.html' },
             { name: '数据存储', url: 'pages/store/index.html' },
             { name: '网络通讯', url: 'pages/websocket.html' },
-            {
-              name: 'electron', url: '', children: [
-                { name: '仿真指南', url: 'pages/electron/simulator/index.html' },
-                { name: '托盘通知', url: 'pages/electron/notice/index.html' },
-              ]
-            },
+            { name: 'electron', url: 'pages/electron/index.html' },
           ]
         },
         {
@@ -393,17 +388,18 @@
       foldElement.classList.add(isFold ? 'right' : 'left');
     }
 
-    const _iframeHostElectronApi = null;
+    // const _iframeHostElectronApi = null;
 
     function main() {
       this.buildDirTree(treeItems, document.querySelector('.weblab-dir-tree'));
 
-      this._iframeHostElectronApi = IframeServerApi.create(document.getElementById('id-weblab-iframe').contentWindow)
+      IframeServerApi.create(document.getElementById('id-weblab-iframe').contentWindow);
     }
 
     this.main();
-
   </script>
 </body>
 
 </html>
+
+

@@ -43,6 +43,15 @@
         margin: 5px 0;
         /* display: flex; */
       }
+
+      .box-area {
+        display: flex;
+        flex-direction: column;
+
+        div {
+          margin-bottom: 5px;
+        }
+      }
     }
 
   </style>
@@ -61,17 +70,20 @@
       <div class="area">
         <button onclick="handleClickIframeSend(event)">send (异步)</button>
         <button onclick="handleClickIframeExec(event)">exec (同步)</button>
-        <button onclick="handleClickIframePing(event)">api (ping)</button>
+        <button onclick="handleClickIframePing(event)">ping (api)</button>
       </div>
     </div>
     <div class="box electron-api">
       <div class="box-title"><b>electron api</b></div>
       <div class="box-subtitle">
       </div>
-      <div class="area">
-        <button onclick="handleClickElectronPing(event)">ping</button>
+      <div class="box-area">
         <div>
-          <button onclick="handleClickElectronOpenFile(event)">Open a File</button>
+          <button onclick="handleClickNotifysMsg(event)">系统通知</button>
+          <a href="https://blog.csdn.net/weixin_40629244/article/details/116137758" target="_blank">Electron中消息通知</a>
+        </div>
+        <div>
+          <button onclick="handleClickOpenFile(event)">打开文件</button>
           File path: <strong id="filePath"></strong>
         </div>
       </div>
@@ -79,10 +91,10 @@
 
   </div>
 
-  <script src="../../../base/iframe/engine.js"></script>
-  <script src="../../../base/iframe/api.js"></script>
-  <script src="./iframe-sdk.js"></script>
-  <script src="../../../base/utils.js"></script>
+  <script src="../../base/iframe/engine.js"></script>
+  <script src="../../base/iframe/api.js"></script>
+  <script src="./iframe-api.js"></script>
+  <script src="../../base/utils.js"></script>
   <script>
     _iframeApi = null;
 
@@ -94,24 +106,24 @@
       this._iframeApi?._engine?.send({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(send)!'
-      }, (data) => {
+      }, (res) => {
         // console.log('[child] get response:', data);
-        alert(`response - ${data.data}`);
+        alert(`response - ${res.data}`);
       });
     }
 
     async function handleClickIframeExec(event) {
-      const data = await this._iframeApi?._engine?.exec({
+      const res = await this._iframeApi?._engine?.exec({
         type: IFRAME_TYPE_PING,
         data: 'ping from iframe(exec)!'
       });
-      alert(`exec - ${data.data}`);
+      alert(`exec - ${res.data}`);
     }
 
     async function handleClickIframePing(event) {
       try {
-        const data = await this._iframeApi?.ping('ping from iframe(api)!');
-        alert(`ping - ${data.data}`);
+        const res = await this._iframeApi?.ping('ping from iframe(api)!');
+        alert(`ping - ${res.data}`);
       } catch (error) {
         console.error(error);
       }
@@ -120,22 +132,27 @@
     // ------------------------------------------------------------
     // electron api
 
-    async function handleClickElectronPing(event) {
+    async function handleClickNotifysMsg(event) {
       try {
-        const data = await this._getElectronApi().ping('ping from electron(api)!');
-        alert(`get - ${data.data}`);
+        const res = await this._getElectronApi().notifySysMsg({
+          title: '系统通知',
+          body: '测试electron系统通知',
+          message: '您已点击系统通知'
+        });
+        res.data.errMsg && alert(res.data.errMsg);
       } catch (error) {
         console.error(error);
       }
     }
 
-    async function handleClickElectronOpenFile(event) {
+    async function handleClickOpenFile(event) {
       try {
-        const data = await this._getElectronApi().openFile('open a file!');
-        // alert(`get - ${data.data}`);
+        const res = await this._getElectronApi().openFile('open a file!');
+        // alert(`get - ${res.data}`);
 
         const filePathElement = document.getElementById('filePath');
-        filePathElement.innerText = data.data;
+        filePathElement.innerText = res.data.filePath;
+        res.data.errMsg && alert(res.data.errMsg);
 
       } catch (error) {
         console.error(error);

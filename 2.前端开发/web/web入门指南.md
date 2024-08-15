@@ -215,7 +215,7 @@ console.log("%cThis is a styled message!", "color: red; background-color: yellow
 ```shell
 #1.首先，宿主和iframe页面约定好协议，如发送ping数据：
 const data = {
-	req: 'xxx', 流水号
+	req: 'xxx', // 流水号
 	type: 10000,
 	data: 'ping'
 }
