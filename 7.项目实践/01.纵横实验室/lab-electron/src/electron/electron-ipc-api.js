@@ -1,14 +1,14 @@
 
-const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
+const { dialog } = require('electron/main')
+const { JvtNativeApi } = require('./ipc/api')
 
-import { JvtNativeApi } from './ipc/api'
-
-export class ElectronIpcApi extends JvtNativeApi {
+class ElectronIpcApi extends JvtNativeApi {
 
   static create() {
     return new ElectronIpcApi({
       name: 'electron-main',
-      type: 'ipcMainOn'
+      hostType: 'server',
+      ipcType: 'ipcOnSingle'
     });
   }
 
@@ -27,3 +27,7 @@ export class ElectronIpcApi extends JvtNativeApi {
 
   // 2、notice: electron => host => iframe
 }
+
+module.exports = {
+  ElectronIpcApi,
+};

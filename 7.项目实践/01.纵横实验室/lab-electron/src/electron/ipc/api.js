@@ -12,6 +12,8 @@
  *  }
  */
 
+const { JvtNativeEngine } = require( './engine')
+
 // ------------------------------- 1、消息交互（不推荐） ------------------------------- 
 
 // 消息类型
@@ -21,14 +23,14 @@ const NATIVE_TYPE_PING = 10000; // electron 回传
 // ------------------------------- 2、API 调用方式（推荐） -------------------------------     
 
 // 接口方法 - 基类
-export class JvtNativeApiAbstract {
+class JvtINativeProtocol {
   openFile = (data) => {
 
   }
 }
 
 // 接口方法 - 实现类
-export class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
+class JvtNativeApiEngine extends JvtINativeProtocol {
   _name = 'native-api';               // native api 名称
   _isOnPrefix = undefined;            // 在JvtNativeEngine中，是否开仅处理带on开头的函数: true=开, false=关, undefined=全部（默认）-效率较低
 
@@ -41,7 +43,8 @@ export class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
     const {
       name,
       isOnPrefix,
-      type,
+      hostType,
+      ipcType,
       onRecv
     } = props;
 
@@ -50,7 +53,8 @@ export class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
 
     this._engine = new JvtNativeEngine({
       name: `${name}-engine`,
-      type,
+      hostType,
+      ipcType,
       receiver: this,
       onRecv
     });
@@ -113,7 +117,7 @@ export class JvtNativeApiCommunicator extends JvtNativeApiAbstract {
 }
 
 // 接口方法 - 业务实现类（建议在业务层中继承该类后，再实现具体的业务逻辑
-export class JvtNativeApi extends JvtNativeApiCommunicator {
+class JvtNativeApi extends JvtNativeApiEngine {
   constructor(props) {
     super({ ...props, isOnPrefix: true });
   }
@@ -132,3 +136,9 @@ export class JvtNativeApi extends JvtNativeApiCommunicator {
     });
   }
 }
+
+module.exports = {
+  JvtINativeProtocol,
+  JvtNativeApiEngine,
+  JvtNativeApi,
+};

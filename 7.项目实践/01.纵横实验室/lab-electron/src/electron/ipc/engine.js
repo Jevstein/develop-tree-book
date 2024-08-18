@@ -4,7 +4,7 @@
  * @desc    : native-engine - 用于客户端（Electron）之间通信的消息交互器
  */
 
-// import { JvtNativeEntity } from './entity.js';
+const { JvtNativeEntity } = require('./entity');
 
 const NATIVE_SOURCE = 'native';
 
@@ -23,7 +23,8 @@ class JvtNativeEngine {
   constructor(props) {
     const {
       name,
-      type,   // 实体类型: 'ipcMainOn' | 'ipcRendererOn'
+      hostType,// 实体类型: 'server' | 'client'
+      ipcType,// 实体类型: 'ipcMainOn' | 'ipcRendererOn'
       receiver,
       onRecv,
     } = props;
@@ -31,7 +32,7 @@ class JvtNativeEngine {
     this._name = name;
     this._receiver = receiver;
     this._onRecv = onRecv;
-    this._entity = JvtNativeEntity.create(type);
+    this._entity = JvtNativeEntity.create({hostType, ipcType, onDispatch: this._dispatch });
 
     this.start();
   }
@@ -79,7 +80,7 @@ class JvtNativeEngine {
 
     this._onRecv && this._onRecv(data);
 
-    if (this._receiver && event.data.type) {
+    if (this._receiver && data.type) {
       let func = undefined;
       let isOnPrefix = this._receiver._isOnPrefix ? true : false;
 
@@ -87,12 +88,12 @@ class JvtNativeEngine {
 
       do {
         if (isOnPrefix) {
-          const funcName = `on${this._toUpperCaseFirstLetter(event.data.type)}`
+          const funcName = `on${this._toUpperCaseFirstLetter(data.type)}`
           func = recvApiObject[funcName];
           break;
         }
 
-        func = recvApiObject[event.data.type];
+        func = recvApiObject[data.type];
         if (!func && (typeof(this._receiver._isOnPrefix) === 'undefined')) {
           isOnPrefix = true;
           continue;
@@ -100,11 +101,11 @@ class JvtNativeEngine {
       } while(0);
 
       if (func) {
-        func(event.data);
+        func(data);
         return;
       }
       
-      this._receiver.onRecv?.(event.data);
+      this._receiver.onRecv?.(data);
     }
   }
 
@@ -185,7 +186,6 @@ class JvtNativeEngine {
   }
 }
 
-// module.exports = {
-//   JvtNativeIpcMain,
-//   JvtNativeIpcRenderer,
-// };
+module.exports = {
+  JvtNativeEngine,
+};

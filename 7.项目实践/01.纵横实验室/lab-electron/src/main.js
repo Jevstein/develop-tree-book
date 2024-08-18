@@ -9,19 +9,18 @@
  *  - 2024/07/25 Jevstein 创建
  */
 
-// import {ElectronIpcApi} from './electron-ipc-api'
-
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
 // const path = require('node:path')
+const { ElectronIpcApi } = require( './electron/electron-ipc-api')
 
 
-async function handleFileOpen () {
-  const { canceled, filePaths } = await dialog.showOpenDialog()
-  if (!canceled) {
-    return filePaths[0]
-  }
-}
+// async function handleFileOpen () {
+//   const { canceled, filePaths } = await dialog.showOpenDialog()
+//   if (!canceled) {
+//     return filePaths[0]
+//   }
+// }
 
 const _createWindowSimple = () => {
     // 导入 Node.js 的 path 模块
@@ -59,8 +58,11 @@ const _createWindowLabHtml = () => {
     width: 1800,
     height: 1600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+      sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./electron/ipc/bridge)
+      // nodeIntegration: true,
+      // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
+    },
   })
   win.loadFile('./../lab-html/src/index.html')
   win.webContents.openDevTools()
@@ -73,11 +75,18 @@ const _createWindowLabHtml = () => {
  * @returns
  */
 const createWindow = () => {
-  // 简易demo
-  // _createWindowSimple()
-
-  // lab-html 实验室
-  _createWindowLabHtml()
+  const type = 2; // 1: 简易demo, 2: lab-html 实验室
+  switch (type) {
+    case 1: // 简易demo
+      _createWindowSimple();
+      break;
+    case 2: // lab-html 实验室
+      _createWindowLabHtml();
+      break;
+    default:
+      console.log('未知类型');
+      break;
+  }
 }
 
 /**
@@ -85,10 +94,7 @@ const createWindow = () => {
  * 可以通过使用 app.whenReady() API来监听此事件
  */
 app.whenReady().then(() => {
-
-  ipcMain.on('jvt-native-on', handleFileOpen);
-
-  // ElectronIpcApi.create();
+  ElectronIpcApi.create() // ipcMain.on('jvt-native-on', handleFileOpen)
 
   createWindow()
 

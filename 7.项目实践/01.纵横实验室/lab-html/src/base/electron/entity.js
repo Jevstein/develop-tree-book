@@ -4,7 +4,7 @@
  * @desc    : native-entity - 用于客户端（Electron）之间通信的实体
  */
 
-const NATIVE_SINGLE_ON = 'jvt-native-on';
+const JVT_NATIVE_ON = 'jvt-native-on';
 
 // 基类
 class JvtNativeEntity {
@@ -38,8 +38,8 @@ class JvtNativeEntity {
   }
 
   _getTarget = () => {
-    if (!_target) { console.error('not found _target!'); }
-    return _target;
+    if (!this._target) { console.error('not found _target!'); }
+    return this._target;
   }
 
   send = (data) => { console.log(`JvtNativeEntity.send:`, data); }
@@ -59,15 +59,15 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
   send = (data) => { 
     // TODO: 待实现
     const target = this._getTarget();
-    target.emit(NATIVE_SINGLE_ON, data);
+    target.emit(JVT_NATIVE_ON, data);
   }
 
   listen = (option) => {
-    this._getTarget()?.on(NATIVE_SINGLE_ON, this._onDispatch);
+    this._getTarget()?.on(JVT_NATIVE_ON, this._onDispatch);
   }
 
   removeListen = (option) => {
-    this._getTarget()?.removeAllListeners(NATIVE_SINGLE_ON);
+    this._getTarget()?.removeAllListeners(JVT_NATIVE_ON);
   }
 }
 
@@ -85,20 +85,22 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
 
   send = (data) => { 
     const target = this._getTarget();
-    if (!target || !target[data?.type]) {
-      console.error(`failed to send as invalid target:`, data, target);
-      return;
-    }
-    target[data.type](data);
+    // if (!target || !target[data?.type]) {
+    //   console.error(`failed to send as invalid target:`, data, target);
+    //   return;
+    // }
+    target.nativeApi(data);
+    // target[data.type](data);
   }
 
   listen = (option) => {
     // const target = this._getTarget();
-    // target.on(NATIVE_SINGLE_ON, this._onDispatch);
+    // target.on(JVT_NATIVE_ON, this._onDispatch);
   }
 }
 
 // module.exports = {
-//   JvtNativeIpcMain,
-//   JvtNativeIpcRenderer,
+//   JvtNativeEntity,
+//   JvtNativeIpcOnSingleServer,
+//   JvtNativeIpcOnSingleClient
 // };

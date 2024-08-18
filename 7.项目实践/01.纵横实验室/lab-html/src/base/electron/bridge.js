@@ -2,29 +2,24 @@ const { contextBridge, ipcRenderer } = require('electron/renderer')
 
 class JvtBridge {
   static create = (type) => {
-    let bridge = undefined;
     switch (type) {
-      case 'ipcOn': bridge = new JvtBridgeOn(); break;
+      case 'ipcOn': this._exposeOn(); break;
       default:
         console.error(`JvtBridge.create: invalid type(${type})!`);
         break;
     }
-
-    bridge?.expose();
   }
 
-  expose = () => {}
-}
-
-class JvtBridgeOn {
-  expose = () => {
+  _exposeOn = () => {
     contextBridge.exposeInMainWorld('JvtNativeAPI', {
-      openFile: (data) => ipcRenderer.send('jvt-native-on', data)
+      nativeApi: (data) => ipcRenderer.send(JVT_NATIVE_ON, data)
     })
   }
+
+  _exposeOnPort = () => {
+  }
 }
 
-// module.exports = {
-//   JvtBridge,
-//   JvtBridgeOn,
-// };
+module.exports = {
+  JvtBridge,
+};

@@ -80,7 +80,7 @@ class JvtNativeEngine {
 
     this._onRecv && this._onRecv(data);
 
-    if (this._receiver && event.data.type) {
+    if (this._receiver && data.type) {
       let func = undefined;
       let isOnPrefix = this._receiver._isOnPrefix ? true : false;
 
@@ -88,12 +88,12 @@ class JvtNativeEngine {
 
       do {
         if (isOnPrefix) {
-          const funcName = `on${this._toUpperCaseFirstLetter(event.data.type)}`
+          const funcName = `on${this._toUpperCaseFirstLetter(data.type)}`
           func = recvApiObject[funcName];
           break;
         }
 
-        func = recvApiObject[event.data.type];
+        func = recvApiObject[data.type];
         if (!func && (typeof(this._receiver._isOnPrefix) === 'undefined')) {
           isOnPrefix = true;
           continue;
@@ -101,11 +101,11 @@ class JvtNativeEngine {
       } while(0);
 
       if (func) {
-        func(event.data);
+        func(data);
         return;
       }
       
-      this._receiver.onRecv?.(event.data);
+      this._receiver.onRecv?.(data);
     }
   }
 
@@ -187,6 +187,5 @@ class JvtNativeEngine {
 }
 
 // module.exports = {
-//   JvtNativeIpcMain,
-//   JvtNativeIpcRenderer,
+//   JvtNativeEngine,
 // };
