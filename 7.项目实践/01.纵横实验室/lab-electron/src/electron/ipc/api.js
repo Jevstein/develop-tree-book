@@ -45,7 +45,8 @@ class JvtNativeApiEngine extends JvtINativeProtocol {
       isOnPrefix,
       hostType,
       ipcType,
-      onRecv
+      onRecv,
+      win
     } = props;
 
     this._name = name;
@@ -56,7 +57,8 @@ class JvtNativeApiEngine extends JvtINativeProtocol {
       hostType,
       ipcType,
       receiver: this,
-      onRecv
+      onRecv,
+      win
     });
   }
 

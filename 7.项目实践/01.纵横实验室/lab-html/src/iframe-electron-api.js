@@ -99,7 +99,7 @@ class NativeApi extends JvtNativeApi {
 
   openFile = async (data) => {
     const type = this._getType(new Error());
-    return await this._exec({ type, data });
+    return await this._exec({ type, data }, {isWait: true});
   }
 
   // 2、notice: electron => host => iframe

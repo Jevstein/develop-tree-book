@@ -12,6 +12,8 @@
  *  }
  */
 
+// const { JvtNativeEngine } = require( './engine')
+
 // ------------------------------- 1、消息交互（不推荐） ------------------------------- 
 
 // 消息类型
@@ -43,7 +45,8 @@ class JvtNativeApiEngine extends JvtINativeProtocol {
       isOnPrefix,
       hostType,
       ipcType,
-      onRecv
+      onRecv,
+      win
     } = props;
 
     this._name = name;
@@ -54,7 +57,8 @@ class JvtNativeApiEngine extends JvtINativeProtocol {
       hostType,
       ipcType,
       receiver: this,
-      onRecv
+      onRecv,
+      win
     });
   }
 

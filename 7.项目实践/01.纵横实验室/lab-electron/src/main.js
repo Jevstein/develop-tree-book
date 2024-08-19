@@ -66,6 +66,7 @@ const _createWindowLabHtml = () => {
   })
   win.loadFile('./../lab-html/src/index.html')
   win.webContents.openDevTools()
+  return win;
 }
 
 /**
@@ -77,12 +78,8 @@ const _createWindowLabHtml = () => {
 const createWindow = () => {
   const type = 2; // 1: 简易demo, 2: lab-html 实验室
   switch (type) {
-    case 1: // 简易demo
-      _createWindowSimple();
-      break;
-    case 2: // lab-html 实验室
-      _createWindowLabHtml();
-      break;
+    case 1: return _createWindowSimple();
+    case 2: return _createWindowLabHtml();
     default:
       console.log('未知类型');
       break;
@@ -94,9 +91,9 @@ const createWindow = () => {
  * 可以通过使用 app.whenReady() API来监听此事件
  */
 app.whenReady().then(() => {
-  ElectronIpcApi.create() // ipcMain.on('jvt-native-on', handleFileOpen)
+  const win = createWindow()
+  ElectronIpcApi.create(win) // ipcMain.on('jvt-native-on', handleFileOpen)
 
-  createWindow()
 
   // 在 macOS 系统内, 如果没有已开启的应用窗口
   // 点击托盘图标时通常会重新创建一个新窗口

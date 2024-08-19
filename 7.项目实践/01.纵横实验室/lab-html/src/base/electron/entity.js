@@ -63,7 +63,8 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
   }
 
   listen = (option) => {
-    this._getTarget()?.on(JVT_NATIVE_ON, this._onDispatch);
+    // this._getTarget()?.on(JVT_NATIVE_ON, this._onDispatch);
+    this._getTarget()?.handle(JVT_NATIVE_ON, this._onDispatch);
   }
 
   removeListen = (option) => {
@@ -80,17 +81,37 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
     if (!window.JvtNativeAPI) {
       console.error('window.JvtNativeAPI is empty!');
     }
+
+    // window.JvtNativeAPI.on(JVT_NATIVE_ON, (data) => {
+    //   console.log(`JvtNativeIpcOnSingleClient.on:`, data);
+    // });
     return window.JvtNativeAPI;
   }
 
-  send = (data) => { 
+  send = async (data, option=null) => { 
+    const { 
+      isWait = true,
+      isNativeApi = true,
+    } = option || {};
+
     const target = this._getTarget();
-    // if (!target || !target[data?.type]) {
-    //   console.error(`failed to send as invalid target:`, data, target);
-    //   return;
-    // }
-    target.nativeApi(data);
-    // target[data.type](data);
+
+    if (isNativeApi) {
+      if (isWait) {
+        return await target.nativeApi(data);
+      }
+      target.nativeApi(data);
+      return;
+    }
+
+    if (!target || !target[data?.type]) {
+      console.error(`failed to send as invalid target:`, data, target);
+      return;
+    }
+    if (isWait) {
+      return await target[data.type](data.data);
+    }
+    target[data.type](data);
   }
 
   listen = (option) => {

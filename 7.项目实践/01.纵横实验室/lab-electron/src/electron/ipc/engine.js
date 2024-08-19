@@ -15,6 +15,7 @@ class JvtNativeEngine {
   _name = 'native-server' | 'native-client';      // native名称
   _onRecv = null;                                 // 接收消息回调函数
   _receiver = null;                               // 接收方对象-JvtNativeReceiver
+  _win = null;                                    // 窗口对象
  
   _entity = null;                                 // 实体对象-JvtNativeEntity
   _seq = 0;                                       // 用于生成序列号
@@ -27,11 +28,13 @@ class JvtNativeEngine {
       ipcType,// 实体类型: 'ipcMainOn' | 'ipcRendererOn'
       receiver,
       onRecv,
+      win
     } = props;
 
     this._name = name;
     this._receiver = receiver;
     this._onRecv = onRecv;
+    this._win = win;
     this._entity = JvtNativeEntity.create({hostType, ipcType, onDispatch: this._dispatch });
 
     this.start();
@@ -68,7 +71,7 @@ class JvtNativeEngine {
    * @param {*} event 
    * @param {*} data 必须满足{seq, source, type, data}的NativeData格式
    */
-  _dispatch = (event, data) => {
+  _dispatch = async (event, data) => {
     console.log(`[${this._name}] recv:`, event, data);
 
     if (data.seq && this._map.has(data.seq)) {
@@ -101,8 +104,7 @@ class JvtNativeEngine {
       } while(0);
 
       if (func) {
-        func(data);
-        return;
+        return await func(data);
       }
       
       this._receiver.onRecv?.(data);

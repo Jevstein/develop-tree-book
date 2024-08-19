@@ -14,7 +14,15 @@ class JvtBridge {
 
   _exposeOn = () => {
     contextBridge.exposeInMainWorld('JvtNativeAPI', {
-      nativeApi: (data) => ipcRenderer.send(JVT_NATIVE_ON, data)
+      // nativeApi: (data) => ipcRenderer.send(JVT_NATIVE_ON, data)
+      nativeApi: (data) => ipcRenderer.invoke(JVT_NATIVE_ON, data)
+    })
+
+    ipcRenderer.on(JVT_NATIVE_ON, (event, data) => {
+      console.log(`JvtBridge._exposeOn: received data(${data}) from native!`);
+      // event.sender.send(JVT_NATIVE_ON, data)
+
+      // window.JvtNativeApi.on(data)
     })
   }
 
