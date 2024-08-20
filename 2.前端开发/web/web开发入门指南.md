@@ -55,7 +55,7 @@
 
 
 
-## 二、web环境搭建
+## 二、环境搭建
 
 详见 [web开发环境完全搭建指南](./web开发环境完全搭建指南.md)
 
@@ -657,11 +657,25 @@ JvtIframeApi {
 
 
 
+### 6、Mobx
+
+[ MobX 要点](https://cn.mobx.js.org/intro/overview.html)
 
 
-## 五、项目实践
 
-详见 lab-html
+## 五、持续进阶
+
+### 1、性能优化
+
+[内存泄漏与性能优化](https://weapp.eteams.cn/ecode/playground/doc/share/view/974728641567170568#常见的mobx性能优化点)
+
+
+
+## 六、项目实践
+
+
+
+详见 lab-html、lab-electron
 
 
 

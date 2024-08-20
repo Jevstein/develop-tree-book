@@ -94,6 +94,10 @@ app.whenReady().then(() => {
   const win = createWindow()
   ElectronIpcApi.create(win) // ipcMain.on('jvt-native-on', handleFileOpen)
 
+  setTimeout(() => {
+    win.webContents.send('jvt-native-on', 'IPC 双向交互已建立，欢迎使用！')
+  }, 1000);
+
 
   // 在 macOS 系统内, 如果没有已开启的应用窗口
   // 点击托盘图标时通常会重新创建一个新窗口

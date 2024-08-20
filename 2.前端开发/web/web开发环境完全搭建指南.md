@@ -64,24 +64,33 @@ $ sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,m
 
   ```shell
   #1、清除node.js的cache
-  $ sudo npm cache clean -f 
+  $ npm cache clean -f 
   
   #2、使用npm安装n模块
-  $ sudo npm install -g n
+  $ npm install -g n
   
   #3、查看node所有版本
   $ npm view node versions
+  $ n ls-remote 			# 查看node.js 的远程版本
+  $ n ls-remote --all # 所有版本
   
   #4、切换版本
-  $ sudo n latest # 升级到最新版本
-  $ sudo n stable # 升级到稳定版本
-  $ sudo n xx.xx  # 升级到具体版本号
+  $ n latest # 升级到最新版本
+  $ n stable # 升级到稳定版本
+  $ n lts    # 升级到最新长期维护版(lts)
+  $ n xx.xx  # 升级到具体版本号
   
   #5、查看当前安装的版本号
   $ node -v
   
   #6、检查目前安装了哪些版本的node，会出现已安装的node版本，选一个就可以直接切换了
   $ n
+  
+  #7、删除某个版本
+  $ n rm <version>
+  
+  #8、指定版本执行js文件
+  $ n use 7.4.0 index.js
   ```
 
   
@@ -94,8 +103,14 @@ $ sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,m
   $ nvm use 20.11.1: 切换node到指定的nodejs版本
   ```
 
-  详见下文nvm。
+  详见下文nvm
   
+  
+  
+#### 3）基本用法
+
+  [菜鸟教程](https://www.runoob.com/nodejs/nodejs-tutorial.html)
+
   
 
 ### 2、nginx
@@ -340,6 +355,8 @@ Yarn是facebook发布的一款取代npm的包管理工具。主要特点：
 ```shell
 # 安装yarn命令
 $ npm install yarn -g
+
+$ yarn upgrade: 升级版本
 
 $ yarn -v：yarn版本
 $ yarn init：初始化项目
