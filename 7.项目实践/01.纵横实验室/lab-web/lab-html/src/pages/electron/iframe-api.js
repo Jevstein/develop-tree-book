@@ -22,7 +22,7 @@ class IframeClientApi extends JvtIframeApi {
   }
 
   //--------------------------- notice: host => iframe  --------------------------- 
-  // onOpenFile = (data) => {
-  //
-  // }
+  onWelcome = (data) => {
+    alert(data.data);
+  }
 }

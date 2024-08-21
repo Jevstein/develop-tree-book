@@ -15,7 +15,16 @@ class JvtBridge {
   _exposeOn = () => {
     contextBridge.exposeInMainWorld('JvtNativeAPI', {
       // nativeApi: (data) => ipcRenderer.send(JVT_NATIVE_ON, data)
-      nativeApi: (data) => ipcRenderer.invoke(JVT_NATIVE_ON, data),
+      // nativeApi: (data) => ipcRenderer.invoke(JVT_NATIVE_ON, data),
+      send: (data) => ipcRenderer.send(JVT_NATIVE_ON, data),
+      invoke: (data) => ipcRenderer.invoke(JVT_NATIVE_ON, data),
+      on: (option, func) => {
+        console.log(`JvtBridge._exposeOn: listen`, option);
+        ipcRenderer.on(JVT_NATIVE_ON, (event, data) => {
+          console.log(`JvtBridge._exposeOn: received data from native!`, event, data);
+          func(event, data);
+        });
+      },
       // send: (channel, data) => {
       //   // 白名单通道
       //   let validChannels = ['toMain'];
@@ -32,12 +41,11 @@ class JvtBridge {
       // }
     })
 
-    ipcRenderer.on(JVT_NATIVE_ON, (event, data) => {
-      console.log(`JvtBridge._exposeOn: received data(${data}) from native!`);
-      // event.sender.send(JVT_NATIVE_ON, data)
-
-      // window.JvtNativeApi.on(data)
-    })
+    // ipcRenderer.on(JVT_NATIVE_ON, (event, data) => {
+    //   console.log(`JvtBridge._exposeOn: received data(${data}) from native!`);
+    //   // event.sender.send(JVT_NATIVE_ON, data)
+    //   // window.JvtNativeApi.on(data)
+    // })
   }
 
   _exposeOnPort = () => {

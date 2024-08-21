@@ -12,7 +12,7 @@
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
 // const path = require('node:path')
-const { ElectronIpcApi } = require( './electron/electron-ipc-api')
+const { ElectronIpcApi } = require( './native/electron-ipc-api')
 
 
 // async function handleFileOpen () {
@@ -59,7 +59,7 @@ const _createWindowLabHtml = () => {
     height: 1600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./electron/ipc/bridge)
+      sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./native/ipc/bridge)
       // nodeIntegration: true,
       // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
     },
@@ -92,11 +92,17 @@ const createWindow = () => {
  */
 app.whenReady().then(() => {
   const win = createWindow()
-  ElectronIpcApi.create(win) // ipcMain.on('jvt-native-on', handleFileOpen)
+  const api =ElectronIpcApi.create(win) // ipcMain.on('jvt-native-on', handleFileOpen)
 
   setTimeout(() => {
-    win.webContents.send('jvt-native-on', 'IPC 双向交互已建立，欢迎使用！')
-  }, 1000);
+    // win.webContents.send('jvt-native-on', {
+    //   data: "IPC 双向交互已建立，欢迎使用！",
+    //   seq: "electron-main-engine_1_1724171403182",
+    //   source: "native",
+    //   type: "welcome"
+    // })
+    api.welcome('IPC 双向交互已建立，欢迎使用！');
+  }, 5000);
 
 
   // 在 macOS 系统内, 如果没有已开启的应用窗口

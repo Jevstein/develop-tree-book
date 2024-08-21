@@ -68,7 +68,10 @@ class IframeServerApi extends JvtIframeApi {
   }
 
   // 2.send: host => iframe
-
+  welcome = (data) => {
+    const type = this._getType(new Error());
+    this._send({ type, data });
+  }
 }
 
 // electron 交互
@@ -103,4 +106,8 @@ class NativeApi extends JvtNativeApi {
   }
 
   // 2、notice: electron => host => iframe
+  onWelcome = (data) => {
+    console.log('[renderer] onWelcome:', data);
+    this._iframeApi?.welcome(data.data);
+  }
 }

@@ -12,6 +12,7 @@ class JvtNativeEntity {
   _ipcType = 'ipcOnSingle'; // ipcOnSingle、ipcOnMutil
   _target = null;
   _onDispatch = undefined;
+  _engine = null;
 
   static create = (props) => {
     const isServer = props.hostType ==='server';
@@ -29,9 +30,11 @@ class JvtNativeEntity {
     const {
       hostType, 
       ipcType,
-      onDispatch
+      onDispatch,
+      engine
     } = props;
 
+    this._engine = engine;
     this._hostType = hostType;
     this._ipcType = ipcType;
     this._onDispatch = onDispatch;
@@ -58,8 +61,10 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
 
   send = (data) => { 
     // TODO: 待实现
-    const target = this._getTarget();
-    target.emit(JVT_NATIVE_ON, data);
+    // const target = this._getTarget();
+    // target.emit(JVT_NATIVE_ON, data);
+
+    this._engine._win?.webContents.send('jvt-native-on', data);
   }
 
   listen = (option) => {

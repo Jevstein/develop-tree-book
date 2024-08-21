@@ -98,9 +98,9 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
 
     if (isNativeApi) {
       if (isWait) {
-        return await target.nativeApi(data);
+        return await target.invoke(data);
       }
-      target.nativeApi(data);
+      target.send(data);
       return;
     }
 
@@ -115,8 +115,8 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
   }
 
   listen = (option) => {
-    // const target = this._getTarget();
-    // target.on(JVT_NATIVE_ON, this._onDispatch);
+    const target = this._getTarget();
+    target.on(JVT_NATIVE_ON, this._onDispatch);
   }
 }
 
