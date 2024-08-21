@@ -23,14 +23,14 @@ const NATIVE_TYPE_PING = 10000; // electron 回传
 // ------------------------------- 2、API 调用方式（推荐） -------------------------------     
 
 // 接口方法 - 基类
-class JvtINativeProtocol {
+class JvtNativeProtocol {
   openFile = (data) => {
 
   }
 }
 
 // 接口方法 - 实现类
-class JvtNativeApiEngine extends JvtINativeProtocol {
+class JvtNativeApiEngine extends JvtNativeProtocol {
   _name = 'native-api';               // native api 名称
   _isOnPrefix = undefined;            // 在JvtNativeEngine中，是否开仅处理带on开头的函数: true=开, false=关, undefined=全部（默认）-效率较低
 
@@ -140,7 +140,7 @@ class JvtNativeApi extends JvtNativeApiEngine {
 }
 
 // module.exports = {
-//   JvtINativeProtocol,
+//   JvtNativeProtocol,
 //   JvtNativeApiEngine,
 //   JvtNativeApi
 // };

@@ -12,6 +12,7 @@ class JvtNativeEntity {
   _ipcType = 'ipcOnSingle'; // ipcOnSingle、ipcOnMutil
   _target = null;
   _onDispatch = undefined;
+  _engine = null;
 
   static create = (props) => {
     const isServer = props.hostType ==='server';
@@ -29,9 +30,11 @@ class JvtNativeEntity {
     const {
       hostType, 
       ipcType,
-      onDispatch
+      onDispatch,
+      engine
     } = props;
 
+    this._engine = engine;
     this._hostType = hostType;
     this._ipcType = ipcType;
     this._onDispatch = onDispatch;
@@ -56,10 +59,8 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
     this._target = require('electron').ipcMain;
   }
 
-  send = (data) => { 
-    // TODO: 待实现
-    const target = this._getTarget();
-    target.emit(JVT_NATIVE_ON, data);
+  send = (data) => {
+    this._engine._win?.webContents.send('jvt-native-on', data);
   }
 
   listen = (option) => {
@@ -81,10 +82,6 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
     if (!window.JvtNativeAPI) {
       console.error('window.JvtNativeAPI is empty!');
     }
-
-    // window.JvtNativeAPI.on(JVT_NATIVE_ON, (data) => {
-    //   console.log(`JvtNativeIpcOnSingleClient.on:`, data);
-    // });
     return window.JvtNativeAPI;
   }
 

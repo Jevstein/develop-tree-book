@@ -190,17 +190,11 @@ $ rm ~/.bashrc
 #2、npm config get/set
 -- 1.查看镜像源使用状态：
 $ npm config get registry
--- 2.全局切换淘宝镜像源：
-$ npm config set registry http://registry.npm.taobao.org
--- 3.全局切换官方镜像源：
+-- 2.设置镜像源：
 $ npm config set registry https://registry.npmjs.org/
--- 4.全局切换华为镜像源：
-$ npm config set registry https://mirrors.huaweicloud.com/repository/npm/
-$ npm config set disturl https://mirrors.huaweicloud.com/nodejs/
-$ npm config set electron_mirror https://mirrors.huaweicloud.com/electron/
--- 5.清除缓存：
+-- 3.清除缓存：
 $ npm cache clean -f
--- 6.检查：
+-- 4.检查：
 $ npm config list
 
 #3、yarn config get/set
@@ -213,6 +207,43 @@ $ yarn config set electron_mirror 'https://mirrors.huaweicloud.com/electron/',
 $ yarn config set electron_builder_binaries_mirror 'https://mirrors.huaweicloud.com/electron-builder-binaries/'
 -- 3.删除
 $ yarn config delete electron_mirror
+
+
+#4、常用镜像源
+-- 1.官方镜像：
+$ npm config set registry https://registry.npmjs.org/
+$ yarn config set registry https://registry.yarnpkg.com/ -- 备选
+-- 2.淘宝镜像：
+$ npm config set registry http://registry.npm.taobao.org
+$ npm config set registry https://registry.npmmirror.com/ -- 更新
+-- 3.腾讯镜像：
+$ npm config set registry https://mirrors.cloud.tencent.com/npm/
+-- 4.华为镜像：
+$ npm config set registry https://mirrors.huaweicloud.com/repository/npm/
+$ npm config set disturl https://mirrors.huaweicloud.com/nodejs/
+$ npm config set electron_mirror https://mirrors.huaweicloud.com/electron/
+
+-- 1.yarn 国内源
+$ yarn config set registry https://registry.npmmirror.com/ --global  && \
+$ yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
+$ yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
+$ yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
+$ yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
+$ yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
+$ yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
+$ yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
+$ yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
+-- 2.npm 国内源
+$ npm set registry https://registry.npmmirror.com/ && \
+$ npm set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass && \
+$ npm set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ && \
+$ npm set puppeteer_download_host https://registry.npmmirror.com/binary.html && \
+$ npm set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver && \
+$ npm set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver && \
+$ npm set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs && \
+$ npm set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium && \
+$ npm set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector && \
+$ npm cache clean --force
 ```
 
 
@@ -364,6 +395,7 @@ $ yarn add <package-name>：安装具体的某个包
 $ yarn remove <package-name>： 删除具体的某个包
 $ yarn serve：运行项目
 $ yarn build：编译项目
+$ yarn cache clean: 清除yarn缓存
 
 # 切换镜像仓库
 $ yarn config get registry # 查看

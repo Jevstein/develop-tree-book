@@ -35,7 +35,7 @@ class JvtNativeEngine {
     this._receiver = receiver;
     this._onRecv = onRecv;
     this._win = win;
-    this._entity = JvtNativeEntity.create({hostType, ipcType, onDispatch: this._dispatch });
+    this._entity = JvtNativeEntity.create({hostType, ipcType, engine: this, onDispatch: this._dispatch });
 
     this.start();
   }

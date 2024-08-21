@@ -115,8 +115,13 @@ class JvtNativeEngine {
    * 发送消息
    * @param {*} data : 消息数据, 必须满足{seq, type, data}的NativeData格式
    * @param {*} cb :回调函数, 接收消息的响应数据
+   * @param {*} option : 发送选项, 包含{
+   *   isWait,      // 是否等待响应
+   *   timeout,     // 超时时间, 单位: ms, -1: 无超时
+   *   isNativeApi, // 是否是原生API
+   * }
    */
-  send = (data, cb = null) => {
+  send = async (data, cb = null, option = null) => {
     if (!data.seq) {
       data.seq = this._createSeq();
     }
@@ -133,6 +138,13 @@ class JvtNativeEngine {
       return;
     }
 
+    const { isWait } = option || {};
+    if (isWait) {
+      const res = await this._entity.send(data, option);
+      cb && cb(res);
+      return;
+    }
+
     this._entity.send(data);
 
     if (cb) {
@@ -143,25 +155,32 @@ class JvtNativeEngine {
   /**
    * 发送消息并等待响应
    * @param {*} data 
+   * @param {*} option {
+   * 
+   * }
    * @returns 
    */
-  exec = async (data, timeout = 5000) => {
+  exec = async (data, option) => {
+    const { 
+      timeout = 50000,
+      isWait = true,
+      // isNativeApi = true,
+    } = option || {};
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
+      const isNoTimeout = (timeout === -1 || isWait);
+      const timer = isNoTimeout ? null : setTimeout(() => {
         clearTimeout(timer);
-
         if (data.seq && this._map.has(data.seq)) {
           this._map.delete(data.seq);
         }
-
         const err = `timeout(${data?.type}): The other party did not respond to the request！`
         reject(err);
       }, timeout);
 
       this.send(data, (res) => {
-        clearTimeout(timer);
+        timer && clearTimeout(timer);
         resolve(res);
-      });
+      }, option);
     });
   }
 

@@ -59,11 +59,7 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
     this._target = require('electron').ipcMain;
   }
 
-  send = (data) => { 
-    // TODO: 待实现
-    // const target = this._getTarget();
-    // target.emit(JVT_NATIVE_ON, data);
-
+  send = (data) => {
     this._engine._win?.webContents.send('jvt-native-on', data);
   }
 
@@ -89,18 +85,35 @@ class JvtNativeIpcOnSingleClient extends JvtNativeEntity {
     return window.JvtNativeAPI;
   }
 
-  send = (data) => { 
+  send = async (data, option=null) => { 
+    const { 
+      isWait = true,
+      isNativeApi = true,
+    } = option || {};
+
     const target = this._getTarget();
+
+    if (isNativeApi) {
+      if (isWait) {
+        return await target.invoke(data);
+      }
+      target.send(data);
+      return;
+    }
+
     if (!target || !target[data?.type]) {
       console.error(`failed to send as invalid target:`, data, target);
       return;
+    }
+    if (isWait) {
+      return await target[data.type](data.data);
     }
     target[data.type](data);
   }
 
   listen = (option) => {
-    // const target = this._getTarget();
-    // target.on(JVT_NATIVE_ON, this._onDispatch);
+    const target = this._getTarget();
+    target.on(JVT_NATIVE_ON, this._onDispatch);
   }
 }
 
