@@ -51,6 +51,13 @@
         div {
           margin-bottom: 5px;
         }
+
+        &.jsapi {
+          span,
+          a {
+            font-size: 12px;
+          }
+        }
       }
     }
 
@@ -77,14 +84,22 @@
       <div class="box-title"><b>electron jsapi</b></div>
       <div class="box-subtitle">
       </div>
-      <div class="box-area">
+      <div class="box-area jsapi">
         <div>
           <button onclick="handleClickNotifysMsg(event)">系统通知</button>
           <a href="https://blog.csdn.net/weixin_40629244/article/details/116137758" target="_blank">Electron中消息通知</a>
         </div>
         <div>
           <button onclick="handleClickOpenFile(event)">打开文件</button>
-          File path: <strong id="filePath"></strong>
+          <span>file: <strong id="filePath"></strong></span>
+        </div>
+        <div>
+          <button>dbCreate</button>
+          <button>dbRemove</button>
+          <button>dbInsert</button>
+          <button>dbUpdate</button>
+          <button>dbSelect</button>
+          <button>dbDelete</button>
         </div>
       </div>
     </div>
@@ -97,7 +112,7 @@
           src="../../assets/images/iframe-electron.png" 
           alt="iframe-electron类图设计"
           title="iframe-electron类图设计"
-          width="auto"
+          width="800"
           height="auto"
           hspace="10" 
           vspace="10"
@@ -179,6 +194,8 @@
 
     function main() {
       this._iframeApi = IframeClientApi.create(window.parent);
+
+      setTimeout(() => { this._iframeApi?.established('established!') }, 500);
     }
 
     main();

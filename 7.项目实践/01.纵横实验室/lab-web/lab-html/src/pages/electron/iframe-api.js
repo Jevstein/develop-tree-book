@@ -11,6 +11,11 @@ class IframeClientApi extends JvtIframeApi {
   }
 
   //--------------------------- send: iframe => host --------------------------- 
+  established = (data) => {
+    const type = this._getType(new Error());
+    this._send({ type, data });
+  }
+
   openFile = async (data) => {
     const type = this._getType(new Error());
     return await this._exec({ type, data }, 15000);

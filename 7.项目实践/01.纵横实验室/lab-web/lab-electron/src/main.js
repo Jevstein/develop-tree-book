@@ -10,21 +10,13 @@
  */
 
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
-const { app, BrowserWindow, ipcMain, dialog } = require('electron/main')
+const { app, BrowserWindow } = require('electron/main')
 // const path = require('node:path')
 const { ElectronIpcApi } = require( './native/electron-ipc-api')
 
-
-// async function handleFileOpen () {
-//   const { canceled, filePaths } = await dialog.showOpenDialog()
-//   if (!canceled) {
-//     return filePaths[0]
-//   }
-// }
-
 const _createWindowSimple = () => {
     // 导入 Node.js 的 path 模块
-    const path = require('node:path')
+    const path = require('node:path');
 
     const win = new BrowserWindow({
       width: 800,
@@ -32,10 +24,10 @@ const _createWindowSimple = () => {
       webPreferences: {
         preload: path.join(__dirname, 'preload.js')
       }
-    })
+    });
   
   // 1) 加载文件
-  win.loadFile('./src/index.html')
+  win.loadFile('./src/index.html');
   // win.loadFile(path.resolve(__dirname,'src/index.html'))
   // win.loadFile('./../lab-html/src/index.html')
   // 2)加载URL
@@ -53,7 +45,7 @@ const _createWindowSimple = () => {
 }
 
 const _createWindowLabHtml = () => {
-  const path = require('node:path')
+  const path = require('node:path');
   const win = new BrowserWindow({
     width: 1800,
     height: 1600,
@@ -63,9 +55,9 @@ const _createWindowLabHtml = () => {
       // nodeIntegration: true,
       // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
     },
-  })
-  win.loadFile('./../lab-html/src/index.html')
-  win.webContents.openDevTools()
+  });
+  win.loadFile('./../lab-html/src/index.html');
+  win.webContents.openDevTools();
   return win;
 }
 
@@ -91,25 +83,24 @@ const createWindow = () => {
  * 可以通过使用 app.whenReady() API来监听此事件
  */
 app.whenReady().then(() => {
-  const win = createWindow()
-  const api =ElectronIpcApi.create(win) // ipcMain.on('jvt-native-on', handleFileOpen)
-
+  const win = createWindow();
+  const api = ElectronIpcApi.create(win); // ipcMain.on('jvt-native-on', handleFileOpen)
   setTimeout(() => {
     // win.webContents.send('jvt-native-on', {
     //   data: "IPC 双向交互已建立，欢迎使用！",
-    //   seq: "electron-main-engine_1_1724171403182",
+    //   seq: "native-main-engine_1_1724171403182",
     //   source: "native",
     //   type: "welcome"
     // })
-    api.welcome('IPC 双向交互已建立，欢迎使用！');
-  }, 5000);
+    api.welcome('electron ipc 双向通信已建立，欢迎使用！');
+  }, 500);
 
 
   // 在 macOS 系统内, 如果没有已开启的应用窗口
   // 点击托盘图标时通常会重新创建一个新窗口
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {// 没有已打开的窗口
-      createWindow()
+      createWindow();
     }
   })
 })
@@ -120,6 +111,6 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   // 在 macOS X 上，通常用户在明确地按下 Cmd + Q 之前，应用会保持活动状态
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
 })

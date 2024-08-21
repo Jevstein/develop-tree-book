@@ -59,11 +59,11 @@ class JvtIframeApiEngine extends JvtIframeProcotol {
       onRecv
     } = props;
 
-    this._name = name;
+    this._name = `${name}-api`;
     this._isOnPrefix = isOnPrefix;
 
     this._engine = new JvtIframeEngine({
-      name: `${name}-engine`,
+      name,//: `${name}-engine`,
       target,
       receiver: this,
       onRecv

@@ -6,7 +6,7 @@ class ElectronIpcApi extends JvtNativeApi {
 
   static create(win) {
     return new ElectronIpcApi({
-      name: 'electron-main',
+      name: 'native-main',
       hostType: 'server',
       ipcType: 'ipcOnSingle',
       win,
@@ -20,11 +20,11 @@ class ElectronIpcApi extends JvtNativeApi {
   // 1.send: host => electron
 
   onOpenFile = async (data) => {
-    const { canceled, filePaths } = await dialog.showOpenDialog()
+    const { canceled, filePaths } = await dialog.showOpenDialog();
     if (!canceled) {
       const path = filePaths[0]
       // this._engine._win.webContents.send('jvt-native-on', path)
-      return path
+      return path;
     }
   }
 

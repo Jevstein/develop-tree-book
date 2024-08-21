@@ -3,6 +3,9 @@
 class IframeServerApi extends JvtIframeApi {
   _nativeApi = null;
 
+  _isEstablished = false;
+  _welcomeContent = '';
+
   static create(target) {
     const iframeApi = new IframeServerApi({
       name: 'iframe-server',
@@ -32,6 +35,11 @@ class IframeServerApi extends JvtIframeApi {
   }
 
   // 1.receive: iframe => host -> electron => iframe
+  onEstablished = (data) => {
+    this._isEstablished = true;
+    this._welcomeContent && this.welcome(this._welcomeContent);
+  }
+
   onNotifySysMsg = async (data) => {
     const { title, body, message } = data.data;
 
@@ -69,8 +77,11 @@ class IframeServerApi extends JvtIframeApi {
 
   // 2.send: host => iframe
   welcome = (data) => {
-    const type = this._getType(new Error());
-    this._send({ type, data });
+    this._welcomeContent = data;
+    if (this._isEstablished) {
+      const type = this._getType(new Error());
+      this._send({ type, data });
+    }
   }
 }
 
@@ -80,7 +91,7 @@ class NativeApi extends JvtNativeApi {
 
   static create() {
     return new NativeApi({
-      name: 'electron-renderer',
+      name: 'native-renderer',
       hostType: 'client',
       ipcType: 'ipcOnSingle'
     });
