@@ -11,11 +11,15 @@
 ### 1）计算localStorage的大小
 
 ```javascript
-function calcLocalStorageSize() {
+function calcLocalStorageSize(obj) {
+  if (!obj) {
+    console.warn('当前浏览器不支持!');
+  }
+  
   let size = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key);
+  for (let i = 0; i < obj.length; i++) {
+    const key = obj.key(i);
+    const value = obj.getItem(key);
     // size += key.length + value.length;// 计算键和值的大小
     size += new Blob([key+value]).size;
   }
@@ -24,6 +28,8 @@ function calcLocalStorageSize() {
   
   return `${size}B`;
 }
+
+calcLocalStorageSize(window.localStorage)
 ```
 
 
@@ -31,9 +37,9 @@ function calcLocalStorageSize() {
 ### 2）计算localStorage的容量
 
 ```javascript
-function calcLocalStorageCapacity() {
-  if (!window.localStorage) {
-    console.warn('当前浏览器不支持localStorage!');
+function calcLocalStorageCapacity(obj) {
+  if (!obj) {
+    console.warn('当前浏览器不支持!');
   }
 
   var test = '0123456789';
@@ -51,8 +57,8 @@ function calcLocalStorageCapacity() {
   var timer = setInterval(function(){
     sum += test;
     try {
-        window.localStorage.removeItem('test');
-        window.localStorage.setItem('test', sum);
+        obj.removeItem('test');
+        obj.setItem('test', sum);
         console.log(sum.length / 1024 + 'KB');
     } catch(e) {
       	alert(sum.length / 1024 + 'KB, 超出最大限制');
@@ -60,6 +66,8 @@ function calcLocalStorageCapacity() {
     }
   }, 0.1);
 }
+
+calcLocalStorageCapacity(window.localStorage)
 ```
 
 

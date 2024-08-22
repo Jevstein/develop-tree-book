@@ -29,3 +29,11 @@ $ defaults write com.apple.dock ResetLaunchPad -bool true
 $ killall Dock
 ```
 
+
+
+## 3、截屏、录屏
+
+```shell
+Shift-Command-5
+```
+
