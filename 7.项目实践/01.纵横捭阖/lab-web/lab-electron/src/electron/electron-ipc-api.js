@@ -1,6 +1,6 @@
 
 const { dialog } = require('electron/main')
-const { JvtNativeApi } = require('./ipc/api')
+const { JvtNativeApi } = require('./native/api')
 
 class ElectronIpcApi extends JvtNativeApi {
 

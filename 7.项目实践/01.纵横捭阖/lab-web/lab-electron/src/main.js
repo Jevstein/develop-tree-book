@@ -12,7 +12,7 @@
 // electron 模块可以用来控制应用的生命周期和创建原生浏览窗口
 const { app, BrowserWindow } = require('electron/main')
 // const path = require('node:path')
-const { ElectronIpcApi } = require( './native/electron-ipc-api')
+const { ElectronIpcApi } = require( './electron/electron-ipc-api')
 
 const _createWindowSimple = () => {
     // 导入 Node.js 的 path 模块
@@ -51,7 +51,7 @@ const _createWindowLabHtml = () => {
     height: 1600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./native/ipc/bridge)
+      sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./electron/native/bridge)
       // nodeIntegration: true,
       // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
     },

@@ -12,5 +12,5 @@
 // })
 
 // 导入 ipcOn 模块
-const { JvtBridge } = require('./native/ipc/bridge')
+const { JvtBridge } = require('./electron/native/bridge')
 JvtBridge.create('ipcOn');
