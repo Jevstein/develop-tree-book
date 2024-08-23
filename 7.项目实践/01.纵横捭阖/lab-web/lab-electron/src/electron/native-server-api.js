@@ -1,11 +1,11 @@
 
 const { dialog } = require('electron/main')
-const { JvtNativeApi } = require('./native/api')
+const { JvtNativeApi } = require('./base/native/api')
 
-class ElectronIpcApi extends JvtNativeApi {
+class NativeServerApi extends JvtNativeApi {
 
   static create(win) {
-    return new ElectronIpcApi({
+    return new NativeServerApi({
       name: 'native-main',
       hostType: 'server',
       ipcType: 'ipcOnSingle',
@@ -37,5 +37,5 @@ class ElectronIpcApi extends JvtNativeApi {
 }
 
 module.exports = {
-  ElectronIpcApi,
+  NativeServerApi,
 };

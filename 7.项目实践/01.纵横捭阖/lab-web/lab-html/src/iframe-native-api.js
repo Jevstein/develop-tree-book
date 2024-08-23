@@ -20,7 +20,7 @@ class IframeServerApi extends JvtIframeApi {
         }
       }
     });
-    const electronApi = NativeApi.create();
+    const electronApi = NativeClientApi.create();
     electronApi.setIframeApi(iframeApi);
     iframeApi.setNativeApi(electronApi);
     return iframeApi;
@@ -86,11 +86,11 @@ class IframeServerApi extends JvtIframeApi {
 }
 
 // electron 交互
-class NativeApi extends JvtNativeApi {
+class NativeClientApi extends JvtNativeApi {
   _iframeApi = null;
 
   static create() {
-    return new NativeApi({
+    return new NativeClientApi({
       name: 'native-renderer',
       hostType: 'client',
       ipcType: 'ipcOnSingle'

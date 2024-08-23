@@ -64,7 +64,7 @@ class JvtNativeIpcOnSingleServer extends JvtNativeEntity {
   }
 
   listen = (option) => {
-    // this._getTarget()?.on(JVT_NATIVE_ON, this._onDispatch);
+    this._getTarget()?.on(JVT_NATIVE_ON, this._onDispatch);
     this._getTarget()?.handle(JVT_NATIVE_ON, this._onDispatch);
   }
 
