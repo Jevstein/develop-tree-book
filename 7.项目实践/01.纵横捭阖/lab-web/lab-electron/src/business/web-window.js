@@ -13,12 +13,18 @@ const { NativeServerApi } = require( './native-server-api');
 
 
 class WebWindow {
+  _browserWindow = null;
+
   static create() {
     return new WebWindow();
   }
 
   constructor() {
-    this._createWindow(2);
+    this._browserWindow = this._createBrowserWindow(2);
+  }
+
+  getBrowserWindow = () => {
+    return this._browserWindow;
   }
 
   _createWindowSimple = () => {
@@ -53,7 +59,6 @@ class WebWindow {
     if (app.isPackaged) {
       const exeDir = path.dirname(app.getPath('exe'));
       filePath = path.join(exeDir, '..', 'resources', 'lab-html', 'src', 'index.html');
-      // filePath = path.join(exeDir, '..', '..', '..', '..', 'lab-html', 'src', 'index.html');
     } else {
       filePath = path.join(__dirname, '..', '..', '..', 'lab-html', 'src', 'index.html');
     }
@@ -63,7 +68,7 @@ class WebWindow {
       height: 1600,
       webPreferences: {
         preload: path.join(__dirname, '..', 'preload.js'),
-        sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./electron/base/native/bridge)
+        sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./base/native/bridge)
         // nodeIntegration: true,
         // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
       },
@@ -73,7 +78,7 @@ class WebWindow {
     return win;
   }
 
-  _createWindow = (type) => {
+  _createBrowserWindow = (type) => {
     const wins = {
       1: this._createWindowSimple,
       2: this._createWindowLabHtml,

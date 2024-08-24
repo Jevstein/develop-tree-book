@@ -16,6 +16,24 @@
     "electron": "^31.3.0"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
     "sqlite3": "^5.1.7"
+  },
+  "config": {
+    "forge": {
+      "makers": [],
+      "publishers": [],
+      "packagerConfig": {
+        "asar": true,
+        "dir": ".",
+        "icon": "./icons/icon",
+        "extraResource": "../lab-html"
+      },
+      "make_targets": {
+        "win32": ["squirrel"],
+        "darwin": ["zip", "dmg"],
+        "linux": ["deb"]
+      }
+    }
   }
 }
