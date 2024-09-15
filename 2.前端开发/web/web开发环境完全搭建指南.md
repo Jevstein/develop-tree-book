@@ -387,7 +387,8 @@ Yarn是facebook发布的一款取代npm的包管理工具。主要特点：
 # 安装yarn命令
 $ npm install yarn -g
 
-$ yarn upgrade: 升级版本
+$ yarn upgrade [package]:  # 升级到最新版本
+$ yarn upgrade [package]@[version]:  # 升级到指定版本
 
 $ yarn -v：yarn版本
 $ yarn init：初始化项目
@@ -402,7 +403,7 @@ $ yarn config get registry # 查看
 $ yarn config set registry http://10.10.27.63:4873/ # 切换
 ```
 
-
+[yarn官网](https://yarn.bootcss.com/docs/usage.html)
 
 ### 5、nvm
 
@@ -487,6 +488,12 @@ $ brew update
 $ yarn config set sass-binary-site http://npm.taobao.org/mirrors/node-sass
 $ yarn add sass node-sass -dev
 ```
+
+
+
+## 五、细节深入
+### 1、devDependencies 和 dependencies 的区别
+​	[彻底搞懂devDependencies 和 dependencies 的区别！](https://blog.csdn.net/zz_jesse/article/details/139348751)
 
 
 

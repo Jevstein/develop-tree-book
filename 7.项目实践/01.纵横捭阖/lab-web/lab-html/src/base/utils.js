@@ -74,7 +74,7 @@ class JvtUtils {
     return function(...args) {
       const callNow = immediate && !timeout;
   
-      timeout &&clearTimeout(timeout);
+      timeout && clearTimeout(timeout);
   
       timeout = setTimeout(() => {
         timeout = null;

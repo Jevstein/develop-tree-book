@@ -661,6 +661,14 @@ JvtIframeApi {
 
 [ MobX 要点](https://cn.mobx.js.org/intro/overview.html)
 
+[MobX](https://zh.mobx.js.org/)
+
+
+
+### 7、promise
+
+[mdn.promise.web](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all#%E8%AF%AD%E6%B3%95)
+
 
 
 ## 五、持续进阶
@@ -669,9 +677,46 @@ JvtIframeApi {
 
 [内存泄漏与性能优化](https://weapp.eteams.cn/ecode/playground/doc/share/view/974728641567170568#常见的mobx性能优化点)
 
+[手把手教你排查Javascript内存泄漏](https://zhuanlan.zhihu.com/p/322356761)
 
 
-## 六、项目实践
+
+
+
+## 六、辅助工具
+
+### 1、why-did-you-render
+
+
+
+### 2、whistle
+
+​	[whistle官网](https://wproxy.org/whistle/)
+
+​	基于Node实现的跨平台web调试代理工具，类似的工具有Windows平台上的[Fiddler](http://www.telerik.com/fiddler/)，主要用于查看、修改HTTP、HTTPS、Websocket的请求、响应，也可以作为HTTP代理服务器使用，不同于Fiddler通过断点修改请求响应的方式，whistle采用的是类似配置系统hosts的方式，一切操作都可以通过配置实现，支持域名、路径、正则表达式、通配符、通配路径等多种[匹配方式](https://wproxy.org/whistle/pattern.html)，且可以通过Node模块[扩展功能](https://wproxy.org/whistle/plugins.html)。
+
+#### 1）安装及命令
+
+```shell
+$ npm install -g whistle
+
+$ w2 help
+$ w2 -V 或 $ whistle --version
+$ w2 start
+$ w2 restart
+$ w2 stop
+$ w2 run
+```
+
+#### 2）使用
+
+[快速上手](https://wproxy.org/whistle/quickstart.html)
+
+
+
+
+
+## 七、项目实践
 
 
 

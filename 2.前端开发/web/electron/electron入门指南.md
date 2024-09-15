@@ -457,7 +457,9 @@ $ code electron-quick-start
 
 ### 6、打包发布
 
+[如何打包 electron 程序：electron-forge 的使用教程](https://blog.csdn.net/KimBing/article/details/119080158)
 
+[Electron Forge](https://www.electronforge.io/)
 
 
 
@@ -465,7 +467,7 @@ $ code electron-quick-start
 
 ### 1、ipc交互
 
-
+[大概是全网最详细的Electron ipc 讲解(一)——主进程与渲染进程的两情相悦](https://blog.csdn.net/qq_39448719/article/details/123081213)
 
 ### 2、sqlite操作
 

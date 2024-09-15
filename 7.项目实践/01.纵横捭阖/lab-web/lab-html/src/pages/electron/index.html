@@ -131,8 +131,8 @@
 
   </div>
 
-  <script src="../../base/iframe/engine.js"></script>
-  <script src="../../base/iframe/api.js"></script>
+  <script src="../../base/communicator/iframe/engine.js"></script>
+  <script src="../../base/communicator/iframe/api.js"></script>
   <script src="./iframe-api.js"></script>
   <script src="../../base/utils.js"></script>
   <script>
@@ -176,8 +176,8 @@
       try {
         const res = await this._getElectronApi().notifySysMsg({
           title: '系统通知',
-          body: '测试electron系统通知',
-          message: '您已点击系统通知'
+          body: '知不足而奋进，望远山而前行',
+          message: '纵横捭阖，俾睨天下'
         });
         res.data.errMsg && alert(res.data.errMsg);
       } catch (error) {
