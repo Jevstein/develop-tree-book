@@ -68,7 +68,7 @@ class WebWindow {
       height: 1600,
       webPreferences: {
         preload: path.join(__dirname, '..', 'preload.js'),
-        sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./base/native/bridge)
+        sandbox: false, // 开启沙箱模式: 若无此项，preload.js 脚本将无法访问 Node.js 环境(从而报错Error: module not found: ./base/communicator/native/bridge)
         // nodeIntegration: true,
         // contextIsolation: false, // 如果需要在渲染进程中使用 Electron 的模块，则需要设置为 false
       },

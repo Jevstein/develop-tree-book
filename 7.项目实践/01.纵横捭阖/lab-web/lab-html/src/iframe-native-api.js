@@ -35,27 +35,27 @@ class IframeServerApi extends JvtIframeApi {
   }
 
   // 1.receive: iframe => host -> electron => iframe
-  onEstablished = (data) => {
+  onEstablished = (result) => {
     this._isEstablished = true;
     this._welcomeContent && this.welcome(this._welcomeContent);
   }
 
-  onNotifySysMsg = async (data) => {
-    const { title, body, message } = data.data;
+  onNotifySysMsg = async (result) => {
+    const { title, body, message } = result.data;
 
     new window.Notification(title, { body }).onclick = () => { 
       alert(message) 
     }
 
     this._send({
-      ...data,
+      ...result,
       data: {
         errMsg: this._nativeApi?.isValid() ? '' : '请在Electron环境下运行!'
       }
     });
   }
 
-  onOpenFile = async (data) => {
+  onOpenFile = async (result) => {
     let filePath = 'invalid file path!';
 
     if (this._nativeApi?.isValid() ) {
@@ -67,9 +67,29 @@ class IframeServerApi extends JvtIframeApi {
     }
 
     this._send({
-      ...data,
+      ...result,
       data: {
         filePath,
+        errMsg: this._nativeApi?.isValid() ? '' : '请在Electron环境下运行!'
+      }
+    });
+  }
+
+  onExecSql = async (result) => {
+    let res = 'invalid result!';
+
+    if (this._nativeApi?.isValid() ) {
+      try {
+        res = await this._nativeApi?.execSql(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    this._send({
+      ...result,
+      data: {
+        result: res?.data || res || 'no data',
         errMsg: this._nativeApi?.isValid() ? '' : '请在Electron环境下运行!'
       }
     });
@@ -114,6 +134,11 @@ class NativeClientApi extends JvtNativeApi {
   openFile = async (data) => {
     const type = this._getType(new Error());
     return await this._exec({ type, data }, {isWait: true});
+  }
+
+  execSql = async (data) => {
+    const type = this._getType(new Error());
+    return await this._exec({ type, data });
   }
 
   // 2、notice: electron => host => iframe

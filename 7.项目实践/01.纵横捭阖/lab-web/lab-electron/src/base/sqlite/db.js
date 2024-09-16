@@ -1,68 +1,144 @@
 
 const sqlite3 = require('sqlite3').verbose();
-// const path = require('path');
 
-class DBAccess {
+class JvtDBAccess {
   _db = null;
 
   constructor() {
     this._db = null;
   }
 
-  connect(dbPath) {
-    this._db = new sqlite3.Database(dbPath, (err) => {
-      if (err) {
-        console.error('Error connecting to database: ', err);
+  /**
+   * 连接数据库
+   * @param {*} dbPath 
+   * @returns promise {
+   *  data: {},
+   *  ret: {
+   *    code: 0,
+   *    msg: 'success'
+   *  }
+   * }
+   */
+  async connect(dbPath) {
+    return new Promise((resolve, reject) => {
+      this._db = new sqlite3.Database(dbPath, (err) => {
+        if (err) {
+          console.error('failed to connect database: ', err);
+          this._db = null;
+          resolve({ret: { code: -1,  msg: err }});
+          return;
+        }
+
+        console.log('Connected to database successfully');
+        resolve({ret: { code: 0, msg: 'success' }});
+      });
+    });
+  }
+
+  /**
+   * 关闭数据库连接
+   * @returns promise {
+   *  data: {},
+   *  ret: {
+   *    code: 0,
+   *    msg: 'success'
+   *  }
+   * }
+   */
+  async close() {
+    return new Promise((resolve, reject) => {
+      if (!this._db) {
+        resolve({ret: { code: -1,  msg: 'Database is not connected' }});
         return;
       }
-      console.log('Connected to database successfully');
+
+      this._db.close((err) => {
+        if (err) {
+          console.error('failed to close database: ', err);
+          resolve({ret: { code: -2,  msg: err }});
+          return;
+        }
+        console.log('Database closed successfully');
+        resolve({ret: { code: 0, msg: 'success' }});
+      });
     });
   }
 
-  close() {
-    if (!this._db) {
-      return;
-    }
-    this._db.close((err) => {
-      if (err) {
-        console.error('Error closing database: ', err);
+  /**
+   * 执行SQL语句
+   * @param {*} sql 
+   * @param {*} params 
+   * @returns promise {
+   *  data: {
+   *    lastID: number,
+   *    changes: number
+   *  },
+   *  ret: {
+   *    code: 0,
+   *    msg: 'success'
+   *  }
+   * }
+   */
+  async execute(sql) {
+    return new Promise((resolve, reject) => {
+      if (!this._db) {
+        resolve({ret: { code: -1,  msg: 'Database is not connected', sql }});
         return;
       }
-      console.log('Database closed successfully');
+
+      this._db.run(sql, (err) => {
+        if (err) {
+          console.error('failed to execute SQL: ', err);
+          resolve({ret: { code: -2,  msg: err, sql }});
+          return;
+        }
+
+        resolve({
+          ret: { code: 0, msg: 'success', sql }
+        });
+      });
     });
   }
 
-  execute(sql, params, callback) {
-    if (!this._db) {
-      console.error('Database not connected');
-      return;
-    }
-
-    this._db.run(sql, params, (err) => {
-      if (err) {
-        console.error('Error executing SQL: ', err);
-        callback(err);
-      } else {
-        callback(null, this._db.lastID);
+  /**
+   * 查询SQL语句
+   * @param {*} sql 
+   * @param {*} params 
+   * @returns promise {
+   *  data: {
+   *    rows: []
+   *  },
+   *  ret: {
+   *    code: 0,
+   *    msg: 'success'
+   *  }
+   * }
+   */
+  async query(sql) {
+    return new Promise((resolve, reject) => {
+      if (!this._db) {
+        resolve({ret: { code: -1,  msg: 'Database is not connected', sql }});
+        return;
       }
-    });
-  }
 
-  query(sql, params, callback) {
-    if (!this._db) {
-      console.error('Database not connected');
-      return;
-    }
+      this._db.all(sql, (err, rows) => {
+        if (err) {
+          console.error('failed to query SQL: ', err);
+          resolve({ret: { code: -2,  msg: err, sql }});
+          return;
+        }
 
-    this._db.all(sql, params, (err, rows) => {
-      if (err) {
-        console.error('Error executing SQL: ', err);
-        callback(err);
-      } else {
-        callback(null, rows);
-      }
+        resolve({
+          data: {
+            rows: rows
+          },
+          ret: { code: 0, msg: 'success', sql }
+        });
+      });
     });
   }
 }
 
-module.exports = DBAccess;
+module.exports = {
+  JvtDBAccess
+};

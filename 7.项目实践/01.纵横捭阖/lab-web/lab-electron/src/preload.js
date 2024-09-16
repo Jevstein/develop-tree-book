@@ -12,5 +12,5 @@
 // })
 
 // 导入 ipcOn 模块
-const { JvtBridge } = require('./base/native/bridge')
+const { JvtBridge } = require('./base/communicator/native/bridge')
 JvtBridge.create('ipcOn');

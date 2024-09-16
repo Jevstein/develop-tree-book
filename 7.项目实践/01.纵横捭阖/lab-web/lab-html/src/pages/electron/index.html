@@ -101,7 +101,7 @@
         </div>
         <div>
           <span class="caption">sqlite:</span>
-          <button>create</button>
+          <button onclick="handleClickExecSql(event)">create</button>
           <button>remove</button>
           <button>insert</button>
           <button>update</button>
@@ -175,7 +175,7 @@
     async function handleClickNotifysMsg(event) {
       try {
         const res = await this._getElectronApi().notifySysMsg({
-          title: '系统通知',
+          title: '告天下之',
           body: '知不足而奋进，望远山而前行',
           message: '纵横捭阖，俾睨天下'
         });
@@ -194,6 +194,32 @@
         filePathElement.innerText = res.data.filePath;
         res.data.errMsg && alert(res.data.errMsg);
 
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function handleClickExecSql(event) {
+      try {
+        const res = await this._getElectronApi().execSql({
+          sqls: [
+            "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);",
+            "INSERT INTO users (name) VALUES ('John Doe');",
+            "SELECT * FROM users;"
+
+            // "CREATE TABLE Person (\
+            //   PersonID int,\
+            //   LastName varchar(255),\
+            //   FirstName varchar(255),\
+            //   Address varchar(255),\
+            //   City varchar(255)\
+            // );",
+            // "INSERT INTO Person VALUES (1, 'Tom', 'Erichsen', 'Skagen 210, Stavanger 4006', 'Norway');",
+            // "SELECT * FROM Person;"
+          ]
+        });
+        // alert(`execSql - ${res.data}`);
+        console.log(`execSql - ${res.data}`);
       } catch (error) {
         console.error(error);
       }

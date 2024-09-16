@@ -26,6 +26,11 @@ class IframeClientApi extends JvtIframeApi {
     return await this._exec({ type, data }, 15000);
   }
 
+  execSql = async (data) => {
+    const type = this._getType(new Error());
+    return await this._exec({ type, data }, 15000);
+  }
+
   //--------------------------- notice: host => iframe  --------------------------- 
   onWelcome = (data) => {
     alert(data.data);
