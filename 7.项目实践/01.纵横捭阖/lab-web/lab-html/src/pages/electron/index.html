@@ -67,47 +67,135 @@
       }
     }
 
+    /* .electron-api {
+      margin: 30px 0;
+    } */
+
+    .electron-sqlite {
+      .sql-area {
+        display: flex;
+        flex-direction: row;
+
+        .sql-input {
+          width: 400px;
+          height: 300px;
+          position: relative;
+
+          .sql-input-bar {
+            position: absolute;
+            right: 10px;
+            top: 20px;
+            display: flex;
+            flex-direction: row;
+            button {
+              margin-left: 2px;
+            }
+          }
+
+          .sql-input-text {
+            width: calc(100% - 16px);
+            height: calc(100% - 0px);
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 12px;
+            padding: 5px;
+            /* overflow-y: auto; */
+          }
+        }
+
+        .sql-output {
+          margin-left: 2px;
+          width: 380px;
+          height: 300px;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          padding: 5px;
+          font-size: 10px;
+          overflow-y: auto;
+
+          .sql-result {
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+
+            .cmd {
+              color: #999999;
+              margin-bottom: 0px;
+            }
+
+            .res {
+              color: green;
+              margin-bottom: 0px;
+              font-size: 12px;
+              white-space: pre-wrap; /* 保留空白符号，如空格和换行，同时文本会包裹 */
+
+              &.error {
+                color: red;
+              }
+            }
+          }
+        }
+      }
+    }
+
   </style>
 </head>
 
 <body text="blue">
   <div class="body">
-    <div class="box iframe-test">
-      <div class="box-title"><b>iframe交互</b></div>
+    <!-- <div> -->
+      <div class="box iframe-api">
+        <div class="box-title"><b>iframe交互</b></div>
+        <div class="box-subtitle">
+          <p>
+            iframe嵌入页面, 通过postmessage、onmessage等方式实现页面间的交互
+            </br> 可打开控制台，查看详细交互过程...
+        </p>
+        </div>
+        <div class="area">
+          <button onclick="handleClickIframeSend(event)">send (异步)</button>
+          <button onclick="handleClickIframeExec(event)">exec (同步)</button>
+          <button onclick="handleClickIframePing(event)">ping (api)</button>
+        </div>
+      </div>
+      <div class="box electron-api">
+        <div class="box-title"><b>electron jsapi</b></div>
+        <div class="box-subtitle">
+        </div>
+        <div class="box-area jsapi">
+          <div>
+            <button onclick="handleClickNotifysMsg(event)">系统通知</button>
+            <a href="https://blog.csdn.net/weixin_40629244/article/details/116137758" target="_blank">Electron中消息通知</a>
+          </div>
+          <div>
+            <button onclick="handleClickOpenFile(event)">打开文件</button>
+            <span>file: <strong id="filePath"></strong></span>
+          </div>
+        </div>
+      </div> 
+    <!-- </div> -->
+    <div class="box electron-sqlite">
+      <div class="box-title"><b>electron(sqlite) sql 在线测试</b></div>
       <div class="box-subtitle">
-        <p>
-          iframe嵌入页面, 通过postmessage、onmessage等方式实现页面间的交互
-          </br> 可打开控制台，查看详细交互过程...
-      </p>
       </div>
-      <div class="area">
-        <button onclick="handleClickIframeSend(event)">send (异步)</button>
-        <button onclick="handleClickIframeExec(event)">exec (同步)</button>
-        <button onclick="handleClickIframePing(event)">ping (api)</button>
-      </div>
-    </div>
-    <div class="box electron-api">
-      <div class="box-title"><b>electron jsapi</b></div>
-      <div class="box-subtitle">
-      </div>
-      <div class="box-area jsapi">
-        <div>
-          <button onclick="handleClickNotifysMsg(event)">系统通知</button>
-          <a href="https://blog.csdn.net/weixin_40629244/article/details/116137758" target="_blank">Electron中消息通知</a>
+      <div class="box-area sql-area">
+        <div class="sql-input">
+          <div class="sql-input-bar">
+            <button class="btn-sql-reset" onclick="handleClickSqlReset(event)">重置</button>
+            <button class="btn-sql-run" onclick="handleClickSqlRun(event)">运行</button>
+            <button class="btn-sql-clear" onclick="handleClickSqlClear(event)">清空</button>
+          </div>
+          <textarea 
+            class="sql-input-text" 
+            placeholder="请输入sql语句" 
+            rows="3" 
+            cols="20"
+            onchange="handleChangeSqlText(event)"
+          >
+          </textarea>
         </div>
-        <div>
-          <button onclick="handleClickOpenFile(event)">打开文件</button>
-          <span>file: <strong id="filePath"></strong></span>
-        </div>
-        <div>
-          <span class="caption">sqlite:</span>
-          <button onclick="handleClickExecSql(event)">create</button>
-          <button>remove</button>
-          <button>insert</button>
-          <button>update</button>
-          <button>select</button>
-          <button>delete</button>
-        </div>
+        <div class="sql-output"></div>
       </div>
     </div>
 
@@ -199,35 +287,89 @@
       }
     }
 
-    async function handleClickExecSql(event) {
-      try {
-        const res = await this._getElectronApi().execSql({
-          sqls: [
-            "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);",
-            "INSERT INTO users (name) VALUES ('John Doe');",
-            "SELECT * FROM users;"
+    async function handleClickSqlReset(event) {
+      this.resetSqlText(true);
+    }
 
-            // "CREATE TABLE Person (\
-            //   PersonID int,\
-            //   LastName varchar(255),\
-            //   FirstName varchar(255),\
-            //   Address varchar(255),\
-            //   City varchar(255)\
-            // );",
-            // "INSERT INTO Person VALUES (1, 'Tom', 'Erichsen', 'Skagen 210, Stavanger 4006', 'Norway');",
-            // "SELECT * FROM Person;"
-          ]
+    async function handleClickSqlRun(event) {
+      const sqlInput = document.querySelector('.sql-input-text');
+      const sqlOutput = document.querySelector('.sql-output');
+      const sqlText = sqlInput.value.trim();
+      if (!sqlText) {
+        alert('请输入sql语句');
+        return;
+      }
+      const sqls = sqlText.split(";").map(item => {
+        return item?.trim()?.replace(/\n/g, "");
+      }).filter(item => !!item);
+
+      try {
+        const res = await this._getElectronApi().execSql({sqls});
+        if (res?.data?.errMsg) {
+          alert(res.data.errMsg);
+          return;
+        }
+
+        // console.log(`execSql - ${res.data}`);
+        sqlOutput.innerText = '';
+
+        res.data.result?.forEach(item => {
+          let content = item.sqlRes?.errMsg;
+          if (!content) {
+            if (typeof item.sqlRes?.data === 'string') {
+              content = item.sqlRes?.data;
+            } else if (item.sqlRes?.data?.rows) {
+              content = '';
+              item.sqlRes?.data?.rows?.forEach(row => {
+                content += JSON.stringify(row) + '\n';
+              });
+            } else {
+              content = JSON.stringify(item.sqlRes?.data || {});
+            }
+          }
+
+          const divElement = document.createElement('div');
+          divElement.setAttribute('class', 'sql-result');
+          const cmdElement = document.createElement('div');
+          cmdElement.innerHTML = `${item.sqlCmd}:`;
+          cmdElement.setAttribute('class', 'cmd');
+          divElement.appendChild(cmdElement);
+          const resElement = document.createElement('div');
+          resElement.innerHTML = content;
+          resElement.setAttribute('class', `res ${item.sqlRes?.errMsg ? 'error' : 'ok'}`);
+          divElement.appendChild(resElement);
+          sqlOutput.appendChild(divElement);
         });
-        // alert(`execSql - ${res.data}`);
-        console.log(`execSql - ${res.data}`);
+
       } catch (error) {
         console.error(error);
       }
     }
+    
+    function handleClickSqlClear(event) {
+      this.resetSqlText();
+    }
+
+    function handleChangeSqlText(event) {
+      debugger;
+      const btnClear = document.querySelector('.btn-sql-clear');
+      const sqlInput = document.querySelector('.sql-input-text');
+      const sqlText = sqlInput.value.trim();
+      btnClear.disabled = !sqlText;
+    }
+
+    function resetSqlText(isInit = false) {
+      const initText = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);\n\n\
+INSERT INTO users (name) VALUES ('John Doe');\n\nSELECT * FROM users;";
+      const sqlInput = document.querySelector('.sql-input-text');
+      const sqlOutput = document.querySelector('.sql-output');
+      sqlInput.value = isInit ? initText : '';
+      sqlOutput.innerText = '请执行sql语句后，再查看结果...';
+    }
 
     function main() {
       this._iframeApi = IframeClientApi.create(window.parent);
-
+      this.resetSqlText(true);
       setTimeout(() => { this._iframeApi?.established('established!') }, 500);
     }
 

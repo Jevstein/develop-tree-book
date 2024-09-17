@@ -22,7 +22,10 @@ class SqlBuilder extends JvtSql {
           const result = await this.query(sql);
           sqlResults.push({
             sqlCmd: sql,
-            sqlRes: result?.ret?.code === 0 ? result.data : result.ret.msg,
+            sqlRes: {
+              data: result?.ret?.code === 0 ? result.data : result.ret.msg,
+              errMsg: result?.ret?.code === 0 ? '' : result.ret.msg
+            },
           });
           continue;
         }
@@ -30,7 +33,10 @@ class SqlBuilder extends JvtSql {
         const result = await this.execute(sql);
         sqlResults.push({
           sqlCmd: sql,
-          sqlRes: result?.ret?.code === 0 ? result.data : result.ret.msg,
+          sqlRes: {
+            data: result?.ret?.code === 0 ? result.data || '执行成功!' : '',
+            errMsg: result?.ret?.code === 0 ? '' : result.ret.msg
+          }
         });
       }
 
