@@ -137,6 +137,39 @@ class JvtDBAccess {
       });
     });
   }
+
+  /**
+   * 批量执行SQL语句
+   * @param {*} funcs 
+   * @returns promise {
+   *  data: {},
+   *  ret: {
+   *    code: 0,
+   *    msg: 'success'
+   *  }
+   * }
+   */
+  async serialize(funcs) {
+    return new Promise((resolve, reject) => {
+      if (!this._db) {
+        resolve({ret: { code: -1,  msg: 'Database is not connected' }});
+        return;
+      }
+
+      this._db.serialize(async () => {
+        const datas = [];
+        for (let func of funcs) {
+          const result = await func();
+          datas.push(result);
+        }
+
+        resolve({
+          datas,
+          ret: { code: 0, msg: 'success' }}
+        );
+      });
+    });
+  }
 }
 
 module.exports = {

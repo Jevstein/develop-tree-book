@@ -6,7 +6,7 @@
 
 ## 一、git的原理
 
-
+![git 过程图](.\images\git过程图.jpg)
 
 ## 二、git的使用
 

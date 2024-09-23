@@ -11,7 +11,7 @@
 
 
 
-## 一、rust语言简介
+## 一、语言简介
 
 为何又来一门新语言？
 -- **因为还缺一门无 GC 且无需手动内存管理、性能高、工程性强、语言级安全性以及能同时得到工程派和学院派认可的语言**，而 Rust 就是这样的语言。
@@ -33,7 +33,7 @@
 
 
 
-## 二、rust项目结构
+## 二、项目结构
 
 ```shell
 $ tree -L 2
@@ -83,7 +83,7 @@ $ tree -L 2
 
 
 
-## 三、**Cargo：Rust 的构建工具和包管理器**
+## 三、**Cargo-Rust 的构建工具和包管理器**
 
 在终端中执行以下命令：
 
@@ -106,7 +106,7 @@ $ cargo [command] --help: 显示[指定命令]的cargo帮助信息
 
 
 
-## 四、rust语法实践
+## 四、基础语法
 
 **语法总览**
 
@@ -866,6 +866,14 @@ image::save(): 保存一个图像文件
 image::DynamicImage::resize(): 调整图像尺寸大小
 
 ```
+
+
+
+## 五、高级进阶
+
+### 1、websocket
+
+[WebSocket：实现实时通信的利器](https://blog.csdn.net/silenceallat/article/details/138300809)
 
 
 
