@@ -1,0 +1,66 @@
+<div class="db-table" id="id-db-table">
+  <table class="table table-hover table-bordered" id="mytable">
+    <thead>
+      <tr>
+        <th>选中</th>
+        <th>编号</th>
+        <th>姓名</th>
+        <th>密码</th>
+        <th>生日</th>
+        <th>地址</th>
+        <th>操作</th>
+      </tr>
+      <tr>
+        <td><input type="checkbox" onclick="checkAll(this)" /></td>
+        <td colspan="6"><a href="javascript:;" class="btn btn-danger" role="button" onclick="delAll(this)">全部删除</a>
+        </td>
+      </tr>
+    </thead>
+    <tbody id="listTable">
+      <tr>
+        <td><input type="checkbox" name="item" /></td>
+        <td>100806131234</td>
+        <td>劈日e斩月</td>
+        <td>123456</td>
+        <td>1995-08-07</td>
+        <td>北京市朝阳区艾欧尼亚</td>
+        <td>
+          <input type="button" name="" value="删除" class="btn btn-danger" onclick="del(this)" />
+          <input type="button" name="" value="修改" class="btn btn-info" onclick="modify(this)" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h1>新增数据</h1>
+  <form>
+    <table class="table table-hover table-bordered">
+      <tr>
+        <th>编号</th>
+        <td><input type="text" name="" class="form-control" id="num" /></td>
+      </tr>
+      <tr>
+        <th>姓名</th>
+        <td><input type="text" name="" class="form-control" id="username" /></td>
+      </tr>
+      <tr>
+        <th>密码</th>
+        <td><input type="password" name="" class="form-control" id="pwd" /></td>
+      </tr>
+      <tr>
+        <th>生日</th>
+        <td><input type="date" name="" class="form-control" id="birth" /></td>
+      </tr>
+      <tr>
+        <th>地址</th>
+        <td><input type="text" name="" class="form-control" id="addre" /></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <input type="reset" value="重置" class="btn btn-primary" id="reset" />
+          <input type="button" value="添加" class="btn btn-success" id="add" onclick="addList()" />
+          <input type="button" value="更新" class="btn btn-info" id="" onclick="update()" />
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>

@@ -99,6 +99,8 @@
             border-radius: 6px;
             font-size: 12px;
             padding: 5px;
+            font-family: Consolas, Monaco, courier, monospace;
+            /* color: #708; */
             /* overflow-y: auto; */
           }
         }
@@ -165,7 +167,8 @@
         pointer-events: none; /* Prevent mouse clicks from affecting text area */
         text-align: right;
         font-size: 12px;
-        padding: 5px 5px 0 0;
+        line-height: 16px;
+        padding: 4px 5px 0 0;
         white-space: pre-wrap; /* 保留空白符号，如空格和换行，同时文本会包裹 */
         color: #ccc;
         background: #f8f8f8;
@@ -399,7 +402,7 @@
       if (lineNumbers) {
           lineNumbers.remove();
       }
-      this.addLineNumbers(textarea);
+      this.addSqlLineNumbers(textarea);
     }
 
     function handleChangeSqlText(event) {
@@ -416,12 +419,12 @@ INSERT INTO users (name) VALUES ('John Doe');\n\nSELECT * FROM users;\n";
       const sqlInput = document.querySelector('.sql-input-text');
       const sqlOutput = document.querySelector('.sql-output');
       sqlInput.value = isInit ? initText : '';
-      sqlOutput.innerText = '请执行sql语句后，再查看结果...';
+      sqlOutput.innerText = '请先在输入框中，输入并运行sql语句后，再查看结果...';
 
       this.handleInputSqlText();
     }
 
-    function addLineNumbers(textarea) {
+    function addSqlLineNumbers(textarea) {
       const lines = textarea.value.split('\n');
       let lineNumbers = '';
       for (let i = 1; i <= lines.length; i++) {
@@ -436,6 +439,7 @@ INSERT INTO users (name) VALUES ('John Doe');\n\nSELECT * FROM users;\n";
     }
 
     function main() {
+      JvtUtils.addWatermark('Jevstein');
       this._iframeApi = IframeClientApi.create(window.parent);
       this.resetSqlText(true);
       setTimeout(() => { this._iframeApi?.established('established!') }, 500);

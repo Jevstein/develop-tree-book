@@ -116,6 +116,32 @@
       }
     }
 
+    .drag-drop-move {
+      .view {
+        margin-top: 20px;
+        height: 100px;
+        position: relative;
+        
+        .box{
+          width: 150px;
+          height: 30px;
+          background: pink;
+          position: absolute;
+          left: 0;
+          top: 50px;
+          border-radius: 20px;
+          display: flex;
+          /* justify-items: center; */
+          justify-content: center;
+          text-align: center;
+          align-items: center;
+        }
+        .box:hover{
+          cursor: move;
+        }
+      }
+    }
+
   </style>
 </head>
 
@@ -123,7 +149,7 @@
   <div><a href="https://zhuanlan.zhihu.com/p/482583250?utm_id=0" target="_blank">前端拖拽入门实践</a></div>
   <div><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API" target="_blank">HTML Drag and Drop API</a></div>
 
-  <img src="../assets/images/dragdrop.jpg" width="800px" height="500px">
+  <img src="../../assets/images/dragdrop.jpg" width="800px" height="500px">
 
   <div class="drag-drop-simple">
     <h1>1、基础拖拽</h1>
@@ -143,7 +169,6 @@
       </div>
     </div>
   </div>
-  
   
   <div class="drag-drop-go">
     <h1>2、拖拽行走</h1>
@@ -259,6 +284,24 @@
         略
     </div>
   </div>
+
+  <div class="drag-drop-move">
+    <h1>5、页面内元素移动</h1>
+    <div><a href="https://blog.51cto.com/u_12553473/8120202" target="_blank">详细讲解原生js拖拽</a></div>
+    <div><a href="page-move.html" target="_blank">页面演示</a></div>
+    <div class="view">
+      <div 
+        class="box" 
+        id="moveElement"
+        onmousedown="handleMouseDownMover(event)"
+        onmouseup="handleMouseUpMover(event)"
+        onmousemove="handleMouseMoveMover(event)"
+      >
+        点击后拖拽移动
+      </div>
+    </div>
+  </div>
+
 
   <script>
     //------------------ 1、基础拖拽 ------------------ 
@@ -441,6 +484,62 @@
 
     //------------------ 4、拖拽连线 ------------------ 
 
+    //------------------ 5、页面内元素移动 ------------------ 
+
+    let moverData = {
+      isDown: false,
+      point: {
+        x: 0,
+        y: 0
+      }
+    };
+    
+    function handleMouseDownMover(e) {
+      //兼容  e || window.event  现在都可以
+      let event = e || window.event;  
+      // 获取鼠标按下去的那一个点距离边框顶部和左侧的距离
+      moverData.point.x = event.offsetX;
+      moverData.point.y = event.offsetY;
+      moverData.isDown = true;
+    }
+
+    function handleMouseUpMover(event) {
+      console.log("抬起停止移动" )
+      
+      let moveElement = document.getElementById('moveElement');
+
+      moverData.isDown = false;
+
+      // // 移除移动和抬起事件
+      // this.onmouseup = null;
+      // this.onmousemove = null;
+
+      //修复低版本的ie可能出现的bug
+      if(typeof moveElement.releaseCapture!='undefined'){  
+        moveElement.releaseCapture();  
+      }
+    }
+
+    function handleMouseMoveMover(e) {
+      if (!moverData.isDown) {
+        return;
+      }
+
+      let event = e || window.event;
+
+      // 获取鼠标移动的坐标位置
+      let ele_left = event.clientX - moverData.point.x;
+      let ele_top = event.clientY - moverData.point.y;
+
+      
+      let moveElement = document.getElementById('moveElement');
+
+      ele_left = Math.min(Math.max(0,ele_left), window.innerWidth - moveElement.offsetWidth)
+      ele_top=  Math.min(Math.max(0,ele_top),  window.innerHeight - moveElement.offsetHeight)
+      
+      moveElement.style.left = ele_left + 'px';
+      moveElement.style.top = ele_top + 'px'
+    }
   </script>
 </body>
 

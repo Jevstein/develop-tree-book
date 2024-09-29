@@ -11,6 +11,10 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="format-detection" content="telephone=no,address=no">
   <meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+  <!-- <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+  <!-- <meta http-equiv="content-security-policy" content="default-src 'self'; script-src 'self';img-src 'self' data:;style-src 'self' 'unsafe-inline';media-src 'self'" /> -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: https://xxx.com;media-src * blob: 'self' http://* 'unsafe-inline' 'unsafe-eval';style-src * 'self' 'unsafe-inline';img-src * 'self' data: content:;connect-src * blob:;"> -->
   <title>web研究院</title>
   <!-- <link href="css/style" rel="stylesheet" type="text/css" /> -->
   <!-- 引入css外部样式表 -->
@@ -289,11 +293,17 @@
               ]
             },
             { name: '动画示例', url: 'pages/animation.html' },
-            { name: '拖拽操作', url: 'pages/drag-drop.html' },
+            { name: '自由拖拽', url: 'pages/drag-drop/index.html'},
             { name: '事件监听', url: 'pages/keyboard-listen.html' },
             { name: '同步异步', url: 'pages/webworker/index.html' },
-            { name: '数据存储', url: 'pages/store/index.html' },
+            { name: '数据存储', url: 'pages/storage/index.html' },
             { name: '网络通讯', url: 'pages/websocket.html' },
+            { name: 'web框架', url: '', children: [
+                { name: 'react', url: 'https://reactjs.bootcss.com/learn/start-a-new-react-project' },
+                { name: 'vue', url: 'https://cn.vuejs.org/' },
+                { name: 'taro', url: 'https://taro-ui.jd.com/#/docs/introduction' },
+              ]
+            },
             { name: '桌面框架', url: '', children: [
                 { name: 'electron', url: 'pages/electron/index.html' },
                 { name: 'tauri', url: 'https://www.tauri.net.cn/24.html' },
@@ -305,6 +315,7 @@
           name: '工具箱', url: '', children: [
             { name: '百度必应', url: 'pages/search-engine.html' },
             { name: '站点导航', url: 'pages/url-navigation.html' },
+            { name: '人机交流', url: 'https://aistudio.baidu.com/community/app/53767/webUI' },
           ]
         },
       ]

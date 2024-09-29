@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>页面内移动</title>
+
+  <style>
+    .box {
+      width: 150px;
+      height: 30px;
+      background: pink;
+      position: absolute;
+      left: 0;
+      top: 50px;
+      border-radius: 20px;
+      display: flex;
+      /* justify-items: center; */
+      justify-content: center;
+      text-align: center;
+      align-items: center;
+    }
+
+    .box:hover {
+      cursor: move;
+    }
+  </style>
+</head>
+
+<body text="blue">
+  <div><a href="https://blog.51cto.com/u_12553473/8120202" target="_blank">详细讲解原生js拖拽</a></div>
+  <div class="box" id="moveElement">我可以移动</div>
+
+  <script>
+    window.onload = function () {
+      // 获取元素节点
+      let moveElement = document.getElementById('moveElement');
+      // 给元素注册鼠标按下事件
+      moveElement.onmousedown = function (e) {
+        //兼容  e || window.event  现在都可以
+        let event = e || window.event;
+        // 获取鼠标按下去的那一个点距离边框顶部和左侧的距离
+        let point_x = event.offsetX;
+        let point_y = event.offsetY;
+        //  鼠标移动(小方块在文档上移动，给文档注册一个是移动事件)
+        document.onmousemove = function (ent) {
+          let evt = ent || window.event;
+          // 获取鼠标移动的坐标位置
+          let ele_left = evt.clientX - point_x;
+          let ele_top = evt.clientY - point_y;
+
+          // ----冗余代码---
+          // if(ele_left<=0){
+          //   // 设置水平方向的最小值
+          //   ele_left = 0
+          // }else if(ele_left >= window.innerWidth - moveElement.offsetWidth){
+          //   // 设置水平方向的最大值
+          //   ele_left = window.innerWidth - moveElement.offsetWidth
+          // }
+          // if(ele_top<=0){
+          //   // 设置垂直方向的最小值
+          //   ele_top = 0
+          // }else if(ele_top >= window.innerHeight - moveElement.offsetHeight){
+          //   // 设置垂直方向的最大值
+          //   ele_top = window.innerHeight - moveElement.offsetHeight
+          // }
+          // 优化为下面的
+          ele_left = Math.min(Math.max(0, ele_left), window.innerWidth - moveElement.offsetWidth)
+          ele_top = Math.min(Math.max(0, ele_top), window.innerHeight - moveElement.offsetHeight)
+
+          moveElement.style.left = ele_left + 'px';
+          moveElement.style.top = ele_top + 'px'
+        }
+
+        // 抬起停止移动
+        document.onmouseup = function (event) {
+          console.log("抬起停止移动")
+          // 移除移动和抬起事件
+          this.onmouseup = null;
+          this.onmousemove = null;
+          //修复低版本的ie可能出现的bug
+          if (typeof moveElement.releaseCapture != 'undefined') {
+            moveElement.releaseCapture();
+          }
+        }
+        // 解决有些时候,在鼠标松开的时候,元素仍然可以拖动-使用的是第二种方式
+        document.ondragstart = function (ev) {
+          ev.preventDefault();
+        }
+        document.ondragend = function (ev) {
+          ev.preventDefault();
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

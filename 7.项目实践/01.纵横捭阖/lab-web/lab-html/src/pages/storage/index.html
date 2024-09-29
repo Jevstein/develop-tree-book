@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <title>本地存储</title>
 
+  <link rel="stylesheet" href="../../components/db-table/style.css">
   <style>
     .box {
       margin: 10px;
@@ -38,11 +39,24 @@
 </head>
 
 <body text="blue">
-  <div><a href="https://blog.csdn.net/weiCong_Ling/article/details/131437456" target="_blank">浏览器存储--IndexedDB数据库的使用</a>
+  <div>存储方式（选型） 简介、浮动：localStorage、sessionStorage、window、IndexedDB </div>
+  <div class="box">
+    <div class="box-title"><b>在线测试</b></div>
+    <div id="indexed-db-view"></div>
+    <div class="box-subtitle">
+      --- 描述 ---
+    </div>
   </div>
+
   <div class="box">
     <div class="box-title"><b>IndexedDB</b></div>
     <div class="box-subtitle">
+      <div> <a href="https://blog.csdn.net/weiCong_Ling/article/details/131437456" target="_blank">浏览器存储--IndexedDB数据库的使用</a> </div>
+      <div> <a href="https://juejin.cn/post/7249386837369159735" target="_blank">一文看懂 IndexedDB</a> </div>
+      <div> <a href="https://www.ruanyifeng.com/blog/2018/07/indexeddb.html" target="_blank">浏览器数据库 IndexedDB 入门教程</a> </div>
+      <div> <a href="https://www.zhangxinxu.com/wordpress/2017/07/html5-indexeddb-js-example/" target="_blank">HTML5 indexedDB前端本地存储数据库实例教程</a> </div>
+      <div> <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API" target="_blank">IndexedDB API</a></div>
+
       <h4>背景：</h4>
       现有的浏览器数据储存方案，都不适合储存大量数据：Cookie 的大小不超过4KB，且每次请求都会发送回服务器；localStorage 和 sessionStorage 在 2.5MB 到
       10MB之间（各家浏览器不同），而且不提供搜索功能，不能建立自定义的索引。所以，需要一种新的解决方案，于是诞生了IndexedDB。</br>
@@ -69,7 +83,7 @@
         </li>
       </ul>
     </div>
-    <div>
+    <!-- <div>
       <button onclick="handleClickIndexedDbInit(event)">初始化</button>
       <button onclick="handleClickIndexedDbAdd(event)">添加数据</button>
       <button onclick="handleClickIndexedDbUpdate(event)">更新数据</button>
@@ -78,38 +92,54 @@
       <button onclick="handleClickIndexedDbDelete1(event)">删除数据-删除主键</button>
       <button onclick="handleClickIndexedDbDelete2(event)">删除数据-清空数据</button>
       <button onclick="handleClickIndexedDbClose(event)">关闭数据库</button>
-    </div>
+    </div> -->
+    <!-- <div id="indexed-db-view"></div> -->
   </div>
 </body>
 
 <script src="indexedDbCache.js"></script>
+<script src="../../components/component.js"></script>
+<script src="../../components/db-table/index.js"></script>
 <script>
-  function handleClickIndexedDbInit(event) {
-    initIndexDB();
-  }
-  function handleClickIndexedDbAdd(event) {
-    changeVal();
-  }
-  function handleClickIndexedDbUpdate(event) {
-    updateIndexDB();
-  }
-  function handleClickIndexedDbQuery1(event) {
-    getImageByName();
-  }
-  function handleClickIndexedDbQuery2(event) {
-    getDataByIndexDB();
-  }
-  function handleClickIndexedDbDelete1(event) {
-    removeIndexDB();
-  }
-  function handleClickIndexedDbDelete2(event) {
-    clearIndexDB();
-  }
-  function handleClickIndexedDbClose(event) {
-    closeIndexDB();
-  }
 
-  
+  // function handleClickIndexedDbInit(event) {
+  //   initIndexDB();
+  // }
+  // function handleClickIndexedDbAdd(event) {
+  //   changeVal();
+  // }
+  // function handleClickIndexedDbUpdate(event) {
+  //   updateIndexDB();
+  // }
+  // function handleClickIndexedDbQuery1(event) {
+  //   getImageByName();
+  // }
+  // function handleClickIndexedDbQuery2(event) {
+  //   getDataByIndexDB();
+  // }
+  // function handleClickIndexedDbDelete1(event) {
+  //   removeIndexDB();
+  // }
+  // function handleClickIndexedDbDelete2(event) {
+  //   clearIndexDB();
+  // }
+  // function handleClickIndexedDbClose(event) {
+  //   closeIndexDB();
+  // }
+
+  storeCfg = [
+    { type: 'window', name: 'window', note: '', desc: '' },
+    { type: 'localStorage', name: 'localStorage', note: '', desc: '' },
+    { type: 'sessionStorage', name: 'sessionStorage', note: '', desc: '' },
+    { type: 'indexedDB', name: 'indexedDB', note: '', desc: '' },
+    { type: 'sqlite', name: 'sqlite', note: '', desc: '' },
+    { type: 'cookie', name: 'cookie', note: '', desc: '' },
+  ];
+
+  JvtDbTable.create({
+    rootId: 'indexed-db-view',
+  });
+
 </script>
 
 </html>

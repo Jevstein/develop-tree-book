@@ -84,4 +84,36 @@ class JvtUtils {
       callNow && cb.apply(this, args);
     };
   }
+
+  /**
+   * 添加水印
+   * @param {*} text 水印内容
+   */
+  static addWatermark(text) {
+    // 创建canvas元素
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+  
+    // 设置canvas大小
+    canvas.width = 300;
+    canvas.height = 200;
+  
+    // 绘制水印文字
+    ctx.font = '20px Arial';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // 半透明黑色
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-Math.atan(canvas.height / canvas.width));
+    ctx.fillText(text, 0, 0);
+  
+    // 创建水印图片
+    var watermark = new Image();
+    watermark.src = canvas.toDataURL('image/png');
+  
+    // 添加水印图片到body
+    document.body.style.backgroundImage = 'url(' + watermark.src + ')';
+    document.body.style.backgroundRepeat = 'repeat';
+  }
+  
 }
