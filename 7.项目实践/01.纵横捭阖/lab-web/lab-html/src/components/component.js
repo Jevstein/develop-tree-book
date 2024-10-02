@@ -1,4 +1,22 @@
 class JvtHTMLComponent {
+  _prefix = '';
+
+  constructor(props = {
+    prefix: 'base-component'
+  }) {
+    this._prefix = props.prefix;
+  }
+
+  _getUniqueElement(name, type) {
+    switch (type) {
+      case 'id':    return `id-${this._prefix}${name}`;
+      case 'class': return `ui-${this._prefix}${name}`;
+      case 'name':  return `nm-${this._prefix}${name}`;
+      default:
+        return `id-${this._prefix}${name}`;
+    }
+  }
+
   getElementDom() {
     return '<div></div>';
   }

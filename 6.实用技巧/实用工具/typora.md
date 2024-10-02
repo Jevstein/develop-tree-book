@@ -12,14 +12,13 @@ https://www.typoraio.cn/#
 1. 打开typora包内容找到文件夹：
      /Applications/Typora.app/Contents/Resources/TypeMark/ 
 
-2. 找到文件：page-dist/static/js/LicenseIndex.*
+2. 找到文件：page-dist/static/js/LicenseIndex.*，如图：
 
-     如图：![typora](./images/typora.png)
+	![typora](./images/typora.png)
 
 3. 修改
 
 ​		搜索 hasActivated="true"==e.hasActivated ，
-
 ​		将它改为 hasActivated="true"=="true"
 
 4. 成功激活！！！

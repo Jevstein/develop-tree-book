@@ -1,6 +1,6 @@
 class JvtDbTable extends JvtHTMLComponent {
   _colums = [
-    {name: '编号', key: 'num', width: '100px', type: 'text'},
+    {name: '编号', key: 'id', width: '100px', type: 'text'},
     {name: '姓名', key: 'username', width: '100px', type: 'text'},
     {name: '密码', key: 'pwd', width: '100px', type: 'password'},
     {name: '生日', key: 'birth', width: '100px', type: 'date'},
@@ -8,20 +8,19 @@ class JvtDbTable extends JvtHTMLComponent {
     // {name: '操作', key: 'operate', width: '100px', type: 'operate'}
   ];
   _datas = [
-    {num: '100806131234', username: '张三', pwd: '123456', birth: '1995-08-07', addre: '上海市黄浦区老西门'},
-    {num: '100806131235', username: '李四', pwd: '123456', birth: '1995-08-07', addre: '北京市朝阳区艾欧尼亚'},
-    {num: '100806131236', username: '王五', pwd: '123456', birth: '1995-08-07', addre: '广东省深圳市南山区'},
+    {id: '101', username: '张小三', pwd: '123456', birth: '1995-08-07', addre: '上海市第九区黑色玫瑰'},
+    {id: '110', username: '李某四', pwd: '123456', birth: '1995-08-07', addre: '北京市朝阳区艾欧尼亚'},
+    {id: '001', username: '王老五', pwd: '123456', birth: '1995-08-07', addre: '广东省深圳市南山区'},
   ];
-  _editData = {num: '100806131234', username: '张三', pwd: '123456', birth: '1995-08-07', addre: '上海市黄浦区老西门'};
-  _onChanged = (data) => {};
-  _checkedDatas = [];
+  _editData = {id: '101', username: '张老三', pwd: '123456', birth: '1995-08-07', addre: '上海市第九区黑色玫瑰'};
+  _onChanged = (data) => undefined;
 
   static create(props) {
     return new JvtDbTable(props);
   }
 
   constructor(props) {
-    super();
+    super({ prefix: 'db-table' });
 
     const {
       rootId,
@@ -40,11 +39,9 @@ class JvtDbTable extends JvtHTMLComponent {
   _init = (rootId) => {
     const root = document.getElementById(rootId);
 
-    // <div class="db-table" id="id-db-table"></div>
+    // <div class="ui-db-table" id="id-ui-db-table"></div>
     const dbTable = document.createElement('div');
-    dbTable.setAttribute('class', 'db-table');
-    // dbTable.onclick = (event) => this.handleClickDirectroy(event, node);
-    // dbTable.ondblclick = (event) => this.handleDblClickDirectroy(event, node);
+    dbTable.setAttribute('class', this._getUniqueElement('', 'class'));
 
     {// <table class="table table-hover table-bordered" id="mytable"></table>
       const table = document.createElement('table');
@@ -71,6 +68,7 @@ class JvtDbTable extends JvtHTMLComponent {
             const td1 = document.createElement('td');
             const input1 = document.createElement('input');
             input1.setAttribute('type', 'checkbox');
+            input1.setAttribute('id', this._getUniqueElement(`-checkall`, 'id'));
             input1.onclick = (event) => this.handleClickCheckAll(event);
             td1.appendChild(input1);
             tr2.appendChild(td1);
@@ -93,15 +91,18 @@ class JvtDbTable extends JvtHTMLComponent {
 
       {// <tbody>
         const tbody = document.createElement('tbody');
-        tbody.setAttribute('id', 'listTable');
+        tbody.setAttribute('id', this._getUniqueElement('-listTable', 'id'));
 
         this._datas.forEach(data => {// tr
           const tr = document.createElement('tr');
           {// td
             const td = document.createElement('td');
             const input = document.createElement('input');
+            input.setAttribute('class', this._getUniqueElement(`-checkbox`, 'class'));
+            input.setAttribute('id', this._getUniqueElement(`-check-${data.id}`, 'id'));
             input.setAttribute('type', 'checkbox');
-            input.setAttribute('name', 'item');
+            input.setAttribute('name', this._getUniqueElement('-item', 'name'));
+            // input.onclick = (event) => this.handleClickCheck(event, data);
             td.appendChild(input);
 
             tr.appendChild(td);
@@ -169,7 +170,7 @@ class JvtDbTable extends JvtHTMLComponent {
             const input = document.createElement('input');
             input.setAttribute('class', 'form-control');
             input.setAttribute('type', colum.type);
-            input.setAttribute('id', colum.key);
+            input.setAttribute('id', this._getUniqueElement(`-${colum.key}`, 'id'));
             input.value = this._editData[colum.key];
             td.appendChild(input);
             tr.appendChild(td);
@@ -222,31 +223,57 @@ class JvtDbTable extends JvtHTMLComponent {
     root.appendChild(dbTable);
   }
 
-  handleChanged = (data) => {
-    this._onChanged(data);
+  handleChanged = (data = {
+    type: '1', // 1:新增 2:修改 3:删除
+    data: undefined, // 新增、修改或删除的数据
+    event: undefined // 事件对象
+  } ) => {
+    if (this._onChanged === undefined) {
+      return true;
+    }
+
+    return this._onChanged(data);
   }
 
   handleClickCheckAll = (event) => {
-    alert("handleClickCheckAll");
+    const items = document.getElementsByName(this._getUniqueElement('-item', 'name'));
+    for (let j=0; j<items.length; j++){    
+      items[j].checked = event.target.checked;
+    }
   }
   
   handleClickDelAll = (event) => {
-    alert("删除全部");
+    const listNode = document.getElementById(this._getUniqueElement('-listTable'));
+    const items = document.getElementsByName(this._getUniqueElement('-item', 'name'));
+    for (let j=0; j<items.length; j++){    
+      if (!items[j].checked) {
+        continue;
+      }
+
+      const node = items[j].parentNode.parentNode;
+      listNode.removeChild(node);
+      j--;
+    }
   }
 
   handleClickDel = (event, data) => {
-    // alert("删除");
 
-    var oParentnode = event.parentNode.parentNode;
-    var olistTable = document.getElementById('listTable');
-    olistTable.removeChild(oParentnode);
+    this.handleChanged({
+      type: '3',
+      data: data,
+      event: event
+    });
+
+    var node = event.target.parentNode.parentNode;
+    var listNode = document.getElementById(this._getUniqueElement('-listTable', 'id'));
+    listNode.removeChild(node);
   }
 
   handleClickModify = (event, data) => {
     this._editData = data;
 
     this._colums.forEach(colum => {
-      const input = document.getElementById(colum.key);
+      const input = document.getElementById(this._getUniqueElement(`-${colum.key}`, 'id'));
       input && (input.value = this._editData[colum.key] || '');
     });
   }

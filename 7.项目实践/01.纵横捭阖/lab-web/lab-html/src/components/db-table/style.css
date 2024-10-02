@@ -1,9 +1,8 @@
 
-.db-table {
+.ui-db-table {
   color: #454545;
   background-color: #f9ffff;
-  padding: 20px;
-  width: 800px;
+  padding: 10px;
 
   .table {
     border: 1px solid #d6d6d6;

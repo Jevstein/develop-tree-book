@@ -5,140 +5,203 @@
   <meta charset="UTF-8" />
   <title>本地存储</title>
 
+  <link rel="stylesheet" href="../../components/float-navilist/style.css">
   <link rel="stylesheet" href="../../components/db-table/style.css">
   <style>
-    .box {
-      margin: 10px;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      background-color: #f6f8fe;
 
-      .box-title {
-        font-size: 16px;
-        line-height: 22px;
-        /* font-weight: 500; */
-        color: #111;
-        display: block;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        padding-left: 10px;
-        border-left: 3px solid #7ed321;
-        margin-bottom: 8px;
-      }
+      display: flex;
+      justify-content: center;
+    }
 
-      .box-subtitle {
-        position: relative;
-        width: 100%;
-        font-size: 12px;
-        color: #999999;
-        word-wrap: break-word;
-        margin: 5px 0;
-        display: flex;
-        flex-direction: column;
+    .storage-content-view {
+      background-color: #ffffff;
+      margin: 15px 10px;
+      padding: 15px;
+      border-radius: 5px;
+
+      .box {
+        margin: 10px;
+
+        .box-title {
+          font-size: 16px;
+          line-height: 22px;
+          /* font-weight: 500; */
+          color: #111;
+          display: block;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          padding-left: 10px;
+          border-left: 3px solid #7ed321;
+          margin-bottom: 8px;
+        }
+
+        .box-subtitle {
+          position: relative;
+          width: 100%;
+          font-size: 12px;
+          color: #999999;
+          word-wrap: break-word;
+          margin: 5px 0;
+          display: flex;
+          flex-direction: column;
+        }
       }
+    }
+    .storage-navi-view {
+      margin: 15px 10px;
     }
   </style>
 </head>
 
 <body text="blue">
-  <div>存储方式（选型） 简介、浮动：localStorage、sessionStorage、window、IndexedDB </div>
-  <div class="box">
-    <div class="box-title"><b>在线测试</b></div>
-    <div id="indexed-db-view"></div>
-    <div class="box-subtitle">
-      --- 描述 ---
+  <div class="storage-content-view">
+    <div class="box">
+      <div class="box-title online-db-title"><b>IndexedDB - 在线测试</b></div>
+      <div class="box-subtitle"></div>
+      <div id="indexed-db-view"></div>
+      </div>
     </div>
   </div>
+  <div class="storage-navi-view" id="id-storage-navi-view"></div>
 
-  <div class="box">
-    <div class="box-title"><b>IndexedDB</b></div>
-    <div class="box-subtitle">
-      <div> <a href="https://blog.csdn.net/weiCong_Ling/article/details/131437456" target="_blank">浏览器存储--IndexedDB数据库的使用</a> </div>
-      <div> <a href="https://juejin.cn/post/7249386837369159735" target="_blank">一文看懂 IndexedDB</a> </div>
-      <div> <a href="https://www.ruanyifeng.com/blog/2018/07/indexeddb.html" target="_blank">浏览器数据库 IndexedDB 入门教程</a> </div>
-      <div> <a href="https://www.zhangxinxu.com/wordpress/2017/07/html5-indexeddb-js-example/" target="_blank">HTML5 indexedDB前端本地存储数据库实例教程</a> </div>
-      <div> <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API" target="_blank">IndexedDB API</a></div>
-
-      <h4>背景：</h4>
-      现有的浏览器数据储存方案，都不适合储存大量数据：Cookie 的大小不超过4KB，且每次请求都会发送回服务器；localStorage 和 sessionStorage 在 2.5MB 到
-      10MB之间（各家浏览器不同），而且不提供搜索功能，不能建立自定义的索引。所以，需要一种新的解决方案，于是诞生了IndexedDB。</br>
-      <h4>特点：</h4>IndexedDB 就是浏览器提供的本地数据库(接近 NoSQL)，它可以被网页脚本创建和操作。IndexedDB 允许储存大量数据，提供查找接口，还能建立索引。
-      <ul>
-        <li>
-          键值对储存: IndexedDB 内部采用对象仓库（object store）存放数据。所有类型的数据都可以直接存入，包括
-          JavaScript对象。对象仓库中，数据以"键值对"的形式保存，每一个数据记录都有对应的主键，主键是独一无二的，不能有重复，否则会抛出一个错误。
-        </li>
-        <li>
-          异步: IndexedDB 操作时不会锁死浏览器，用户依然可以进行其他操作，这与 LocalStorage 形成对比，后者的操作是同步的。异步设计是为了防止大量数据的读写，拖慢网页的表现
-        </li>
-        <li>
-          事务: IndexedDB 支持事务（transaction），这意味着一系列操作步骤之中，只要有一步失败，整个事务就都取消，数据库回滚到事务发生之前的状态，不存在只改写一部分数据的情况。
-        </li>
-        <li>
-          同源限制: IndexedDB 受到同源限制，每一个数据库对应创建它的域名。网页只能访问自身域名下的数据库，而不能访问跨域的数据库。
-        </li>
-        <li>
-          储存空间大: IndexedDB 的储存空间比 LocalStorage 大得多，一般来说不少于 250MB，甚至没有上限。
-        </li>
-        <li>
-          二进制储存: IndexedDB 不仅可以储存字符串，还可以储存二进制数据（ArrayBuffer 对象和 Blob 对象）。
-        </li>
-      </ul>
-    </div>
-    <!-- <div>
-      <button onclick="handleClickIndexedDbInit(event)">初始化</button>
-      <button onclick="handleClickIndexedDbAdd(event)">添加数据</button>
-      <button onclick="handleClickIndexedDbUpdate(event)">更新数据</button>
-      <button onclick="handleClickIndexedDbQuery1(event)">查询数据-主键</button>
-      <button onclick="handleClickIndexedDbQuery2(event)">查询数据-索引</button>
-      <button onclick="handleClickIndexedDbDelete1(event)">删除数据-删除主键</button>
-      <button onclick="handleClickIndexedDbDelete2(event)">删除数据-清空数据</button>
-      <button onclick="handleClickIndexedDbClose(event)">关闭数据库</button>
-    </div> -->
-    <!-- <div id="indexed-db-view"></div> -->
-  </div>
 </body>
 
 <script src="indexedDbCache.js"></script>
 <script src="../../components/component.js"></script>
+<script src="../../components/float-navilist/index.js"></script>
 <script src="../../components/db-table/index.js"></script>
 <script>
-
-  // function handleClickIndexedDbInit(event) {
-  //   initIndexDB();
-  // }
-  // function handleClickIndexedDbAdd(event) {
-  //   changeVal();
-  // }
-  // function handleClickIndexedDbUpdate(event) {
-  //   updateIndexDB();
-  // }
-  // function handleClickIndexedDbQuery1(event) {
-  //   getImageByName();
-  // }
-  // function handleClickIndexedDbQuery2(event) {
-  //   getDataByIndexDB();
-  // }
-  // function handleClickIndexedDbDelete1(event) {
-  //   removeIndexDB();
-  // }
-  // function handleClickIndexedDbDelete2(event) {
-  //   clearIndexDB();
-  // }
-  // function handleClickIndexedDbClose(event) {
-  //   closeIndexDB();
-  // }
-
-  storeCfg = [
-    { type: 'window', name: 'window', note: '', desc: '' },
-    { type: 'localStorage', name: 'localStorage', note: '', desc: '' },
-    { type: 'sessionStorage', name: 'sessionStorage', note: '', desc: '' },
-    { type: 'indexedDB', name: 'indexedDB', note: '', desc: '' },
-    { type: 'sqlite', name: 'sqlite', note: '', desc: '' },
-    { type: 'cookie', name: 'cookie', note: '', desc: '' },
+  // 当前选中的存储方式
+  _storageActiveId = 'IndexedDB';
+  // 存储方式配置
+  _storageCfgs = [
+    { id: 'Cookie', name: 'Cookie', desc: [
+      { text: '<b>Cookie</b> 是服务器发送到用户浏览器并保存在本地的一小块数据，它用于存储用户的一些个人信息。Cookie 大小不超过4KB，且每次请求都会发送回服务器。' },
+    ]},
+    { id: 'window', name: 'window', desc: [
+      { text: '<b>window</b> 是一个全局对象，用来在浏览器中存储少量数据。' },
+    ]},
+    { id: 'localStorage', name: 'localStorage', desc: [
+      { text: '<b>localStorage</b> 是 HTML5 提供的一种本地存储，它可以将数据保存在用户浏览器上。\n特点：\n\
+      一、<b>存储空间</b>：5MB 左右，取决于浏览器的限制。\n\
+      二、<b>存储内容</b>：仅可存储字符串。\n\
+      二、<b>清空方式</b>：\n\
+        1、用户手动清除浏览器缓存或数据。\n\
+        2、用户设置了限制网站存储数据的浏览器隐私设置。\n\
+        3、浏览器因磁盘空间不足而自动清理数据。\n\
+        4、浏览器发生崩溃或遇到了严重错误，导致存储数据被重置。\n\
+        5、用户使用的是“隐私模式”，在这种模式下，localStorage 可能不可用或被清空。\n\
+        6、浏览器更新或升级时可能会清除旧的或损坏的数据。\n\
+      三、<b>使用场景</b>：\n\
+        适用于小量数据存储，如用户的偏好设置、浏览记录、搜索历史等。\n\
+      四、<b>注意事项</b>：\n\
+        1、存储的数据只能是字符串，如果需要存储对象，需要先转换成字符串再存储。\n\
+        2、存储的数据是明文形式，不安全，容易被窃取。\n\
+        3、存储的数据只能在当前域名下使用，不同域名下无法共享。\n\
+      '},
+    ]},
+    { id: 'sessionStorage', name: 'sessionStorage', desc: [
+      { text:'<b>sessionStorage</b> 和 localStorage 类似，但它不是持久化的，关闭浏览器后数据也会被清除。' },
+    ]},
+    { id: 'IndexedDB', name: 'IndexedDB', desc: [
+      { text: '<b>IndexedDB</b> 是浏览器提供的本地数据库（接近 NoSQL），它可以被网页脚本创建和操作。\n\特点：\n\
+      1、<strong>储存空间</strong>： 比 LocalStorage 大得多，一般来说不少于 250MB， 甚至没有上限（取决于硬盘大小)。\n\
+      2、<b>二进制储存</b>： 允许储存二进制数据（ArrayBuffer 对象和 Blob 对象）。\n\
+      3、<b>异步</b>： IndexedDB 操作时不会锁死浏览器，用户依然可以进行其他操作，这与 LocalStorage 形成对比，后者的操作是同步的。\n\
+      4、<b>同源限制</b>： IndexedDB 受到同源限制，每一个数据库对应创建它的域名。网页只能访问自身域名下的数据库，而不能访问跨域的数据库。\n\
+      5、<b>事务</b>： IndexedDB 支持事务（transaction），这意味着一系列操作步骤之中，只要有一步失败，整个事务就都取消，数据库回滚到事务发生之前的状态，不存在只改写一部分数据的情况。\n\
+      6、<b>键值对储存</b>： IndexedDB 内部采用对象仓库（object store）存放数据。所有类型的数据都可以直接存入，包括 JavaScript对象。对象仓库中，数据以"键值对"的形式保存，每一个数据记录都有对应的主键，主键是独一无二的，不能有重复，否则会抛出一个错误。\n\
+      二、<b>使用场景</b>：\n\
+      适用于大量数据存储，如网页的本地数据缓存、离线数据存储等。\n\
+      三、<b>注意事项</b>：\n\
+      1、IndexedDB 是一个复杂的 API，涉及到很多概念和方法，需要熟练掌握。\n\
+      2、IndexedDB 不是所有浏览器都支持，需要做兼容处理。\n\
+      3、IndexedDB 是一个异步的 API，需要注意回调函数的执行顺序。\n\
+      参考：\n' },
+      { text: '浏览器存储--IndexedDB数据库的使用', a: 'https://blog.csdn.net/weiCong_Ling/article/details/131437456' },
+      { text: '一文看懂 IndexedDB', a: 'https://juejin.cn/post/7249386837369159735' },
+      { text: '浏览器数据库 IndexedDB 入门教程', a: 'https://www.ruanyifeng.com/blog/2018/07/indexeddb.html' },
+      { text: 'HTML5 indexedDB前端本地存储数据库实例教程', a: 'https://www.zhangxinxu.com/wordpress/2017/07/html5-indexeddb-js-example/' },
+      { text: 'IndexedDB API', a: 'https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API' },
+    ]},
+    { id: 'SQLite', name: 'SQLite', desc: [
+      { text: '<b>SQLite</b> 是一种开源的关系型数据库，它被誉为最快、最可靠的关系型数据库。但浏览器不支持，一般配合原生框架使用（如 Electron）。\n\参考：\n'},
+      { text: '本地测试：electron-sqlite3', a: '../electron/index.html' },
+      { text: 'SQLite官网', a: 'https://www.sqlite.org/index.html' },
+    ]},
   ];
 
-  JvtDbTable.create({
-    rootId: 'indexed-db-view',
-  });
+  function initStorage() {
+    // const dbName = 'my-db';
+    // const tableName = 'my-table';
+    // const version = 1;
+    // const request = window.indexedDB.open(dbName, version);
+
+    // request.onerror = function (event) {
+    //   console.log('IndexedDB打开失败', event);
+    // };
+
+    // request.onsuccess = function (event) {
+    //   console.log('IndexedDB打开成功', event);
+    //   const db = event.target.result;
+    //   const transaction = db.transaction(tableName,'readwrite');
+    //   const objectStore = transaction.objectStore(tableName);
+    //   const data = { id: 1, name: '张三', age: 20 };
+    //   const request = objectStore.add(data);
+
+    //   request.onsuccess = function (event) {
+    //     console.log('数据添加成功', event);
+    //   };
+
+    //   request.onerror = function (event) {
+    //     console.log('数据添加失败', event);
+    //   };
+    // };
+
+    // request.onupgradeneeded = function (event) {
+    //   console.log('IndexedDB升级', event);
+    //   const db = event.target.result;
+    //   if (!db.objectStoreNames.contains(tableName)) {
+    //     const objectStore = db.createObjectStore(tableName, { keyPath: 'id' });
+    //     objectStore.createIndex('name', 'name', { unique: false });
+    //     objectStore.createIndex('age', 'age', { unique: false });
+    //   }
+    // };
+  }
+
+  function main() {
+    JvtFloatNavilist.create({
+      rootId: 'id-storage-navi-view',
+      title: '存储方式（选型）',
+      datas: this._storageCfgs,
+      activeId: this._storageActiveId,
+      onChanged: function (data) {
+        console.log(data);
+
+        _storageActiveId = data.id;
+
+        document.querySelector('.online-db-title').innerHTML = `${data.name} - 在线测试`;
+      }
+    });
+
+    JvtDbTable.create({
+      rootId: 'indexed-db-view',
+      onChanged: function (event) {
+        console.log(event);
+      }
+    });
+  }
+
+  main();
 
 </script>
 

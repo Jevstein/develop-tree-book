@@ -117,3 +117,23 @@ class JvtUtils {
   }
   
 }
+
+/**
+ * 枚举类: 用于定义常量, 防止魔法字符串，可确保枚举不被覆盖或访问不存在的命名常量
+ * 也可以使用冻结的方式创建枚举类（但访问不存在的命名常量会返回undefined），
+ * 例如：const Enum = Object.freeze({ A: 1, B: 2, C: 3 });
+ * @param {Object} baseEnum 基础枚举对象
+ */
+function JvtEnum(baseEnum) {
+  return new Proxy(baseEnum, {
+    get(target, name) {
+      if (!baseEnum.hasOwnProperty(name)) {
+        throw new Error(`"${name}" value does not exist in the enum`)
+      }
+      return baseEnum[name]
+    },
+    set(target, name, value) {
+      throw new Error('Cannot add a new value to the enum')
+    }
+  })
+}
