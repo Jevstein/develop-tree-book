@@ -1,4 +1,4 @@
-const indexDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
+const indexDBEx = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
 
 class IndexDBCache {
 	constructor(
@@ -23,7 +23,7 @@ class IndexDBCache {
 	initDB() {
 		return new Promise((resolve, reject) => {
 			// 打开数据库
-			this._request = indexDB.open(this._dbName, this._dbversion);
+			this._request = indexDBEx.open(this._dbName, this._dbversion);
 			// 数据库初始化成功
 			this._request.onsuccess = (event) => {
 				this._db = this._request.result;
@@ -159,7 +159,7 @@ class IndexDBCache {
 	// 删除数据库
 	deleteDB() {
 		console.log('开始删除数据库')
-		let DBDeleteRequest = indexDB.deleteDatabase(this._dbName)
+		let DBDeleteRequest = indexDBEx.deleteDatabase(this._dbName)
 		DBDeleteRequest.onsuccess = function (event) {
 			console.log('删除数据库成功')
 		}
@@ -184,12 +184,12 @@ let imageDB = new IndexDBCache(params)
 const initIndexDB = () => {
 	imageDB.initDB().then(res => {
 		if (res.type == 'upgradeneeded') {
-			console.log('indexDB 数据库创建或更新成功!')
+			console.log('indexDBEx 数据库创建或更新成功!')
 		} else {
-			console.log('indexDB 数据库初始化成功!')
+			console.log('indexDBEx 数据库初始化成功!')
 		}
 	}).catch((err) => {
-		console.log('indexDB 数据库初始化失败! ', err)
+		console.log('indexDBEx 数据库初始化失败! ', err)
 	})
 }
 
@@ -201,9 +201,9 @@ function RandomNumber() {
 const changeVal = () => {
 	const data = { imageName: 'uploadImgName' + RandomNumber(), imageData: 'uploadImgUrl' + RandomNumber(), imageFile: 'uploadFile' + RandomNumber() }
 	imageDB.addData(data).then((res) => {
-		console.log('写入 indexDB 数据库成功', res)
+		console.log('写入 indexDBEx 数据库成功', res)
 	}).catch((err) => {
-		console.log('写入 indexDB 数据库失败==>', err)
+		console.log('写入 indexDBEx 数据库失败==>', err)
 	})
 }
 

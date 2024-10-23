@@ -1,17 +1,17 @@
 class JvtDbTable extends JvtHTMLComponent {
   _colums = [
-    {name: '编号', key: 'id', width: '100px', type: 'text'},
-    {name: '姓名', key: 'username', width: '100px', type: 'text'},
-    {name: '密码', key: 'pwd', width: '100px', type: 'password'},
-    {name: '生日', key: 'birth', width: '100px', type: 'date'},
-    {name: '地址', key: 'addre', width: '200px', type: 'text'},
-    // {name: '操作', key: 'operate', width: '100px', type: 'operate'}
+    // {name: '编号', key: 'id', width: '100px', type: 'text'},
+    // {name: '姓名', key: 'username', width: '100px', type: 'text'},
+    // {name: '密码', key: 'pwd', width: '100px', type: 'password'},
+    // {name: '生日', key: 'birth', width: '100px', type: 'date'},
+    // {name: '地址', key: 'addre', width: '200px', type: 'text'},
+    // // {name: '操作', key: 'operate', width: '100px', type: 'operate'}
   ];
   _datas = [
-    {id: '101', username: '张小三', pwd: '123456', birth: '1949-10-01', addre: '上海市第九区红色玫瑰'},
-    {id: '110', username: '李某四', pwd: '654321', birth: '1997-07-01', addre: '北京市朝阳区艾欧尼亚'},
-    {id: '001', username: '王老五', pwd: '234561', birth: '2008-08-08', addre: '广东省深圳市黑色玫瑰'},
-    {id: '100', username: '陈阿六', pwd: '345612', birth: '2024-09-25', addre: '广东省广州市白色玫瑰'},
+    // {id: '101', username: '张小三', pwd: '123456', birth: '1949-10-01', addre: '上海市第九区红色玫瑰'},
+    // {id: '110', username: '李某四', pwd: '654321', birth: '1997-07-01', addre: '北京市朝阳区艾欧尼亚'},
+    // {id: '001', username: '王老五', pwd: '234561', birth: '2008-08-08', addre: '广东省深圳市黑色玫瑰'},
+    // {id: '100', username: '陈阿六', pwd: '345612', birth: '2024-09-25', addre: '广东省广州市白色玫瑰'},
   ];
   _onChanged = (data) => undefined;
 
@@ -33,7 +33,7 @@ class JvtDbTable extends JvtHTMLComponent {
     this._colums = colums;
     onChanged && (this._onChanged = onChanged);
 
-    const editData = this._datas.find(data => data.id === editId);
+    const editData = datas.find(data => data.id === editId);
 
     this._init({rootId, colums, datas, editData});
   }
@@ -158,9 +158,9 @@ class JvtDbTable extends JvtHTMLComponent {
       dbTable.appendChild(table);
     }
 
-    {// <h3>新增数据</h3>
+    {// <h3>新增或编辑数据</h3>
       const h = document.createElement('h3');
-      h.innerText = '新增数据';
+      h.innerText = '新增或编辑数据';
       dbTable.appendChild(h);
     }
 

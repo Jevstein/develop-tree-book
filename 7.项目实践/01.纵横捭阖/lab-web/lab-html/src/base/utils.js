@@ -49,11 +49,11 @@ class JvtUtils {
    * @param {*} wait 
    * @returns 
    */
-  static throttle(cb, wait = 3000){
+  static throttle(cb, wait = 3000) {
     let previous = 0;
     return (...args) => {
       const now = +new Date();
-      if ( now - previous > wait ){
+      if (now - previous > wait) {
         previous = now;
         cb.apply(this, args);
       }
@@ -70,17 +70,17 @@ class JvtUtils {
    */
   static debounce(cb, wait = 3000, immediate = false) {
     let timeout;
-  
-    return function(...args) {
+
+    return function (...args) {
       const callNow = immediate && !timeout;
-  
+
       timeout && clearTimeout(timeout);
-  
+
       timeout = setTimeout(() => {
         timeout = null;
         !immediate && cb.apply(this, args);
       }, wait);
-  
+
       callNow && cb.apply(this, args);
     };
   }
@@ -93,11 +93,11 @@ class JvtUtils {
     // 创建canvas元素
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
-  
+
     // 设置canvas大小
     canvas.width = 300;
     canvas.height = 200;
-  
+
     // 绘制水印文字
     ctx.font = '20px Arial';
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // 半透明黑色
@@ -106,34 +106,33 @@ class JvtUtils {
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.rotate(-Math.atan(canvas.height / canvas.width));
     ctx.fillText(text, 0, 0);
-  
+
     // 创建水印图片
     var watermark = new Image();
     watermark.src = canvas.toDataURL('image/png');
-  
+
     // 添加水印图片到body
     document.body.style.backgroundImage = 'url(' + watermark.src + ')';
     document.body.style.backgroundRepeat = 'repeat';
   }
-  
-}
 
-/**
- * 枚举类: 用于定义常量, 防止魔法字符串，可确保枚举不被覆盖或访问不存在的命名常量
- * 也可以使用冻结的方式创建枚举类（但访问不存在的命名常量会返回undefined），
- * 例如：const Enum = Object.freeze({ A: 1, B: 2, C: 3 });
- * @param {Object} baseEnum 基础枚举对象
- */
-function JvtEnum(baseEnum) {
-  return new Proxy(baseEnum, {
-    get(target, name) {
-      if (!baseEnum.hasOwnProperty(name)) {
-        throw new Error(`"${name}" value does not exist in the enum`)
+  /**
+   * 枚举类: 用于定义常量, 防止魔法字符串，可确保枚举不被覆盖或访问不存在的命名常量
+   * 也可以使用冻结的方式创建枚举类（但访问不存在的命名常量会返回undefined），
+   * 例如：const Enum = Object.freeze({ A: 1, B: 2, C: 3 });
+   * @param {Object} baseEnum 基础枚举对象
+   */
+  static enum(baseEnum) {
+    return new Proxy(baseEnum, {
+      get(target, name) {
+        if (!baseEnum.hasOwnProperty(name)) {
+          throw new Error(`"${name}" value does not exist in the enum`)
+        }
+        return baseEnum[name]
+      },
+      set(target, name, value) {
+        throw new Error('Cannot add a new value to the enum')
       }
-      return baseEnum[name]
-    },
-    set(target, name, value) {
-      throw new Error('Cannot add a new value to the enum')
-    }
-  })
+    });
+  }
 }

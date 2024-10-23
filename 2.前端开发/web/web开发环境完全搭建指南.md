@@ -34,10 +34,14 @@
   
   # 方法三：apt命令 - 适用于linux
   $ sudo apt-get update
-  $ sudo apt-get install node
+  $ sudo apt-get install -y nodejs
   或者：
   $ sudo apt update
-  $ sudo apt install nod
+  $ sudo apt install node
+  
+  # 方法四：nvm命令-gitee镜像
+  $ curl -fsSL https://gitee.com/sdq/nvm/raw/master/install.sh | bash
+  $ export NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/
   ```
   
 
@@ -487,6 +491,20 @@ $ brew update
 ```shell
 $ yarn config set sass-binary-site http://npm.taobao.org/mirrors/node-sass
 $ yarn add sass node-sass -dev
+```
+
+
+
+### 3、error:0308010C:digital envelope routines::unsupported
+
+   [参考文档](https://www.jianshu.com/p/fc7674e8a84d)
+
+​	出现这个错误是因为 node.js V17版本中最近发布的OpenSSL3.0, 而OpenSSL3.0对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响.
+
+目前可以通过运行以下命令行临时解决这个问题
+
+```bash
+export NODE_OPTIONS=--openssl-legacy-provider
 ```
 
 
