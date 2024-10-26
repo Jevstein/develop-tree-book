@@ -497,14 +497,24 @@ $ yarn add sass node-sass -dev
 
 ### 3、error:0308010C:digital envelope routines::unsupported
 
-   [参考文档](https://www.jianshu.com/p/fc7674e8a84d)
+   [参考文档](https://blog.csdn.net/m0_65933139/article/details/130690790)
 
 ​	出现这个错误是因为 node.js V17版本中最近发布的OpenSSL3.0, 而OpenSSL3.0对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响.
 
 目前可以通过运行以下命令行临时解决这个问题
 
 ```bash
+# 方法一：
+# Linux & Mac OS：
 export NODE_OPTIONS=--openssl-legacy-provider
+#Windows
+set NODE_OPTIONS=--openssl-legacy-provider
+
+# 方法二：
+$env:NODE_OPTIONS="--openssl-legacy-provider"
+
+# 方法三：
+卸载Node.js17+版本，安装Node.js17-版本（合适的版本）
 ```
 
 

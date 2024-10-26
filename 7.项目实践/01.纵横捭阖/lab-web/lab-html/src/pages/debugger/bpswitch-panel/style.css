@@ -1,0 +1,81 @@
+.bitmap-switch-panel {
+  display: flex;
+  flex-wrap: wrap;    /* 超出时自动换行 */
+  gap: 10px;          /* 项目之间的间隔 */
+
+  .view {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    background: #f2f2f2;
+    border-radius: 5px;
+    /* margin: 10px 10px 0 0; */
+    padding: 10px;
+    min-width: 90px;
+
+    .item-header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', Courier, monospace;
+      flex: 1;
+      width: 100%;
+      font-size: 12px;
+      margin-bottom: 10px;
+
+      span {
+        color: red;
+      }
+    }
+
+    .item-body {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;    /* 超出时自动换行 */
+      gap: 5px;          /* 项目之间的间隔 */
+      width: 100%;
+
+      .item {
+        position: relative;
+        padding: 5px 8px;
+        font-size: 12px;
+        background: #ffffff;
+        color: #818181;
+        border: 1px solid #e5e5e5;
+        border-radius: 5px;
+        width: 48px;
+
+        &.checked {
+          background: #5d9cec;
+          color: #ffffff;
+
+          &:hover {
+            background: #77aaef;
+          }
+        }
+
+        &:hover {
+          background: #e0ebfb;
+          /* color: #ffffff; */
+          border: 1px solid #5d9cec;
+          cursor: pointer;
+        }
+
+        .badge {
+          position: absolute;
+          top: -5px;
+          left: 1px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 8px;
+          background: red;
+          color: #ffffff;
+          border-radius: 20px;
+          padding: 1px 4px;
+        }
+      }
+    }
+  }
+}
