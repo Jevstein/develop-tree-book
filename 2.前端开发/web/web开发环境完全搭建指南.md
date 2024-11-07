@@ -400,7 +400,7 @@ $ yarn add <package-name>：安装具体的某个包
 $ yarn remove <package-name>： 删除具体的某个包
 $ yarn serve：运行项目
 $ yarn build：编译项目
-$ yarn cache clean: 清除yarn缓存
+$ yarn cache clean --force: 清除yarn缓存
 
 # 切换镜像仓库
 $ yarn config get registry # 查看

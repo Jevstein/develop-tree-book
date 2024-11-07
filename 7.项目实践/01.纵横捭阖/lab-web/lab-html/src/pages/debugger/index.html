@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>调试神器</title>
-  <link rel="stylesheet" href="./bpswitch-panel/style.css">
+  <link rel="stylesheet" href="./bpswitch-director/style.css">
   <style>
     body {
       .body {
@@ -14,7 +14,7 @@
     }
 
     .box {
-      margin: 10px;
+      margin: 0 10px;
 
       .box-title {
         font-size: 16px;
@@ -42,34 +42,10 @@
 
       &.bitmap-onoff {
         .area {
-          /* border: 1px solid #ccc; */
-          background: #f9ffff;
+          border: 0.5px solid #ccc;
+          /* background: #f9ffff; */
           border-radius: 5px;
-
-          .settings {
-            border-bottom: 1px solid #ccc;
-            padding: 10px;
-            font-size: 14px;
-
-            .item {
-              display: flex;
-              align-items: center;
-              margin-bottom: 10px;
-              
-              .bitmap-text {
-                width: 450px;
-              }
-
-              input {
-                height: 20px;
-                margin-right: 10px;
-              }
-            }
-          }
-
-          .preview {
-            padding: 10px;
-          }
+          position: relative;
         }
       }
     }
@@ -84,23 +60,10 @@
     <div class="box bitmap-onoff">
       <div class="box-title"><b>位图开关</b></div>
       <div class="box-subtitle">
-        支持海量开关，数据类型支持数组或字符串(以逗号分隔)
+        支持海量开关 - 开关值为整型数组或数字字符串(以逗号分隔)
         </span>
       </div>
       <div class="area" id="id-bitmap-switch-area">
-        <div class="settings">
-          <div class="item">
-            开关值：<input class="bitmap-text" id="id-bitmap-text" type="text" value="2147483646,1,2,3,4,5,6,7,8,9,10" onchange="handleChangeBitmapPreview()">
-            二进制长度：<input class="bitmap-binary" id="id-bitmap-binarylen" type="number" value="30" min="4" max="64" onchange="handleChangeBitmapPreview()">
-          </div>
-          <div class="item">
-            第几位：<input class="bitmap-index" id="id-bitmap-index" type="text" value="22">
-            <button onclick="handleClickQuery()">查询</button>
-          </div>
-        </div>
-        <div class="preview" id="id-bitmap-preview">
-          预览
-        </div>
       </div>
     </div>
 
@@ -108,41 +71,14 @@
 
   <script src="../../base/utils.js"></script>
   <script src="../../base/bpswitch.js"></script>
-  <script src="./bpswitch-panel/index.js"></script>
+  <script src="./bpswitch-director/index.js"></script>
   <script>
-    _bitmapSwitchPanel = undefined;
 
-    function handleChangeBitmapPreview() {
-      const textElement = document.getElementById("id-bitmap-text");
-      const binaryLenthElement = document.getElementById("id-bitmap-binarylen");
-      const previewElement = document.getElementById("id-bitmap-preview");
-      previewElement.innerHTML = "";
-      // const text = elementText.value;
-      // console.log('createBitmapPreview', textElement.value, binaryLenthElement.value);
-
-      this._bitmapSwitchPanel = new BitmapSwitchPanel({
-        value: textElement.value,
-        binaryLenth: binaryLenthElement.value,
-        target: previewElement,
-        onChange: (data) => {
-          console.log('onSwitchChange', data);
-          const indexElement = document.getElementById("id-bitmap-text");
-          indexElement.value = data.value;
-          // this.handleChangeBitmapPreview();
-        }
-      });
+    function __main__() {
+      BitmapSwitchDirector.create(document.getElementById("id-bitmap-switch-area"));
     }
 
-    function handleClickQuery() {
-      const indexElement = document.getElementById("id-bitmap-index");
-      this._bitmapSwitchPanel?.queryChecked(indexElement.value);
-    }
-
-    function main() {
-      this.handleChangeBitmapPreview();
-    }
-
-    main();
+    __main__();
 
   </script>
 </body>
