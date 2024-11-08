@@ -115,20 +115,25 @@
         position: relative;
         box-sizing: border-box;
 
-        &.active {
-          border: 2px solid #5d9cec;
-          opacity: 1;
+        > * {
+          position: relative; /* 确保内容在伪元素之上 */
         }
 
-        &.inactive {
-          border: none;
-          opacity: 0.5
+        .active-border {
+          border: 2px solid #5d9cec;
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          z-index: -1;
+          border-radius: 5px;
         }
 
         .group-badge {
           position: absolute;
-          top: 0px;
-          left: 0px;
+          top: 5px;
+          left: 5px;
           display: flex;
           justify-content: center;
           align-items: center;

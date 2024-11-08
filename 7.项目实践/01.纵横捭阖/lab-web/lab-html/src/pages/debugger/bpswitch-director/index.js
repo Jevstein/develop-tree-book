@@ -2,6 +2,7 @@
 class BitmapSwitchDirector {
   _core = undefined;
   _activeItemIndex = undefined;
+  _lastBlinkStop = undefined;
 
   static create(target) {
     return new BitmapSwitchDirector(target);
@@ -120,18 +121,17 @@ class BitmapSwitchDirector {
         const nowActiveElement = document.getElementById(`id-bitmap-navi-view-${i}`);
         const lastActiveElement = document.getElementById(`id-bitmap-navi-view-${this._activeItemIndex}`);
         const nowPanelViewElement = document.getElementById(`id-bitmap-view-${i}`);
-        const lastPanelViewElement = document.getElementById(`id-bitmap-view-${this._activeItemIndex}`);
 
         if (typeof(this._activeItemIndex) !== 'undefined') {
+          this._lastBlinkStop && this._lastBlinkStop(true);
           lastActiveElement && lastActiveElement.classList.remove('active');
-          lastPanelViewElement && lastPanelViewElement.classList.remove('active');
         }
 
         nowActiveElement.classList.add('active');
         this._activeItemIndex = i;
 
-        nowPanelViewElement.scrollIntoView({ behavior: 'smooth' });
-        this._blinkElement(nowPanelViewElement, 100, 1500);
+        nowPanelViewElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        this._lastBlinkStop = this._blinkElement(nowPanelViewElement, 100, 1000);
       }
 
       const badgeElement = document.createElement('div');
@@ -256,30 +256,53 @@ class BitmapSwitchDirector {
   }
 
   _blinkElement(element, duration, timeout) {
-    // 设置定时器，周期性地改变元素的透明度
     let active = false;
-    const interval = setInterval(function() {
-      active = !active;
-      element.style.border = active ? '2px solid #5d9cec' : 'none';
-      element.style.opacity = active ? 1 : 0.5;
+    let interval = null;
+    let timer = null;
 
-      // element.classList.add(active ? 'active' : 'inactive');
+    interval = setInterval(function() {
+      active = !active;
+      if (active) {
+        // element.style.opacity = 1;
+        const activeBorderElement = document.createElement('div');
+        activeBorderElement.classList.add('active-border');
+        element.appendChild(activeBorderElement);
+      } else {
+        // element.style.opacity = 0.5;
+        const activeBorderElement = element.querySelector('.active-border');
+        activeBorderElement && element.removeChild(activeBorderElement);
+      }
     }, duration);
 
-    const timer = setTimeout(() => {
-      clearInterval(interval);
-      clearTimeout(timer);
-      element.style.opacity = 1;
-      element.style.border = '2px solid #5d9cec';
-      // element.classList.remove('inactive');
-      element.classList.add('active');
-    }, timeout);
+    const stop = (isRemove = false) => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+      
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+
+      // element.style.opacity = 1;
+
+      const activeBorderElement = element.querySelector('.active-border');
+      if (isRemove) {
+        activeBorderElement && element.removeChild(activeBorderElement);
+        return;
+      }
+
+      if (!activeBorderElement) {
+        const activeBorderElement = document.createElement('div');
+        activeBorderElement.classList.add('active-border');
+        element.appendChild(activeBorderElement);
+      }
+    }
+
+    timer = setTimeout(() => stop(), timeout);
    
-    // 返回一个清除定时器的函数
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
+    return stop;
   }
 
   handleChangeSwitch(data) {
