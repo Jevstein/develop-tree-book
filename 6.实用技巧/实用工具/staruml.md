@@ -39,6 +39,48 @@ $asar e app.asar app
   }
 ```
 
+或者
+
+```javascript
+checkLicenseValidity () {
+    this.validate().then(() => {
+      setStatus(this, true)
+    }, () => {
+      //setStatus(this, false)
+     // UnregisteredDialog.showDialog()
+     setStatus(this, true)//这个
+    })
+  }
+ 
+  /**
+   * Check the license key in server and store it as license.key file in local
+   *
+   * @param {string} licenseKey
+   */
+  register (licenseKey) {
+    return new Promise((resolve, reject) => {
+      $.post(app.config.validation_url, {licenseKey: licenseKey})
+        .done(data => {
+          var file = path.join(app.getUserPath(), '/license.key')
+          fs.writeFileSync(file, JSON.stringify(data, 2))
+          licenseInfo = data
+          setStatus(this, true)
+          resolve(data)
+        })
+        .fail(err => {
+          setStatus(this, true)//这个
+          //if (err.status === 499) { /* License key not exists */
+           // reject('invalid')
+          //} else {
+          //  reject()
+          //}
+        })
+    })
+  }
+```
+
+
+
 保存！
 
 4）重新打包

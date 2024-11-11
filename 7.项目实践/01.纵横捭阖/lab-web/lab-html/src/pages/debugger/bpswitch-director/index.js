@@ -29,7 +29,7 @@ class BitmapSwitchDirector {
             textElement.classList.add('bitmap-text');
             textElement.setAttribute('id', 'id-bitmap-text');
             textElement.setAttribute('type', 'text');
-            textElement.setAttribute('value', '123,132,213,231,312,321,123456,234561,345612,456123,561234,654321,1234567,2345671,3456712,4567123,5671234,6712345,7123456,2147483646');
+            textElement.setAttribute('value', _jvt_bitmap_data_);
             // textElement.setAttribute('onchange', 'handleChangeBitmapPreview()');
             itemElement.onchange = () => this.handleChangeBitmapPreview();
             itemElement.appendChild(textElement);
@@ -101,10 +101,12 @@ class BitmapSwitchDirector {
       onChange: (data) => this.handleChangeSwitch(data),
     });
 
-    if (this._core) {
-      this._createPreviewNavi(previewElement);
-      this._createPreviewPanel(previewElement);
+    if (!this._core) {
+      return;
     }
+
+    this._createPreviewNavi(previewElement);
+    this._createPreviewPanel(previewElement);
   }
 
   _createPreviewNavi(target) {
@@ -279,7 +281,7 @@ class BitmapSwitchDirector {
         clearInterval(interval);
         interval = null;
       }
-      
+
       if (timer) {
         clearTimeout(timer);
         timer = null;
@@ -334,3 +336,44 @@ class BitmapSwitchDirector {
     alert(`第 ${index} 个开关的状态: ${isChecked ? '开启' : '关闭'}!`);
   }
 }
+
+/**  IntersectionObserver */
+
+// const container = document.getElementById('container');
+// const itemCount = 1000000; // 假设有百万级的元素
+ 
+// // 创建一个用于填充DOM的函数
+// function renderItems(start, end) {
+//   container.innerHTML = ''; // 清空容器内容
+//   for (let i = start; i < end; i++) {
+//     const element = document.createElement('div');
+//     element.textContent = `Item ${i}`;
+//     container.appendChild(element);
+//   }
+// }
+ 
+// // 创建一个IntersectionObserver实例
+// const observer = new IntersectionObserver((entries) => {
+//   if (entries[0].isIntersecting) {
+//     const visibleItems = Math.ceil(container.clientHeight / entry.target.clientHeight);
+//     const start = Math.floor(entries[0].target.id);
+//     const end = start + visibleItems;
+//     renderItems(start, end);
+//   }
+// }, {
+//   root: null,
+//   threshold: 0.5
+// });
+ 
+// // 监听容器的滚动事件
+// container.addEventListener('scroll', () => {
+//   const firstVisibleItem = Math.floor(container.scrollTop / container.firstElementChild.clientHeight);
+//   const placeholder = document.createElement('div');
+//   placeholder.id = firstVisibleItem;
+//   container.textContent = ''; // 清空容器内容
+//   container.appendChild(placeholder);
+//   observer.observe(placeholder);
+// });
+ 
+// // 初始化
+// renderItems(0, 10); // 假设初始显示前10个元素
