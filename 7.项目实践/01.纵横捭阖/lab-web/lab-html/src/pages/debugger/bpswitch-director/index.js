@@ -58,6 +58,7 @@ class BitmapSwitchDirector {
             const indexElement = document.createElement('input');
             indexElement.classList.add('bitmap-index');
             indexElement.setAttribute('id', 'id-bitmap-index');
+            indexElement.setAttribute('title', '从0开始');
             indexElement.setAttribute('type', 'text');
             indexElement.setAttribute('value', '22');
             // indexElement.setAttribute('onchange', 'handleChangeBitmapPreview()');
