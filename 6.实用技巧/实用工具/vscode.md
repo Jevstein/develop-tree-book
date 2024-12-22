@@ -4,7 +4,21 @@
 
 ## 1、下载安装
 
-略
+​	略
+
+### 1）实用插件
+
+```shell
+1.GitLens # Visualize code authorship at a glance via Git blame annotations and CodeLens, seamlessly navigate.
+2.Git Blame # See git blame information in the status bar.
+3.Git History # View git log, file history, compare branches or commits.
+4.Fitten Code # Super Fast and accurate AI Powered Automatic Code Generation and Completion for Multiple Languages.
+5.通义灵码（TONGYI Lingma）# 基于通义大模型的智能编码辅助工具，提供行级/函数级实时续写、自然语言生成代码、单元测试生成、代码注释生成、代码解释、研发智能问答、异常报错排查等能力，并针对阿里云 SDK/API 的使用场景调优，为开发者带来高效、流畅的编码体验.
+6.CursorCode(Cursor for VSCode) # a free AI coder with GPT
+7.One Dark Pro # Atom's iconic One Dark theme for Visual Studio Code.
+```
+
+
 
 ## 2、基本用法
 
