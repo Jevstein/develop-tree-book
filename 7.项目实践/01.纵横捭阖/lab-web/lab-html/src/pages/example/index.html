@@ -20,13 +20,6 @@
     .weblab-urlnavi-example {
       width: 100%;
       height: 100%;
-
-      .weblab-urlnavi-center {
-        .box {
-          min-width: 260px;
-          width: auto;
-        }
-      }
     }
   </style>
 </head>
@@ -41,28 +34,20 @@
   const cfgs = {
     // 左侧栏
     left: [
-      // {
-      //   title: '高频网站', show: 12,
-      //   items: [
-      //     { name: 'github-Jevstein', url: 'https://github.com/jevstein' },
-      //     { name: 'gitlab-emessage', url: 'http://10.12.101.12/EM/weapp-emmessage' },
-      //     { name: 'Jenkins-emessage', url: 'http://10.12.101.25:8080/job/weapp-emmessage' },
-      //   ],
-      // },
+      {
+        title: '徒手画鸦', show: 20,
+        items: [
+          { name: '虚拟列表', url: './muck/auto-translateY.html'},
+        ],
+      },
     ],
     // 中间栏
     center: [
       {
-        title: '徒手画鸦', show: 20,
-        items: [
-          { name: '虚拟列表', url: './debugger/auto-translateY.html'},
-        ],
-      },
-      {
         title: '网络示例',
         items: [
-          { name: '虚拟列表-鼠标拖拉(padding bottom/top)，受限', url: './virtual-list/infinite-padding.html', subname: '谷歌浏览器的页面的最大宽/高是33554400px，如果超过这个宽度/高度，会被默认切掉' },
-          { name: '虚拟列表-无限滚动(transform: translateY(...))', url: './virtual-list/auto-translateY.html' },
+          { name: '虚拟列表-鼠标拖拉(padding)，浏览器受限', url: './flat/virtual-list/infinite-padding.html', subname: '谷歌浏览器的页面的最大宽/高是33554400px，如果超过这个宽度/高度，会被默认切掉' },
+          { name: '虚拟列表-无限滚动(transform)', url: './flat/virtual-list/auto-translateY.html' },
         ],
       },
     ],

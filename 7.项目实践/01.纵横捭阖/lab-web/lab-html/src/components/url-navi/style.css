@@ -56,7 +56,7 @@
           color: #161e2e;
           cursor: pointer;
           display: flex;
-          justify-content: start;
+          justify-content: center;
           /* text-align: center; */
 
           &:hover {
@@ -65,10 +65,11 @@
 
           .icon {
             margin-right: 5px;
+            font-size: 12px;
           }
 
           a {
-            width: 100%;
+            /* width: 100%; */
             word-break: keep-all;
             white-space: nowrap;
             overflow: hidden;
@@ -138,6 +139,7 @@
 
         .icon {
           margin-right: 5px;
+          font-size: 12px;
           /* margin-top: 6px;
           width: 5px;
           height: 5px;
@@ -198,6 +200,7 @@
 
       .icon {
         margin-right: 5px;
+        font-size: 12px;
         /* margin-top: 6px;
           width: 5px;
           height: 5px;

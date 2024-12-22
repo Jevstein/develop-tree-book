@@ -65,7 +65,7 @@ class BitmapSwitchDirector {
             itemElement.onchange = () => this.handleChangeBitmapPreview();
             itemElement.appendChild(indexElement);
 
-            const queryBtnElement = document.createElement('button');
+            const queryBtnElement = document.createElement('div');
             queryBtnElement.classList.add('query-btn');
             queryBtnElement.onclick = () => this.handleClickQuery();
             queryBtnElement.innerHTML = `查询`;

@@ -112,6 +112,11 @@ class JvtUrlNavi extends JvtHTMLComponent {
             img.width = '16';
             img.height = '16';
             itemElement.appendChild(img);
+          } else {
+            const img = document.createElement('div');
+            img.className = "icon";
+            img.innerText = '🔗';
+            itemElement.appendChild(img);
           }
 
           // a标签
@@ -144,7 +149,7 @@ class JvtUrlNavi extends JvtHTMLComponent {
           moreItems.forEach(item => {
             const subname = item.subname ? `${item.subname}` : '';
             const itemElement = document.createElement('div');
-            itemElement.title = `${item.name}:\n${item.url}\n${item.subname}`
+            itemElement.title = `${item.name}:\n${item.url}\n${subname}`
             itemElement.setAttribute('class', 'item');
 
             // logo
