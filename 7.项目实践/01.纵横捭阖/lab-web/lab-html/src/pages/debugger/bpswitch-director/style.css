@@ -4,7 +4,8 @@
 
   .settings {
     border-bottom: 0.5px solid #ccc;
-    background: #f9ffff;
+    /* background: #ededff; #f9ffff */
+    background: linear-gradient(to bottom, #eeedff, #ffffff);
     padding: 10px 10px 0 10px;
     font-size: 14px;
     border-top-left-radius: 5px;
@@ -40,8 +41,11 @@
       flex-shrink: 0;
       max-height: 790px;
       overflow: auto;
+      /* border: 0.5px solid #ccc; */
+      border-left: 0.5px solid #ccc;
       border-right: 0.5px solid #ccc;
-      background: #f9ffff;
+      /* background: #f9ffff; */
+      /* background: #f9f8ff; */
       border-bottom-left-radius: 5px;
 
       .view {
@@ -52,9 +56,11 @@
         position: relative;
         cursor: pointer;
         border-bottom: 0.5px solid #ccc;
+        background: linear-gradient(#ffffff, #eeedff, #ffffff);
 
         :hover, &.active {
-          background: #f2f2f2;
+          /* background: #f2f2f2; */
+          background: #f9ffff;
         }
 
         .group-badge {
@@ -108,7 +114,8 @@
         display: flex;
         justify-content: center;
         flex-direction: column;
-        background: #f2f2f2;
+        /* background: #f2f2f2; */
+        background: linear-gradient(to bottom, #eeedff, #ffffff);
         border-radius: 5px;
         padding: 10px;
         min-width: 90px;

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Scroll with IntersectionObserver</title>
+  <style>
+    .container-box {
+      height: 400px;
+      width: 100%;
+      background-color: aliceblue;
+      border: #000 1px solid;
+    }
+
+    .infinite-list-container {
+      height: 100%;
+      overflow: auto;
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+      /* 启用触摸滚动 */
+    }
+
+    .infinite-list-phantom {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      z-index: -1;
+      /* 置于背景层 **/
+    }
+
+    .infinite-list {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      text-align: center;
+    }
+
+    .infinite-list-item {
+      border-bottom: 1px solid #000;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-box"> </div>
+
+  <script>
+    const _listData = Array.from({ length: 1000000 }, (_, index) => ({
+      id: index,
+      name: `item ${index}`,
+      value: `value ${index}`,
+    }));
+
+    function createList(start, end) {
+      const infiniteList = document.querySelector('#id-infinite-list');
+      const list = this._listData.slice(start, Math.min(this._listData.length, end));
+      list.map((item, index) => {
+        const listItem = document.createElement('div');
+        listItem.classList.add('infinite-list-item');
+        listItem.innerHTML = `${item.name}`;
+        infiniteList.appendChild(listItem);
+      });
+  
+    }
+
+    function __main__() {
+      // https://blog.csdn.net/qq_27702739/article/details/143502785
+      const container = document.querySelector('.container-box');
+
+      const infiniteListContainer = document.createElement('div');
+      infiniteListContainer.classList.add('infinite-list-container');
+      infiniteListContainer.setAttribute('id', 'id-infinite-list-container');
+      infiniteListContainer.onscroll = () => {
+        console.log(infiniteListContainer.scrollTop);
+      };
+      {
+        const infinitePhantom = document.createElement('div');
+        infinitePhantom.classList.add('infinite-list-phantom');
+        infinitePhantom.setAttribute('id', 'id-infinite-phantom');
+        container.appendChild(infinitePhantom);
+        
+        const infiniteList = document.createElement('div');
+        infiniteList.classList.add('infinite-list');
+        infiniteList.setAttribute('id', 'id-infinite-list');
+        container.appendChild(infiniteList);
+        this.createList(0, 10);
+      }
+      container.appendChild(infiniteListContainer);
+    }
+
+    __main__();
+
+  </script>
+</body>
+
+</html>

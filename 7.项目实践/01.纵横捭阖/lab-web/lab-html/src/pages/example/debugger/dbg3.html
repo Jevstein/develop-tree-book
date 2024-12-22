@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Scroll with IntersectionObserver</title>
+  <style>
+    #container {
+      height: 600px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+    }
+
+    /*.item {
+      height: 20px;
+      border-bottom: 1px solid #eee;
+    } */
+  </style>
+</head>
+
+<body>
+
+  <div id="container"></div>
+
+  <script>
+
+    const container = document.getElementById('container');
+    const itemHeight = 20; // 假设每个元素高度是20px
+    const numItems = 1000000; // 假设总共有100万个元素
+
+    container.style.height = `${itemHeight * 30}px`; // 设置容器高度
+
+    let start = 0; // 当前开始渲染的元素索引
+    let end = Math.ceil(container.clientHeight / itemHeight); // 当前结束渲染的元素索引
+
+    function render() {
+      // 清除当前内容
+      container.innerHTML = '';
+
+      for (let i = start; i < end; i++) {
+        const div = document.createElement('div');
+        div.textContent = `Item ${i}`; // 创建元素并设置内容
+        div.style.height = `${itemHeight}px`;
+        container.appendChild(div); // 将元素添加到容器中
+      }
+    }
+
+    render(); // 首次渲染
+
+    container.onscroll = function () {
+      const scrollTop = this.scrollTop;
+      start = Math.floor(scrollTop / itemHeight);
+      end = start + Math.ceil(this.clientHeight / itemHeight) + 1;
+      requestAnimationFrame(render); // 使用requestAnimationFrame优化性能
+    };
+
+  </script>
+</body>
+
+</html>

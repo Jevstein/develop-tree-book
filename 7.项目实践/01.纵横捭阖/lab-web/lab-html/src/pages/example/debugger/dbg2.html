@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Scroll with IntersectionObserver</title>
+  <style>
+    #container {
+      height: 600px;
+      /* Fixed height for scrolling */
+      overflow-y: auto;
+      /* Enable vertical scrolling */
+      border: 1px solid #ccc;
+    }
+
+    .item {
+      height: 20px;
+      /* Height of each item */
+      border-bottom: 1px solid #eee;
+      /* Border for visibility */
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="container"></div>
+
+  <script>
+    const container = document.getElementById('container');
+    const totalItems = 1000000; // Total number of items
+    const itemsPerRender = 100; // Number of items to display at once
+    const itemHeight = 20; // Height of each item
+    const itemBuffer = 10; // Buffer to render above and below the viewport
+
+    // Create an array to hold the data
+    const data = Array.from({ length: totalItems }, (_, i) => `Item ${i + 1}`);
+
+    let currentStartIndex = 0; // Keep track of the starting index of rendered items
+    let observer; // IntersectionObserver instance
+
+    // Function to create and observe items
+    function createItems(startIndex, endIndex) {
+      for (let i = startIndex; i < endIndex; i++) {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.textContent = data[i];
+        container.appendChild(div);
+      }
+    }
+
+    // Function to update visible items
+    function updateVisibleItems() {
+      const items = container.children;
+      const containerHeight = container.clientHeight;
+
+      // Calculate the start and end index based on the height of the container
+      const itemCount = Math.ceil(containerHeight / itemHeight);
+      const visibleStartIndex = Math.max(0, Math.floor(container.scrollTop / itemHeight) - itemBuffer);
+      const visibleEndIndex = Math.min(totalItems, visibleStartIndex + itemCount + itemBuffer);
+
+      // Clear existing items and render new ones
+      currentStartIndex = visibleStartIndex;
+      container.innerHTML = ''; // Clear the container
+      createItems(visibleStartIndex, visibleEndIndex);
+
+      console.log(`Visible items: ${visibleStartIndex} - ${visibleEndIndex}`, containerHeight, itemHeight, itemBuffer);
+    }
+
+    // Setup IntersectionObserver to call updateVisibleItems
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          updateVisibleItems();
+        }
+      });
+    }, {
+      root: container,
+      rootMargin: '0px',
+      threshold: 1.0
+    });
+
+    // Event listener for initial load and scroll
+    container.addEventListener('scroll', () => {
+      observer.observe(container); // Start observing the container
+      updateVisibleItems();
+    });
+
+    // Initial render
+    createItems(0, itemsPerRender); // Render the initial items
+
+  </script>
+</body>
+
+</html>

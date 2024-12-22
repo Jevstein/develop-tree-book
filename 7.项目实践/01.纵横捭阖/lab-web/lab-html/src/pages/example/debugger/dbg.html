@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>调试神器</title>
+  <style>
+    /* body {
+      .body {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    } */
+
+  </style>
+</head>
+
+<body>
+  <div class="body" id="id-body">
+
+    <!-- <div id="container">
+
+    </div> -->
+
+  </div>
+
+  <script>
+      // const container = document.getElementById('container');
+      // const itemCount = 1000000; // 假设有百万级的元素
+      
+      // // 创建一个用于填充DOM的函数
+      // function renderItems(start, end) {
+      //   container.innerHTML = ''; // 清空容器内容
+      //   for (let i = start; i < end; i++) {
+      //     const element = document.createElement('div');
+      //     element.textContent = `Item ${i}`;
+      //     container.appendChild(element);
+      //   }
+      // }
+      
+      // // 创建一个IntersectionObserver实例
+      // const io = new IntersectionObserver((entries) => {
+      //   if (entries[0].isIntersecting) {
+      //     const visibleItems = Math.ceil(container.clientHeight / entry.target.clientHeight);
+      //     const start = Math.floor(entries[0].target.id);
+      //     const end = start + visibleItems;
+      //     renderItems(start, end);
+      //   }
+      // }, {
+      //   root: container,
+      //   rootMargin: '100px',
+      //   threshold: [0.5],
+
+      //   // root: null,
+      //   // threshold: 0.5,
+      // });
+      
+      // // 监听容器的滚动事件
+      // container.addEventListener('scroll', () => {
+      //   const firstVisibleItem = Math.floor(container.scrollTop / container.firstElementChild.clientHeight);
+      //   const placeholder = document.createElement('div');
+      //   placeholder.id = firstVisibleItem;
+      //   container.textContent = ''; // 清空容器内容
+      //   container.appendChild(placeholder);
+      //   io.observe(placeholder);
+      // });
+      
+      // // 初始化
+      // renderItems(0, 200); // 假设初始显示前10个元素
+
+      // // io.observe(container.firstElementChild); // 监听第一个元素
+
+
+
+
+
+    const body = document.getElementById('id-body');
+    container = document.createElement('div');
+    container.id = 'container';
+    container.onscroll = () => {
+      this.onScroll();
+    };
+    container.addEventListener('scroll', this.onScroll);
+    body.appendChild(container);
+
+
+    // const container = document.getElementById('container');
+    const ITEM_HEIGHT = 20; // 假设每个项的高度都是 20px
+    const TOTAL_ITEMS = 1000000;
+    const VISIBLE_ITEMS = Math.ceil(window.innerHeight / ITEM_HEIGHT);
+
+    container.style.height = (TOTAL_ITEMS * ITEM_HEIGHT) + 'px';
+
+    function renderItems(startIndex) {
+        container.innerHTML = '';
+        for (let i = startIndex; i < startIndex + VISIBLE_ITEMS; i++) {
+            if (i >= TOTAL_ITEMS) break;
+            const item = document.createElement('div');
+            item.style.height = ITEM_HEIGHT + 'px';
+            item.textContent = 'Item ' + i;
+            container.appendChild(item);
+        }
+    }
+
+    function onScroll() {
+        const scrollTop = container.scrollTop;
+        const startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
+        renderItems(startIndex);
+    }
+
+
+    function throttle(fn, wait) {
+      let lastTime = 0;
+      return function (...args) {
+          const now = Date.now();
+          if (now - lastTime >= wait) {
+              lastTime = now;
+              fn.apply(this, args);
+          }
+      };
+    }
+
+    // 使用节流处理滚动事件
+    // container.addEventListener('scroll', throttle(onScroll, 100));
+    container.addEventListener('scroll', onScroll);
+    renderItems(0); // 初始渲染
+
+
+  </script>
+</body>
+
+</html>

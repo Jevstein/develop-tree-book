@@ -1,0 +1,140 @@
+<!-- https://blog.csdn.net/weixin_52418790/article/details/136228889?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522c8345ab339df49eeab80f096a7b6acaa%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=c8345ab339df49eeab80f096a7b6acaa&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-136228889-null-null.142^v100^pc_search_result_base4&utm_term=%E8%99%9A%E6%8B%9F%E5%88%97%E8%A1%A8&spm=1018.2226.3001.4187 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    /* 最外层容器，宽高固定列表视口大小 */
+    .container {
+      width: 500px;
+      height: 800px;
+      border: 1px solid #f80c0c;
+      margin: auto;
+      /* 居中 */
+    }
+
+    /* 可滚动容器，占最外层容器宽高100% 能被显示的列表撑开 */
+    .list_scroll {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      /* 超出滚动 */
+      background-color: antiquewhite;
+    }
+
+    /* 虚拟列表容器，用于展示长列表位于视口区域的部分项 */
+    .list {
+      width: 90%;
+      margin: auto;
+      /* 居中 */
+    }
+
+    /* 子项 */
+    .item {
+      width: 100%;
+      border: 1px solid #000;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="list_scroll">
+      <div class="list">
+        <div class="item">1</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+<script>
+  // 获取容器和列表元素
+  const listScroll = document.querySelector('.list_scroll')
+  const list = document.querySelector('.list')
+
+  // 源数据
+  const dataSource = []
+  // 渲染数据=> 通过定义首位index截取源数据
+  let renderData = []
+  // item的高度
+  const itemHeight = 50
+  // listScroll容器能够显示的最大数量
+  // +2 撑开listScroll容器使其具有滚动条
+  const maxCount = Math.floor(listScroll.clientHeight / itemHeight) + 2
+  // 开始位置索引
+  let startIndex = 0
+  // 结束位置索引
+  let endIndex = 0
+
+  // 源数据
+  function GetData() {
+    for (let i = 0; i < 1000000; i++) {
+      dataSource.push(i)
+    }
+  }
+
+  // 计算开始位置和结束位置索引
+  function ComputePointerPosition() {
+    const end = startIndex + maxCount
+    endIndex = dataSource[end] ? end : dataSource.length
+  }
+
+  // 截取渲染数据
+  function GetRenderData() {
+    renderData = dataSource.slice(startIndex, endIndex)
+  }
+
+  // 渲染
+  function Render() {
+    // 计算开始和结束位置
+    ComputePointerPosition()
+    // 获取数据
+    GetRenderData()
+    // 将截取的渲染数据生成动态的item元素，填充到list内容元素
+    list.innerHTML = renderData.map(item => `<div class="item" style="height: ${itemHeight}px">${item}</div>`).join('')
+  }
+
+  // 记录到的位置索引
+  let pointerIndex = 0
+
+  // 监听listOut滚动事件
+  function ScrollHandle() {
+    // 更新开始位置索引：滚动的距离 / 每个元素的高度
+    startIndex = Math.floor(listScroll.scrollTop / itemHeight)
+
+    if (pointerIndex === startIndex) return
+
+    pointerIndex = startIndex
+    // 更新位置，重新渲染
+    Render()
+    if (dataSource.length - startIndex >= maxCount) {
+      // 测试发现每次向下滚动一个元素，列表会向上移动一个元素的位置，所以增加transform属性，使列表位置向下移动一个元素的位置
+      // startIndex表示已经上移到的元素的个数，itemHeight表示每个元素的高度
+      list.style.transform = `translateY(${startIndex * itemHeight}px)`
+    } else {
+      // 滑动到底部 加载增更多数据
+      GetData()
+    }
+  }
+
+  function init() {
+    // 获取数据
+    GetData()
+    Render()
+    // 监听滚动事件
+    listScroll.addEventListener('scroll', ScrollHandle)
+  }
+
+  init()
+
+
+</script>
