@@ -14,6 +14,7 @@
       border: 1px solid #f80c0c;
       margin: auto;
       /* 居中 */
+      position: relative;
     }
 
     /* 可滚动容器，占最外层容器宽高100% 能被显示的列表撑开 */
@@ -41,6 +42,23 @@
       justify-content: center;
       align-items: center;
     }
+
+    .jump-to {
+      background: #5d9cec;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 3px 10px;
+      position: absolute;
+      right: -150px;
+      top: 0;
+      font-size: 14px;
+
+      &:hover {
+        background: #77aaef;
+      }
+    }
   </style>
 </head>
 
@@ -51,6 +69,7 @@
         <div class="item">1</div>
       </div>
     </div>
+    <div class="jump-to" onclick="handleJumpTo(999980)">手动跳到第x项</div>
   </div>
 
 </body>
@@ -60,6 +79,7 @@
   // 获取容器和列表元素
   const listScroll = document.querySelector('.list_scroll')
   const list = document.querySelector('.list')
+  let isJumpTo = false
 
   // 源数据
   const dataSource = []
@@ -108,10 +128,16 @@
 
   // 监听listOut滚动事件
   function ScrollHandle() {
-    // 更新开始位置索引：滚动的距离 / 每个元素的高度
-    startIndex = Math.floor(listScroll.scrollTop / itemHeight)
+    if (isJumpTo) {
+      isJumpTo = false
+      // return
+    } else {
 
-    if (pointerIndex === startIndex) return
+      // 更新开始位置索引：滚动的距离 / 每个元素的高度
+      startIndex = Math.floor(listScroll.scrollTop / itemHeight)
+
+      if (pointerIndex === startIndex) return
+    }
 
     pointerIndex = startIndex
     // 更新位置，重新渲染
@@ -132,6 +158,29 @@
     Render()
     // 监听滚动事件
     listScroll.addEventListener('scroll', ScrollHandle)
+  }
+
+  function handleJumpTo(idx) {
+    if (idx) {
+      const index = parseInt(idx)
+      if (index >= 0 && index < dataSource.length) {
+        // 计算开始位置和结束位置索引
+        startIndex = index
+        endIndex = index + 1
+
+        // 更新位置，重新渲染
+        Render()
+
+        isJumpTo = true
+
+        // 手动滚动到指定位置
+        listScroll.scrollTop = index * itemHeight;
+
+        console.log(listScroll.scrollTop)
+      } else {
+        alert('请输入正确的位置')
+      }
+    }
   }
 
   init()

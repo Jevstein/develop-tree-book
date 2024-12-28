@@ -1,0 +1,74 @@
+/*
+ * @Author: Jevstein
+ * @Date: 2021-08-15 14:59:22
+ * @LastEditTime: 2021-08-15 15:00:02
+ * @LastEditors: Jevstein
+ * @Description:  开源eSearch，electron - npm install desktop-capturer html2canvas
+ * @FilePath: \lab-web\lab-html\src\pages\example\muck\screen-shot.html
+ */
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>截屏示例</title>
+  <style>
+    #canvas {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 9999;
+      display: none;
+      /* 隐藏canvas元素 */
+    }
+  </style>
+</head>
+
+<body>
+  <h1>截屏示例</h1>
+  <p>这是一个简单的截屏示例。</p>
+  <button id="btn" onclick="handleClick(event)">截图</button>
+  <canvas id="canvas"></canvas>
+  <!-- 引入html2canvas库 -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const btn = document.getElementById('btn');
+
+    // 将canvas大小设置为窗口的大小
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function handleClick(event) {
+      // 获取页面的宽度和高度
+      const pageWidth = document.documentElement.scrollWidth;
+      const pageHeight = document.documentElement.scrollHeight;
+
+      // 更新canvas的大小
+      canvas.width = pageWidth;
+      canvas.height = pageHeight;
+
+      // 清空canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 将网页内容绘制到canvas中
+      html2canvas(document.body).then((canvasElement) => {
+        ctx.drawImage(canvasElement, 0, 0);
+
+        // 将canvas内容转换为图片
+        const imgData = canvas.toDataURL("image/png");
+        console.log(imgData);
+
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = 'screenshot.png';//link.setAttribute('download', 'screenshot.png');
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+
+</html>
