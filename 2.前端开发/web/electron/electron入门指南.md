@@ -7,6 +7,7 @@
 **electron 学习资料**
 1、[官网](https://www.electronjs.org/)
 2、[Electron社区](https://www.electronjs.org/zh/docs/latest/)
+3、[electron中文教程](https://www.bookstack.cn/read/electron-zh/guide.md)
 
 
 
@@ -461,6 +462,8 @@ $ code electron-quick-start
 
 [Electron Forge](https://www.electronforge.io/)
 
+[electron-builder 打包配置](https://blog.csdn.net/liyu_ya/article/details/135282663)
+
 
 
 ## 三、electron 开发应用
@@ -469,7 +472,19 @@ $ code electron-quick-start
 
 [大概是全网最详细的Electron ipc 讲解(一)——主进程与渲染进程的两情相悦](https://blog.csdn.net/qq_39448719/article/details/123081213)
 
-### 2、sqlite操作
+[Electron的ipcMain.handle与ipcMain.on](https://juejin.cn/post/7415806520443600923)
+
+
+
+### 2、多tab的标签页浏览窗口
+
+[「桌面端」Electron 你不知道的 BrowserView](https://juejin.cn/post/7260030417461346361)
+
+
+
+
+
+### 3、sqlite操作
 
 [Electron中的数据库操作如何实现](https://www.yisu.com/jc/840049.html)
 

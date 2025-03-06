@@ -169,7 +169,7 @@ $ git checkout ../../script.py
   #2、查询用户信息
   git config --list
   
-  #3、如果push遇到在输入密码是熟错后，就会报这个错误fatal: Authentication failed for
+  #3、如果push遇到在输入密码是输错后，就会报这个错误fatal: Authentication failed for
   git config --system --unset credential.helper
   #之后你在push就会提示输入名称和密码
   ```
@@ -228,7 +228,38 @@ $ git checkout ../../script.py
 
   
   
+#### 3）error: RPC failed; HTTP 500 curl 22 The requested URL returned error: 500 ...
+
+执行“git push”时报错，如：
+
+* 问题:
+
+  ```shell
+  $ git push 
   
+  warning: redirecting to http://xxx.git/
+  Enumerating objects: 186, done.
+  Counting objects: 100% (186/186), done.
+  Delta compression using up to 10 threads
+  Compressing objects: 100% (120/120), done.
+  error: RPC failed; HTTP 500 curl 22 The requested URL returned error: 500
+  send-pack: unexpected disconnect while reading sideband packet
+  Writing objects: 100% (127/127), 277.67 MiB | 221.62 MiB/s, done.
+  Total 127 (delta 55), reused 1 (delta 0), pack-reused 0
+  fatal: the remote end hung up unexpectedly
+  Everything up-to-date
+  ```
+
+* 解决：
+
+  ​	原因是git的**缓存空间给少了**，通过在命令行运行以下代码，把git缓存空间加大可以解决这个问题，注意要**加上--global**，不然只是temporarily changing！
+
+  ```shell
+  $ git config --global http.postBuffer 524288000
+  ```
+
+  
+
 
 
 

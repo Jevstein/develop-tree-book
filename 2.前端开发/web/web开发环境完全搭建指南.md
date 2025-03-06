@@ -207,6 +207,7 @@ $ yarn config get registry #  查看
 $ yarn config list # 查看所有
 -- 2.设置
 $ yarn config set registry http://10.10.27.63:4873/ # 切换-ecology
+$ yarn config set registry https://registry.npmmirror.com/ --global
 $ yarn config set electron_mirror 'https://mirrors.huaweicloud.com/electron/',
 $ yarn config set electron_builder_binaries_mirror 'https://mirrors.huaweicloud.com/electron-builder-binaries/'
 -- 3.删除
@@ -396,7 +397,7 @@ $ yarn upgrade [package]@[version]:  # 升级到指定版本
 
 $ yarn -v：yarn版本
 $ yarn init：初始化项目
-$ yarn add <package-name>：安装具体的某个包
+$ yarn add <package-name@版本号>：安装具体的某个包
 $ yarn remove <package-name>： 删除具体的某个包
 $ yarn serve：运行项目
 $ yarn build：编译项目
@@ -499,7 +500,7 @@ $ yarn add sass node-sass -dev
 
    [参考文档](https://blog.csdn.net/m0_65933139/article/details/130690790)
 
-​	出现这个错误是因为 node.js V17版本中最近发布的OpenSSL3.0, 而OpenSSL3.0对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响.
+​	如果出现了 "node: --openssl-legacy-provider is not allowed in NODE_OPTIONS" 的错误提示，这个错误是因为 node.js V17版本中最近发布的OpenSSL3.0, 而OpenSSL3.0对允许算法和密钥大小增加了严格的限制，可能会对生态系统造成一些影响.
 
 目前可以通过运行以下命令行临时解决这个问题
 
@@ -507,15 +508,26 @@ $ yarn add sass node-sass -dev
 # 方法一：
 # Linux & Mac OS：
 export NODE_OPTIONS=--openssl-legacy-provider
+export NODE_OPTIONS="${NODE_OPTIONS/--openssl-legacy-provider/}"
+
 #Windows
 set NODE_OPTIONS=--openssl-legacy-provider
+set NODE_OPTIONS=%NODE_OPTIONS:--openssl-legacy-provider=%
 
 # 方法二：
-$env:NODE_OPTIONS="--openssl-legacy-provider"
+$ env:NODE_OPTIONS="--openssl-legacy-provider"
 
 # 方法三：
 卸载Node.js17+版本，安装Node.js17-版本（合适的版本）
 ```
+
+
+
+
+
+
+
+
 
 
 
