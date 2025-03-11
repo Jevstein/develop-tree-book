@@ -40,8 +40,10 @@ class WebWindow {
     win.loadFile('../index.html');
     // win.loadFile(path.resolve(__dirname,'src/index.html'))
     // win.loadFile('./../lab-html/src/index.html')
+    //
     // 2)加载URL
     // win.loadURL('file:///Users/yiwenqiang/Desktop/studio/jvtstudio/develop-tree-book/7.%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/01.%E7%BA%B5%E6%A8%AA%E5%AE%9E%E9%AA%8C%E5%AE%A4/lab-html/src/index.html')
+    // win.loadURL('https://chat.deepseek.com/');
 
     // // 打开开发调试工具
     // win.webContents.openDevTools()

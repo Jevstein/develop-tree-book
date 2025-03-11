@@ -49,3 +49,30 @@ Shift-Command-5
 $ sudo spctl --master-disable
 ```
 
+
+
+## 5、查看app安装位置
+
+如： 查看当前的python3安装在哪了？
+
+```bash
+-- 1.which
+$ which python3
+/usr/local/bin/python3
+
+-- 2.type
+$ type python3
+python3 is /usr/local/bin/python3
+
+-- 3. 使用ls命令结合which命令
+$ ls -l $(which python3)
+会显示Python 3的可执行文件的详细信息，包括它的权限、所有者、大小和最后修改时间等
+
+-- 4. 使用python3 -m site
+python3 -m site
+
+-- 5. 使用brew（如果你通过Homebrew安装
+$ brew --prefix python3
+/usr/local/Cellar/python/3.x.x/bin/python3
+```
+

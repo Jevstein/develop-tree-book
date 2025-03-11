@@ -459,10 +459,116 @@ $ code electron-quick-start
 ### 6、打包发布
 
 [如何打包 electron 程序：electron-forge 的使用教程](https://blog.csdn.net/KimBing/article/details/119080158)
-
 [Electron Forge](https://www.electronforge.io/)
-
 [electron-builder 打包配置](https://blog.csdn.net/liyu_ya/article/details/135282663)
+
+
+
+#### 1.Electron Forge打包
+
+```bash
+# https://www.electronforge.io/
+-- 1.Add a description to your package.json file, otherwise rpmbuild will fail. Blank description are not valid.
+	To build an RPM package for Linux, you will need to install its required system dependencies：https://www.electronforge.io/config/makers/rpm
+
+-- 2.安装electron-forge
+$ npm install --save-dev @electron-forge/cli 或
+$ yarn add --dev @electron-forge/cli
+
+-- 3.打包
+$ npx electron-forge package 或
+$ yarn package
+
+------- 届时，将产生如下文件或内容：
+1、/package.json：
+{
+  "scripts": {
+      "start": "electron-forge start",
+      "package": "electron-forge package",
+      "make": "electron-forge make",
+    },
+}
+2、/.forge/config.js
+3、/appName-darwin-arm64 可执行文件
+```
+
+
+
+#### 2.Electron-builder打包
+
+```bash
+-- 1.安装electron-builder
+$ yarn add electron-builder --dev # 打包工具
+
+-- 2.package.json
+{
+  "name": "lab-electron",
+  "version": "1.0.0",
+  "main": "src/main.js",  // 主入口文件
+  "scripts": {
+    "start": "electron .",    // 本地运行
+    "eb:mac": "electron-builder --mac" // 打包命令
+  },
+  "eb:mac": {
+    "appId": "com.company.labelectron", // 唯一应用标识
+    "productName": "lab-electron",       // 显示名称
+    "mac": {
+      "category": "public.app-category.utilities", // 应用分类
+      "target": ["dmg", "zip"],   // 输出格式
+      "icon": "build/icon.icns",  // 应用图标
+      "hardenedRuntime": true,    // 强化运行时
+      "gatekeeperAssess": false,  // 跳过 Gatekeeper 评估
+      "entitlements": "build/entitlements.mac.plist", // 权限文件
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    }
+  }
+}
+
+-- 3.生成 .icns 图标
+	准备 1024x1024 的 PNG 图标文件 icon.png。生成多尺寸图标，并转换为 .icns：
+$ mkdir -p build/icon.iconset
+$ sips -z 16 16     icon.png --out build/icon.iconset/icon_16x16.png
+$ sips -z 32 32     icon.png --out build/icon.iconset/icon_16x16@2x.png
+$ sips -z 32 32     icon.png --out build/icon.iconset/icon_32x32.png
+$ sips -z 64 64     icon.png --out build/icon.iconset/icon_32x32@2x.png
+$ sips -z 128 128   icon.png --out build/icon.iconset/icon_128x128.png
+$ sips -z 256 256   icon.png --out build/icon.iconset/icon_128x128@2x.png
+$ sips -z 256 256   icon.png --out build/icon.iconset/icon_256x256.png
+$ sips -z 512 512   icon.png --out build/icon.iconset/icon_256x256@2x.png
+$ sips -z 512 512   icon.png --out build/icon.iconset/icon_512x512.png
+$ sips -z 1024 1024 icon.png --out build/icon.iconset/icon_512x512@2x.png
+$ iconutil -c icns build/icon.iconset -o build/icon.icns
+
+-- 4.创建权限文件：build/entitlements.mac.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+  </dict>
+</plist>
+
+-- 5.执行打包命令
+yarn eb:mac
+
+
+------- 届时，将产生如下文件或内容：
+/dist/lab-electron-1.0.0-arm64.dmg
+```
+
+
+
+#### 3.Electron-packager 打包
+
+```bash
+```
+
+
 
 
 

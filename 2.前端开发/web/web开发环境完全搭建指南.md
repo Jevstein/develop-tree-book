@@ -397,11 +397,12 @@ $ yarn upgrade [package]@[version]:  # 升级到指定版本
 
 $ yarn -v：yarn版本
 $ yarn init：初始化项目
-$ yarn add <package-name@版本号>：安装具体的某个包
+$ yarn add <package-name@版本号>：安装具体的某个包,未指定@版本号时，默认最新
 $ yarn remove <package-name>： 删除具体的某个包
 $ yarn serve：运行项目
 $ yarn build：编译项目
 $ yarn cache clean --force: 清除yarn缓存
+$ yarn list <package-name>：查看版本号
 
 # 切换镜像仓库
 $ yarn config get registry # 查看
@@ -415,6 +416,13 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 -- 用于多版本管理, [windows安装包下载地址](https://github.com/coreybutler/nvm-windows/releases)
 
 ```shell
+-- 1、安装nvm
+$ brew install nvm
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc  
+echo '[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"' >> ~/.zshrc  # 路径需根据实际安装位置调:ml-citation{ref="3" data="citationList"}  
+source ~/.zshrc  # 立即生:ml-citation{ref="3,7" data="citationList"}  
+
+
 $ nvm list 或 nvm ls: 查看已安装的node.js
 $ nvm install 20.11.1: 安装20.11.1版本node
 $ nvm use 20.11.1: 切换node到指定的nodejs版本
@@ -458,6 +466,12 @@ $ code electron-quick-start
 
 
 ## 三、打包、发布
+
+
+
+
+
+
 
 
 
