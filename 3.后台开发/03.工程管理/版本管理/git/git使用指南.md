@@ -103,7 +103,8 @@ $ git log
 $ git log -p xxx
 $ git blame xxx
 
-
+# 10、查看哪一处将文件忽略
+$ git check-ignore -v ./xxx
 ```
 
 

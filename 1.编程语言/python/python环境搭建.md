@@ -257,7 +257,7 @@ $ sudo apt-get install python3.5
   $python3、$pip3
 ```
 
-​	但是Windows python2与python3不兼容！正常安装并设置好python2和python3环境变量之后，再打开安装目录会发现，在windows中python2/3的可执行文件都叫python.exe，无法区别python.exe是哪个版本的。此时，命令行调用python，会优先调用在环境变量path里靠上的python。即：windows默认的python取决于环境变量里哪个版本的path环境变量更靠前：
+​	但是Windows python2与python3不兼容！正常安装并设置好python2和python3环境变量之后，再打开安装目录会发现，在windows中python2/3的可执行文件都叫python.exe，无法区别python.exe是哪个版本的。此时，命令行调用python，会优先调用在环境变量path里靠上的python。即：windows默认的python取决于环境变量里哪个版本的**path**环境变量更靠前：
 
 ```shell
 C:\Program Files\Python37
@@ -386,6 +386,8 @@ $ python3
 >>> print(get_python_lib())
 /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages
 
+#5.通过python指定对应版本的pip，如查看pip3版本号：
+$ python -m pip -V
 ```
 
 

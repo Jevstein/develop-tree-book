@@ -33,10 +33,11 @@ $ killall Dock
 
 
 
-## 3、截屏、录屏
+## 3、截屏、录屏快捷键
 
 ```shell
-Shift-Command-5
+开始录屏：Shift + Command + 5
+停止录屏：control + Command + esc
 ```
 
 
@@ -47,6 +48,13 @@ Shift-Command-5
 
 ```shell
 $ sudo spctl --master-disable
+```
+
+### 2) 允许运行未签名的app
+
+```shell
+#移除文件隔离属
+$ sudo xattr -r -d com.apple.quarantine /Applications/EMobile10.app。
 ```
 
 

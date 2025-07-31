@@ -166,7 +166,7 @@ $ yarn build
 
 ### 4、其他
 
-#### 1）切换镜像源
+#### 1）切换镜像源 - 推荐使用yrm工具
 
 ```shell
 #1、vim 编辑配置文件
@@ -397,12 +397,15 @@ $ yarn upgrade [package]@[version]:  # 升级到指定版本
 
 $ yarn -v：yarn版本
 $ yarn init：初始化项目
-$ yarn add <package-name@版本号>：安装具体的某个包,未指定@版本号时，默认最新
+$ yarn add <package-name@版本号> <--dev> <-D>：安装具体的某个包,未指定@版本号时，默认最新
 $ yarn remove <package-name>： 删除具体的某个包
 $ yarn serve：运行项目
 $ yarn build：编译项目
 $ yarn cache clean --force: 清除yarn缓存
 $ yarn list <package-name>：查看版本号
+
+# 手动下载安装，如：https://registry.npmmirror.com/fs-xattr/-/fs-xattr-0.3.1.tgz
+$ yarn add file:/path/to/fs-xattr-0.3.1.tgz
 
 # 切换镜像仓库
 $ yarn config get registry # 查看
@@ -410,6 +413,8 @@ $ yarn config set registry http://10.10.27.63:4873/ # 切换
 ```
 
 [yarn官网](https://yarn.bootcss.com/docs/usage.html)
+
+
 
 ### 5、nvm
 
@@ -459,6 +464,146 @@ $ alias code='/path/to/visual-studio-code/folder/code'
 
 # 4、重启 zsh 或重新打开终端后，再次尝试运行 code 命令
 $ code electron-quick-start
+```
+
+
+
+### 7、yrm
+
+​	方便切换镜像源
+
+```shell
+$ yarn add yrm --global 									# 安装
+
+$ yrm -h 																	# 帮助
+$ yrm ls 																	# 查看
+$ yrm test 																# 测速
+$ yrm add weaver http://10.10.27.63:4873 	# 添加私有源
+$ yrm use <weaver> 												# 切换
+$ yrm del <镜像名称>												# 删除
+```
+
+
+
+### 8、npx
+
+​	`npx` 是 Node.js 的 ‌**npm 包执行工具**‌，随 npm 5.2+ 版本内置。它的核心作用是简化 npm 包的执行流程，无需全局安装即可直接运行命令
+
+```bash
+$ npx jest # 若本地 node_modules/.bin 中存在已安装的包（如 jest），直接运行
+$ npx create-react-app my-app  # 临时安装并执行远程包（完成后自动清理），无需全局安装 
+$ npx npm-check-updates  # 检查项目依赖的最新版本
+$ npx node@14 script.js  # 使用 Node.js 14 执行脚本
+$ npx -p cowsay -p lolcatjs 'cowsay "Hello" | lolcatjs' # 安装多个包后执行命令
+
+```
+
+
+
+### 9、iconutil
+
+`iconutil` 是 macOS 自带的命令行工具，可以将 `.iconset` 文件夹转换为 `.icns` 文件
+
+```bash
+ 1、创建一个文件夹，命名为 myicon.iconset（名称可以自定义，但必须以 .iconset 结尾）。
+  在该文件夹中放置不同分辨率的 PNG 图片，文件名必须遵循以下格式：
+  icon_16x16.png
+  icon_16x16@2x.png
+  icon_32x32.png
+  icon_32x32@2x.png
+  icon_128x128.png
+  icon_128x128@2x.png
+  icon_256x256.png
+  icon_256x256@2x.png
+  icon_512x512.png
+  icon_512x512@2x.png
+  @2x 表示 Retina 显示屏的高分辨率版本。
+  确保所有图片的分辨率正确，并且是透明的 PNG 格式。
+  
+​ 2、使用 iconutil 命令生成 .icns 文件：
+$ iconutil -c icns myicon.iconset -o myicon.icns
+
+[附注]:
+	以下命令支持将一张大尺寸的图片，转成小尺寸图片
+	$ sips -z 16 16 icon.png --out icon_16x16.png
+	$ sips -z 32 32 icon.png --out icon_32x32.png
+```
+
+
+
+### 10、upx
+
+UPX（Ultimate Packer for eXecutables）, 能显著减小应用体积，又能确保签名有效性。 Electron生成的.exe或.dll文件（如主程序、node.dll）体积庞大（约100MB+），UPX可将其压缩至原体积的30%-50%。
+
+下载地址：[UPX 官网](https://upx.github.io/) 或[GitHub Releases](https://github.com/upx/upx/releases/latest)
+
+```shell
+$ brew install upx # 安装
+
+$ upx --version #查看
+$ upx --best --ultra-brute --lzma --force-macos xx/compressed.exe # 压缩
+$ upx --test xx/compressed.exe # 验证文件完整性
+
+
+```
+
+附打包应用：
+```javascript
+const upxPackedFiles_ = [];
+async function runUPXCompression(file) {
+  const onlyFiles = [
+    'EMobile10.exe',
+    'eteams.exe',
+    '易秒办.exe',
+  ];
+
+  const excludeFiles = [
+    'd3dcompiler_47.dll',
+    'vcruntime140.dll',
+    'libEGL.dll'
+  ];
+
+  if (onlyFiles.length > 0 && !onlyFiles.some(item => file.indexOf(item) > -1)) {
+    console.warn('非仅NPX压缩:', file);
+    return;
+  }
+
+  if (upxPackedFiles_.some(item => item === file)) {
+    console.warn('已经NPX压缩:', file);
+    return;
+  }
+
+  if (excludeFiles.some(item => file.indexOf(item) > -1)) {
+    console.warn('排除NPX压缩:', file);
+    return;
+  }
+
+  const upxCmd = [
+    'C:/Users/Administrator/Desktop/upx.exe',
+    '--no-strip',
+    // '--best',
+    '--lzma',
+    // '--ultra-brute', // 太慢了
+    '--force',
+    `"${file}"`
+  ].join(' ');
+
+  // console.log(`UPX压缩:`, upxCmd, file);
+  console.log(`UPX压缩:`, file);
+
+  try {
+    execSync(upxCmd, { stdio: 'inherit' });
+  } catch (error) {
+    if (error.status === 255) {
+      console.warn('文件已被压缩，跳过');
+    } else {
+      console.error('UPX压缩失败:', error);
+      // process.exit(1);
+    }
+  }
+
+  upxPackedFiles_.push(file);
+}
 ```
 
 
