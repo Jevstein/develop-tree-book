@@ -616,11 +616,52 @@ async function runUPXCompression(file) {
 
 
 
+## 四、实用技巧
+
+### 1、简单执行一段js脚本
+
+* ### 方法 1：使用 Node.js 运行（确保安装了node）
+
+  ```bash
+  $ node /path/to/your-script.js
+  ```
+
+* ### 方法 2：赋予可执行权限（需 shebang - 确保安装了node）
+
+  1) 脚本首行
+
+  ```javascript
+  #!/usr/bin/env node
+  // TODO: js代码
+  ```
+
+  2. 终端执行
+
+  ```bash
+  $ chmod +x your-script.js
+  $ ./your-script.js
+  ```
+
+* ### 方法 3：直接通过浏览器执行
+
+  1. 创建 HTML 文件，并引入脚本
+
+  ```html
+  <script src="your-script.js"></script>
+  ```
+
+  2. 用浏览器打开该 HTML 文件
+
+* ### 方法 4：使用 Safari/Chrome 开发者工具
+
+  1. 浏览器中按 `Cmd+Option+I` 打开开发者工具
+  2. 在 Console 或 Sources 面板中粘贴/加载 JS 文件
 
 
 
 
-## 四、常见命令错误
+
+## 五、常见命令错误
 
 ### 1、brew-在更新或安装时报root权限的错误
 
@@ -690,7 +731,7 @@ $ env:NODE_OPTIONS="--openssl-legacy-provider"
 
 
 
-## 五、细节深入
+## 六、细节深入
 ### 1、devDependencies 和 dependencies 的区别
 ​	[彻底搞懂devDependencies 和 dependencies 的区别！](https://blog.csdn.net/zz_jesse/article/details/139348751)
 
