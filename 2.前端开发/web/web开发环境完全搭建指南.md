@@ -505,7 +505,7 @@ $ npx -p cowsay -p lolcatjs 'cowsay "Hello" | lolcatjs' # 安装多个包后执�
 `iconutil` 是 macOS 自带的命令行工具，可以将 `.iconset` 文件夹转换为 `.icns` 文件
 
 ```bash
- 1、创建一个文件夹，命名为 myicon.iconset（名称可以自定义，但必须以 .iconset 结尾）。
+1、创建一个文件夹，命名为 myicon.iconset（名称可以自定义，但必须以 .iconset 结尾）。
   在该文件夹中放置不同分辨率的 PNG 图片，文件名必须遵循以下格式：
   icon_16x16.png
   icon_16x16@2x.png
@@ -520,7 +520,7 @@ $ npx -p cowsay -p lolcatjs 'cowsay "Hello" | lolcatjs' # 安装多个包后执�
   @2x 表示 Retina 显示屏的高分辨率版本。
   确保所有图片的分辨率正确，并且是透明的 PNG 格式。
   
-​ 2、使用 iconutil 命令生成 .icns 文件：
+2、使用 iconutil 命令生成 .icns 文件：
 $ iconutil -c icns myicon.iconset -o myicon.icns
 
 [附注]:
@@ -611,6 +611,14 @@ async function runUPXCompression(file) {
 
 
 ## 三、打包、发布
+
+
+
+临时构建目录
+
+```bash
+rm -rf /var/folders/bf/_sn8d4f15b1dcmfpll9h8t_r0000gn/T/electron-packager/tmp-*
+```
 
 
 

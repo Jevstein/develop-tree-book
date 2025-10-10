@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>键盘物理键值检测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1d2b64, #f8cdda);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            color: #2c3e50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2980b9;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+        }
+        
+        .input-section {
+            margin: 20px 0;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .keyboard {
+            background: #f1f2f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            margin: 0 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .key.active {
+            background: #3498db;
+            color: white;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+            transform: scale(0.95);
+        }
+        
+        .output {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            min-height: 120px;
+        }
+        
+        .output h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .event-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f1f8ff;
+            color: #2980b9;
+        }
+        
+        .note {
+            background: #fff9db;
+            border-left: 4px solid #f1c40f;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .example {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f8ff;
+            border-radius: 8px;
+            font-family: monospace;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .key {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>键盘事件处理与物理键值检测</h1>
+        <p class="description">获取物理按键值而非Shift修改的字符 - 针对"Shift+1"返回"1"而非"!"的场景</p>
+        
+        <div class="card">
+            <h2><i>⌨️</i> 物理键值检测</h2>
+            <div class="input-section">
+                <div class="input-container">
+                    <input type="text" id="keyInput" placeholder="在此输入 - 按下Shift+1测试效果">
+                </div>
+            </div>
+            
+            <div class="keyboard">
+                <div class="keyboard-row">
+                    <div class="key" data-key="`">`</div>
+                    <div class="key" data-key="1">1</div>
+                    <div class="key" data-key="2">2</div>
+                    <div class="key" data-key="3">3</div>
+                    <div class="key" data-key="4">4</div>
+                    <div class="key" data-key="5">5</div>
+                    <div class="key" data-key="6">6</div>
+                    <div class="key" data-key="7">7</div>
+                    <div class="key" data-key="8">8</div>
+                    <div class="key" data-key="9">9</div>
+                    <div class="key" data-key="0">0</div>
+                    <div class="key" data-key="-">-</div>
+                    <div class="key" data-key="=">=</div>
+                </div>
+            </div>
+            
+            <div class="output">
+                <h3>输出结果</h3>
+                <div id="result"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i>🔧</i> 技术解决方案</h2>
+            <div class="event-details">
+                <h3>关键属性对比</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>事件属性</th>
+                            <th>说明</th>
+                            <th>Shift+1 返回值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>event.key</td>
+                            <td>按下键的字符值（考虑修饰键）</td>
+                            <td class="highlight">"!"</td>
+                        </tr>
+                        <tr>
+                            <td>event.code</td>
+                            <td>按下键的物理键值（忽略修饰键）</td>
+                            <td class="highlight">"Digit1"</td>
+                        </tr>
+                        <tr>
+                            <td>event.keyCode</td>
+                            <td>弃用 - 物理键码值</td>
+                            <td class="highlight">49</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="note">
+                <p><strong>推荐方案：</strong> 使用 <code>event.code</code> 属性检测物理按键位置</p>
+                <p>示例：处理"Shift+1"按键事件，获取实际物理键"1"</p>
+            </div>
+            
+            <div class="example">
+                <p>document.getElementById('input').addEventListener('keydown', function(e) {</p>
+                <p style="padding-left: 20px">if (e.code === 'Digit1') { // 物理按键检测</p>
+                <p style="padding-left: 40px">console.log('物理键1被按下');</p>
+                <p style="padding-left: 20px">}</p>
+                <p>});</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>JavaScript 键盘输入处理示例 | 适用于需要获取物理键值的应用场景</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 获取输入框和结果显示元素
+        const inputElement = document.getElementById('keyInput');
+        const resultElement = document.getElementById('result');
+        const keys = document.querySelectorAll('.key');
+        
+        // 键盘按下事件处理
+        inputElement.addEventListener('keydown', function(e) {
+          console.log(`e.key: ${e.key}, e.code: ${e.code}, e.shiftKey: ${e.shiftKey}, e.ctrlKey: ${e.ctrlKey}, e.altKey: ${e.altKey}`);
+
+            // 获取事件详情
+            const details = `
+                <div><strong>event.key:</strong> <span class="highlight">${e.key}</span> (生成的字符值)</div>
+                <div><strong>event.code:</strong> <span class="highlight">${e.code}</span> (物理按键值)</div>
+                <div><strong>shiftKey:</strong> ${e.shiftKey}</div>
+                <div><strong>ctrlKey:</strong> ${e.ctrlKey}</div>
+                <div><strong>altKey:</strong> ${e.altKey}</div>
+            `;
+            
+            // 物理键值检测逻辑
+            if (e.code === 'Digit1') {
+                resultElement.innerHTML = `
+                    <div class="highlight" style="font-size: 1.4rem; margin: 10px 0;">检测到物理键"1"被按下</div>
+                    <div>无论是否按下Shift键，event.code总是指向物理按键位置</div>
+                    ${details}
+                `;
+            } else if (e.code === 'Digit2') {
+                resultElement.innerHTML = `
+                    <div class="highlight" style="font-size: 1.4rem; margin: 10px 0;">检测到物理键"2"被按下</div>
+                    ${details}
+                `;
+            } else if (e.code === 'Digit3') {
+                resultElement.innerHTML = `
+                    <div class="highlight" style="font-size: 1.4rem; margin: 10px 0;">检测到物理键"3"被按下</div>
+                    ${details}
+                `;
+            }
+            
+            // 高亮对应键
+            keys.forEach(key => {
+                const keyChar = key.textContent;
+                const code = key.getAttribute('data-key');
+                
+                // 检查物理键对应关系
+                if (e.code === `Digit${keyChar}` || 
+                   (e.code === 'Backquote' && keyChar === '`') ||
+                   (e.code === 'Minus' && keyChar === '-') ||
+                   (e.code === 'Equal' && keyChar === '=')) {
+                    key.classList.add('active');
+                    
+                    // 移除活动状态
+                    setTimeout(() => {
+                        key.classList.remove('active');
+                    }, 200);
+                }
+            });
+            
+            // 添加键盘高亮提示
+            inputElement.classList.add('active');
+            setTimeout(() => {
+                inputElement.classList.remove('active');
+            }, 100);
+        });
+        
+        // 添加空键事件处理逻辑展示
+        inputElement.addEventListener('keydown', function(e) {
+            // 处理特定物理按键的示例
+            switch(e.code) {
+                case 'Digit1':
+                    // 这里处理数字键1的物理按键事件
+                    break;
+                case 'KeyA':
+                    // 处理A键的物理按键
+                    break;
+                case 'Space':
+                    // 处理空格键
+                    break;
+                default:
+                    // 其他键的处理
+            }
+        });
+        
+        // 初始提示
+        resultElement.innerHTML = `
+            <p style="color: #7f8c8d">请在输入框中按下 "Shift + 1" 测试事件处理效果</p>
+            <p><strong>提示：</strong> event.key 将返回 "!"，而 event.code 将返回 "Digit1"</p>
+        `;
+    </script>
+</body>
+</html>
