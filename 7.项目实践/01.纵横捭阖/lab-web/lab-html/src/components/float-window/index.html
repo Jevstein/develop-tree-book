@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>在线客服</title>
+
+  <link rel="stylesheet" href="./style.css">
+  <style type="text/css">
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .weblab-float-window {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="weblab-float-window" id="id-weblab-float-window">
+    在线客服 - 访客咨询演示
+  </div>
+</body>
+
+<script src="./index.js"></script>
+<script>
+  JvtFloatWindow.create({
+    rootId: 'id-weblab-float-window',
+    title: '客服',
+    data: {
+      url: 'https://front2.yunteams.cn/sp/em/freepass/visitor?pluginId=1184676573164363776&channelId=1184672497128587264'
+    }
+  });
+</script>
+
+</html>
