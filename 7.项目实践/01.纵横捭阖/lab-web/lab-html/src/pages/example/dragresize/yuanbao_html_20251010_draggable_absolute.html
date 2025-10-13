@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS拖拽类示例</title>
+    <style>
+        .draggable-box {
+            width: 100px;
+            height: 100px;
+            background-color: #3498db;
+            position: absolute;
+            cursor: move;
+            text-align: center;
+            line-height: 100px;
+            color: white;
+            border-radius: 5px;
+            user-select: none; /* 防止文字被选中 */
+        }
+        
+        #box1 {
+            left: 50px;
+            top: 50px;
+        }
+        
+        #box2 {
+            left: 200px;
+            top: 50px;
+            background-color: #e74c3c;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h2>可拖拽元素示例</h2>
+    <p>尝试拖动下面的盒子</p>
+    
+    <div id="box1" class="draggable-box">盒子1</div>
+    <div id="box2" class="draggable-box">盒子2</div>
+
+    <script>
+        // 拖拽类定义
+        class Draggable {
+            constructor(elementId, options = {}) {
+                this.element = document.getElementById(elementId);
+                this.options = Object.assign({
+                    // 默认配置
+                    containment: true, // 是否限制在父容器内
+                    handle: null, // 指定拖拽手柄，默认为元素本身
+                    onStart: null, // 开始拖拽回调
+                    onDrag: null, // 拖拽中回调
+                    onEnd: null // 拖拽结束回调
+                }, options);
+                
+                if (!this.element) {
+                    console.error(`未找到ID为"${elementId}"的元素`);
+                    return;
+                }
+                
+                // 确保元素可定位
+                if (getComputedStyle(this.element).position === 'static') {
+                    this.element.style.position = 'absolute';
+                }
+                
+                this.isDragging = false;
+                this.offsetX = 0;
+                this.offsetY = 0;
+                
+                // 设置拖拽手柄
+                this.handle = this.options.handle ? 
+                    this.element.querySelector(this.options.handle) : this.element;
+                
+                this.init();
+            }
+            
+            init() {
+                this.handle.style.cursor = 'move';
+                this.handle.addEventListener('mousedown', this.onMouseDown.bind(this));
+            }
+            
+            onMouseDown(e) {
+                e.preventDefault();
+                
+                // 计算鼠标相对于元素左上角的偏移
+                const rect = this.element.getBoundingClientRect();
+                this.offsetX = e.clientX - rect.left;
+                this.offsetY = e.clientY - rect.top;
+                
+                this.isDragging = true;
+                
+                // 添加事件监听
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+                document.addEventListener('mouseup', this.onMouseUp.bind(this));
+                
+                // 回调函数
+                if (this.options.onStart) {
+                    this.options.onStart(this.element, e);
+                }
+            }
+            
+            onMouseMove(e) {
+                if (!this.isDragging) return;
+                
+                let newX = e.clientX - this.offsetX;
+                let newY = e.clientY - this.offsetY;
+                
+                // 限制在容器内
+                if (this.options.containment) {
+                    const maxX = window.innerWidth - this.element.offsetWidth;
+                    const maxY = window.innerHeight - this.element.offsetHeight;
+                    
+                    newX = Math.max(0, Math.min(newX, maxX));
+                    newY = Math.max(0, Math.min(newY, maxY));
+                }
+                
+                // 更新元素位置
+                this.element.style.left = `${newX}px`;
+                this.element.style.top = `${newY}px`;
+                
+                // 回调函数
+                if (this.options.onDrag) {
+                    this.options.onDrag(this.element, e);
+                }
+            }
+            
+            onMouseUp(e) {
+                this.isDragging = false;
+                
+                // 移除事件监听
+                document.removeEventListener('mousemove', this.onMouseMove.bind(this));
+                document.removeEventListener('mouseup', this.onMouseUp.bind(this));
+                
+                // 回调函数
+                if (this.options.onEnd) {
+                    this.options.onEnd(this.element, e);
+                }
+            }
+            
+            // 销毁方法，用于清理事件监听
+            destroy() {
+                this.handle.removeEventListener('mousedown', this.onMouseDown.bind(this));
+            }
+        }
+
+        // 使用示例
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建第一个可拖拽元素
+            const draggable1 = new Draggable('box1', {
+                onStart: (element, e) => {
+                    element.style.backgroundColor = '#2980b9';
+                    console.log('开始拖拽盒子1');
+                },
+                onDrag: (element, e) => {
+                    console.log(`拖拽中 - 位置: ${element.style.left}, ${element.style.top}`);
+                },
+                onEnd: (element, e) => {
+                    element.style.backgroundColor = '#3498db';
+                    console.log('结束拖拽盒子1');
+                }
+            });
+            
+            // 创建第二个可拖拽元素
+            const draggable2 = new Draggable('box2', {
+                onStart: (element, e) => {
+                    element.style.backgroundColor = '#c0392b';
+                    console.log('开始拖拽盒子2');
+                },
+                onEnd: (element, e) => {
+                    element.style.backgroundColor = '#e74c3c';
+                    console.log('结束拖拽盒子2');
+                }
+            });
+            
+            // 在控制台中可以尝试以下代码来创建新的可拖拽元素：
+            // const newBox = document.createElement('div');
+            // newBox.id = 'newBox';
+            // newBox.className = 'draggable-box';
+            // newBox.textContent = '新盒子';
+            // newBox.style.left = '350px';
+            // newBox.style.top = '50px';
+            // newBox.style.backgroundColor = '#2ecc71';
+            // document.body.appendChild(newBox);
+            // 
+            // const draggable3 = new Draggable('newBox');
+        });
+    </script>
+</body>
+</html>
