@@ -13,6 +13,10 @@
     position: absolute;
     right: 30px;
     bottom: 50px;
+    
+    &.hide {
+      display: none;
+    }
   }
 
   .main {
@@ -22,16 +26,25 @@
     right: 20px;
     bottom: 20px;
 
+    &.hide {
+      display: none;
+    }
+
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       width: calc(100% - 36px);
-      height: 60px;
+      height: 59px;
       padding: 0 18px;
       background: #117bdf;
       color: #ffffff;
       border-radius: 14px 14px 0 0;
+      /* box-shadow: 0 4px 8px 0 rgba(14, 30, 37, .3), 0 2px 12px 0 rgba(14, 30, 37, .3); */
+      box-shadow: 
+        -5px 0 10px -5px rgba(14, 30, 37, .3), /* 左侧阴影 */
+        0 -5px 10px -5px rgba(14, 30, 37, .3), /* 顶部阴影 */
+        5px 0 10px -5px rgba(14, 30, 37, .3);  /* 右侧阴影 */
       position: absolute;
       top: 0px;
 
@@ -58,6 +71,7 @@
       height: 100%;
       border: none;
       border-radius: 14px;
+      box-shadow: 0 4px 8px 0 rgba(14, 30, 37, .3), 0 2px 12px 0 rgba(14, 30, 37, .3);
     }
   }
 }
