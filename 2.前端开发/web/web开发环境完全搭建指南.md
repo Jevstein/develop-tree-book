@@ -608,9 +608,350 @@ async function runUPXCompression(file) {
 
 
 
+## 三、常用web库
+
+### 1、UI library
+
+* 1、[ant.design](https://ant.design/index-cn)
+* 2、[element ui](https://element.eleme.cn/2.11/#/zh-CN)
 
 
-## 三、打包、发布
+
+
+
+## 四、搭建项目
+
+### 1、创建TypeScript项目
+
+#### 1.1 脚手架创建
+
+##### 1.1.1 使用 Create React App (React + TypeScript)
+
+```bash
+1. 创建项目
+$ npx create-react-app my-ts-app --template typescript
+
+2. 进入项目目录
+$ cd my-ts-app
+
+3. 启动项目
+$ npm start 
+# 或 
+$yarn start
+
+4. 查看效果
+# 浏览器会自动打开 http://localhost:3000显示 React 欢迎页面
+```
+
+##### 1.1.2 使用 Vite (超快构建工具)
+
+```bash
+1. 创建项目
+$ npm create vite@latest my-ts-project -- --template react-ts
+# 或
+$ yarn create vite my-ts-project --template react-ts
+
+2. 安装依赖
+$ cd my-ts-project
+$ npm install
+# 或
+$ yarn
+
+3. 启动项目
+$ npm run dev
+# 或
+$ yarn dev
+
+4. 查看效果
+# 控制台会显示访问地址（通常是 http://localhost:5173）
+```
+
+* Vite支持的模板选项：
+  vanilla-ts- 纯 TypeScript
+  vue-ts- Vue + TypeScript
+  react-ts- React + TypeScript
+  svelte-ts- Svelte + TypeScript
+  lit-ts- Lit + TypeScript
+
+
+
+##### 1.1.3 使用 Next.js (React 框架)
+
+```bash
+1. 创建项目
+$ npx create-next-app@latest my-next-ts-app --typescript
+# 或
+$ yarn create next-app my-next-ts-app --typescript
+
+2. 进入项目目录 ...
+```
+
+
+
+##### 1.1.4 使用 Angular CLI
+
+```bash
+1. 安装 Angular CLI
+$ npm install -g @angular/cli
+# 或
+yarn global add @angular/cli
+
+2. 创建项目
+$ ng new my-angular-ts-app
+
+3. 进入项目目录
+$ cd my-angular-ts-app
+
+4. 启动项目
+$ ng serve
+
+5. 查看效果
+# 访问 http://localhost:4200查看 Angular 欢迎页面
+```
+
+创建项目时，根据提示选择：
+
+- 是否添加 Angular routing? `Y`
+- 选择样式格式 (CSS, SCSS 等)
+- 自动创建为 TypeScript 项目
+
+
+
+##### 1.1.5 使用 NestJS (Node.js 框架)
+
+```bash
+1. 安装 Nest CLI
+$ npm install -g @nestjs/cli
+# 或
+$ yarn global add @nestjs/cli
+
+2. 创建项目
+$ nest new my-nest-project
+
+3. 进入项目目录 ...
+```
+
+
+
+##### 1.1.6  使用 Deno (现代 JavaScript/TypeScript 运行时)
+
+```bash
+1. 安装 Deno
+# macOS/Linux
+curl -fsSL https://deno.land/x/install/install.sh | sh
+
+# Windows
+iwr https://deno.land/x/install/install.ps1 -useb | iex
+
+2. 创建 app.ts
+console.log("Hello from Deno!");
+
+3. 运行文件
+deno run app.ts
+
+4. 查看效果
+# 控制台输出：Hello from Deno!
+```
+
+
+
+##### 1.1.7 各方案对比
+
+| 方案                 | 适合场景       | 启动命令            | 访问地址         | 特点                       |
+| :------------------- | :------------- | :------------------ | :--------------- | :------------------------- |
+| **Create React App** | React Web应用  | `npm start`         | `localhost:3000` | 官方脚手架，配置完善       |
+| **Vite**             | 各种前端框架   | `npm run dev`       | `localhost:5173` | 超快启动，现代化           |
+| **Next.js**          | 服务端渲染应用 | `npm run dev`       | `localhost:3000` | SSR支持，全栈能力          |
+| **Angular CLI**      | Angular应用    | `ng serve`          | `localhost:4200` | 企业级框架，完整解决方案   |
+| **NestJS**           | Node.js后端    | `npm run start:dev` | `localhost:3000` | 类Angular架构，适合API开发 |
+| **纯TypeScript**     | 学习/简单脚本  | `npm run dev`       | 控制台输出       | 最简配置，无框架依赖       |
+| **Deno**             | 现代运行时     | `deno run app.ts`   | 控制台输出       | 内置工具链，安全沙箱       |
+
+
+
+**选择适合的脚手架**：
+
+- 前端应用：Vite（速度快）或 Create React App（稳定性高）
+- 全栈应用：Next.js（React）或 Nuxt.js（Vue）
+- 后端服务：NestJS（结构化）或 Fastify（高性能）
+
+
+
+#### 1.2 bash脚本一键创建
+
+* 创建 `create-ts-project.sh`
+
+  ```bash
+  #!/bin/bash
+  
+  # 创建项目目录
+  mkdir $1
+  cd $1
+  
+  # 初始化项目
+  yarn init -y
+  
+  # 安装依赖
+  yarn add typescript webpack webpack-cli webpack-dev-server ts-loader html-webpack-plugin --dev
+  yarn add eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier --dev
+  yarn add jest ts-jest @types/jest --dev
+  
+  # 创建配置文件
+  npx tsc --init
+  cat > webpack.config.js <<EOL
+  const path = require('path');
+  const HtmlWebpackPlugin = require('html-webpack-plugin');
+  
+  module.exports = {
+    mode: 'development',
+    entry: './src/index.ts',
+    output: {
+      filename: 'bundle.js',
+      path: path.resolve(__dirname, 'dist'),
+      clean: true,
+    },
+    devtool: 'inline-source-map',
+    devServer: {
+      static: './dist',
+      hot: true,
+      open: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.tsx?\$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+      ],
+    },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+        title: 'TypeScript Project',
+      }),
+    ],
+  };
+  EOL
+  
+  # 创建 ESLint 配置
+  cat > .eslintrc.json <<EOL
+  {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "prettier"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off"
+    }
+  }
+  EOL
+  
+  # 创建 Prettier 配置
+  cat > .prettierrc <<EOL
+  {
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "tabWidth": 2
+  }
+  EOL
+  
+  # 初始化 Jest
+  npx ts-jest config:init
+  
+  # 创建目录结构
+  mkdir src
+  touch src/index.ts
+  touch src/index.html
+  
+  # 添加示例代码
+  cat > src/index.ts <<EOL
+  const message: string = 'Hello, TypeScript with Webpack!';
+  console.log(message);
+  EOL
+  
+  cat > src/index.html <<EOL
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Project</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>TypeScript + Webpack Project</h1>
+      <p>Check the console for output</p>
+    </div>
+  </body>
+  </html>
+  EOL
+  
+  # 更新 package.json 脚本
+  npm pkg set scripts.build="webpack --mode production"
+  npm pkg set scripts.start="webpack serve --open"
+  npm pkg set scripts.test="jest"
+  npm pkg set scripts.type-check="tsc --noEmit"
+  
+  # 初始化 Git
+  git init
+  git add .
+  git commit -m "Initial commit"
+  
+  echo "TypeScript project $1 created successfully!"
+  ```
+
+  
+
+* 使用`create-ts-project.sh`
+
+  ```bash
+  chmod +x create-ts-project.sh
+  ./create-ts-project.sh my-new-project
+  ```
+
+  
+
+* 测试运行项目
+
+  ```bash
+  yarn start
+  ```
+
+  
+
+
+
+
+
+
+
+### 2、创建electron项目
+
+详见：
+
+[electron入门指南.基于ts搭建一个新项目.脚手架向导](../electron/electron入门指南.md)
+
+
+
+
+
+
+
+## 五、打包、发布
 
 
 
@@ -624,9 +965,9 @@ rm -rf /var/folders/bf/_sn8d4f15b1dcmfpll9h8t_r0000gn/T/electron-packager/tmp-*
 
 
 
-## 四、实用技巧
+## 六、实用技巧
 
-### 1、简单执行一段js脚本
+### 1、如何执行一段js脚本
 
 * ### 方法 1：使用 Node.js 运行（确保安装了node）
 
@@ -669,7 +1010,7 @@ rm -rf /var/folders/bf/_sn8d4f15b1dcmfpll9h8t_r0000gn/T/electron-packager/tmp-*
 
 
 
-## 五、常见命令错误
+## 七、常见命令错误
 
 ### 1、brew-在更新或安装时报root权限的错误
 
@@ -739,7 +1080,7 @@ $ env:NODE_OPTIONS="--openssl-legacy-provider"
 
 
 
-## 六、细节深入
+## 八、细节深入
 ### 1、devDependencies 和 dependencies 的区别
 ​	[彻底搞懂devDependencies 和 dependencies 的区别！](https://blog.csdn.net/zz_jesse/article/details/139348751)
 

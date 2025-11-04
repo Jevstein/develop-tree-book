@@ -198,6 +198,14 @@
           <button onclick="handleClickIframePing(event)">ping (api)</button>
         </div>
       </div>
+      <div class="box electron-doc">
+        <div class="box-title"><b>electron doc</b></div>
+        <div class="box-subtitle">
+        </div>
+        <div class="box-area jsapi">
+          <div class="example-url"> <a href="../example/electron-doc/Electron IPC invoke 与 send 区别示例.html" target="_blank">Electron IPC invoke 与 send 区别示例</a></div>
+        </div>
+      </div> 
       <div class="box electron-api">
         <div class="box-title"><b>electron jsapi</b></div>
         <div class="box-subtitle">
@@ -435,7 +443,8 @@ INSERT INTO users (name) VALUES ('John Doe');\n\nSELECT * FROM users;\n";
       lineNumberDiv.textContent = lineNumbers;
       textarea.parentNode.insertBefore(lineNumberDiv, textarea);
 
-      document.querySelector('.line-numbers').scrollTop = 999999;
+      const lineNumbersDiv = document.querySelector('.line-numbers');
+      lineNumbersDiv.scrollTop = lineNumbersDiv.scrollHeight;
     }
 
     function main() {

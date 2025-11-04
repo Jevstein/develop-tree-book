@@ -17,7 +17,9 @@
 
 ## 二、electron 环境搭建
 
-### 1、项目示例
+### 1、基于js搭建一个新项目
+
+#### 1、项目示例
 
 * 目录结构
 
@@ -41,7 +43,7 @@
 
 
 
-### 2、搭建命令
+#### 2、搭建命令
 
 ```shell
 #1、检查并安装node.js, 参考：《../web开发环境完全搭建指南》
@@ -103,7 +105,7 @@ $ yarn package
 
 
 
-### 3、预加载
+#### 3、预加载
 
 ​	通过预加载脚本从渲染器访问Node.js。仔细观察index.html文本中，您会发现主体文本中丢失了版本编号。 现在，将使用 JavaScript 动态插入它们，最后要做的是输出Electron的版本号和它的依赖项到你的web页面上。
 
@@ -162,9 +164,9 @@ $ yarn package
 
   
 
-### 4、项目文件
+#### 4、项目文件
 
-#### 1） index.html
+##### 1） index.html
 
 ```html
 <!DOCTYPE html>
@@ -188,7 +190,7 @@ $ yarn package
 
 
 
-####  2） main.js
+#####  2） main.js
 
 ```javascript
 /**
@@ -258,7 +260,7 @@ app.on('window-all-closed', () => {
 
 
 
-#### 	3） preload.js
+##### 	3） preload.js
 
 ```javascript
 // 所有的 Node.js API接口 都可以在 preload 进程中被调用.
@@ -277,7 +279,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-#### 	4）.forge/config.js
+##### 	4）.forge/config.js
 
 ```javascript
 module.exports = {
@@ -311,7 +313,7 @@ module.exports = {
 
 
 
-#### 5）.vscode/launch.json
+##### 5）.vscode/launch.json
 
 ```json
 {
@@ -350,7 +352,48 @@ module.exports = {
 
 
 
-### 5、代码调试
+### 2、基于ts搭建一个新项目
+
+#### 1) 脚手架向导
+
+   [使用 Electron Forge 之 Webpack + Typescript 向导，创建ts新项目](https://www.electronforge.io/templates/typescript-+-webpack-template)
+
+  ```bash
+  $ npx create-electron-app@latest my-new-app --template=webpack-typescript
+  ```
+
+#### 2）按部就班（不推荐）
+
+  ```bash
+  --- 1. 初始化项目
+
+  mkdir my-electron-app
+  cd my-electron-app
+  yarn init -y  # 生成 package.json
+
+  --- 2. 安装依赖
+  # 核心依赖
+  yarn add electron
+
+  # 开发依赖
+  yarn add -D typescript @types/node @types/electron
+
+  # 可选工具（推荐）
+  yarn add -D electron-builder  # 打包工具
+  yarn add -D concurrently       # 并行执行命令
+  yarn add -D nodemon            # 文件监听重启
+
+  --- 3. 生成的tsconfig.json文件
+  npx tsc --init
+  ```
+
+
+
+
+
+
+
+### 3、代码调试
 
 #### 1. 浏览器页面开发调试
 
@@ -456,7 +499,7 @@ $ code electron-quick-start
 
 
 
-### 6、打包发布
+### 4、打包发布
 
 [如何打包 electron 程序：electron-forge 的使用教程](https://blog.csdn.net/KimBing/article/details/119080158)
 [Electron Forge](https://www.electronforge.io/)
@@ -471,11 +514,17 @@ $ code electron-quick-start
 -- 1.Add a description to your package.json file, otherwise rpmbuild will fail. Blank description are not valid.
 	To build an RPM package for Linux, you will need to install its required system dependencies：https://www.electronforge.io/config/makers/rpm
 
+$ git clone https://github.com/electron/electron-quick-start #demo
+
 -- 2.安装electron-forge
 $ npm install --save-dev @electron-forge/cli 或
 $ yarn add --dev @electron-forge/cli
 
--- 3.打包
+-- 3、初始化，生成/.forge/config.js文件
+$ yarn add electron-squirrel-startup
+$ npx electron-forge import
+
+-- 4.打包
 $ npx electron-forge package 或
 $ yarn package
 

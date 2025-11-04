@@ -67,7 +67,7 @@ $ git add ./xxx/xxx.md
 # 4、提交
 $ git commit -m 'xxx'
 *日志格式可参考：
-  1）fix(input): no.23035 修复Input输入英文无法显示的问题
+  1）fix(input): no.23035 解决Input输入英文无法显示的问题
   2）feat(input): no.23036 新增autoFocus参数用于自动获取焦点
   3）perf(input): no.23037 优化Input输入卡顿的问题
   4）docs(input): no.23036 添加autoFocus功能示例
