@@ -95,15 +95,25 @@ $ git pull origin xxx # 分支拉取且合并
 
 -- 1）建议用merge（保留历史）方式pull，且自行解决冲突
 	$ git config --global pull.rebase false
+	
+-- 2）撤销
+	$ git merge --abort
 
-# 8、标签
+# 8、中止操作
+$ git merge --abort # 当合并(如git pull origin xxx)出现冲突时，中止合并并回到合并前的状态
+$ git reset --merge # 等同git merge --abort
+$ git rebase --abort # 中止正在进行的变基操作
+$ git cherry-pick --abort # 中止正在进行的 cherry-pick 操作
+$ git revert --abort # 中止正在进行的 revert 操作
 
-# 9、日志
+# 9、标签
+
+# 10、日志
 $ git log
 $ git log -p xxx
 $ git blame xxx
 
-# 10、查看哪一处将文件忽略
+# 11、查看哪一处将文件忽略
 $ git check-ignore -v ./xxx
 ```
 

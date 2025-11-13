@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac特殊符号大全</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .category-tab {
+            background: #e9ecef;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .category-tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .symbols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .symbol-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .symbol-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #3498db;
+        }
+        
+        .symbol-char {
+            font-size: 32px;
+            margin-bottom: 10px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .symbol-name {
+            font-size: 12px;
+            color: #666;
+            word-break: break-word;
+        }
+        
+        .symbol-code {
+            font-size: 11px;
+            color: #999;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            margin-top: 5px;
+        }
+        
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .copy-notification.show {
+            opacity: 1;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+            grid-column: 1 / -1;
+        }
+        
+        @media (max-width: 768px) {
+            .symbols-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mac 特殊符号大全</h1>
+            <p>点击符号即可复制到剪贴板</p>
+        </header>
+        
+        <div class="content">
+            <div class="controls">
+                <input type="text" class="search-box" id="search-input" placeholder="搜索符号名称或代码...">
+            </div>
+            
+            <div class="category-tabs" id="category-tabs">
+                <!-- 分类标签将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="symbols-grid" id="symbols-grid">
+                <!-- 符号将通过JavaScript动态加载 -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="copy-notification" id="copy-notification">符号已复制到剪贴板</div>
+
+    <script>
+        // 符号数据
+        const symbolsData = [
+            // 警告和状态符号
+            { char: '⚠️', name: '警告', code: 'U+26A0', category: 'warning' },
+            { char: '🚸', name: '儿童通行', code: 'U+1F6B8', category: 'warning' },
+            { char: '⛔', name: '禁止进入', code: 'U+26D4', category: 'warning' },
+            { char: '🚫', name: '禁止', code: 'U+1F6AB', category: 'warning' },
+            { char: '🚳', name: '禁止自行车', code: 'U+1F6B3', category: 'warning' },
+            { char: '🚭', name: '禁止吸烟', code: 'U+1F6AD', category: 'warning' },
+            { char: '🚯', name: '禁止乱扔垃圾', code: 'U+1F6AF', category: 'warning' },
+            { char: '🚱', name: '非饮用水', code: 'U+1F6B1', category: 'warning' },
+            { char: '🚷', name: '禁止行人', code: 'U+1F6B7', category: 'warning' },
+            { char: '📵', name: '禁止手机', code: 'U+1F4F5', category: 'warning' },
+            { char: '🔞', name: '未满18岁', code: 'U+1F51E', category: 'warning' },
+            { char: '☢️', name: '放射性', code: 'U+2622', category: 'warning' },
+            { char: '☣️', name: '生物危害', code: 'U+2623', category: 'warning' },
+            
+            // 状态指示符号
+            { char: '✅', name: '复选框', code: 'U+2705', category: 'status' },
+            { char: '☑️', name: '带勾选框', code: 'U+2611', category: 'status' },
+            { char: '✔️', name: '勾号', code: 'U+2714', category: 'status' },
+            { char: '❌', name: '叉号', code: 'U+274C', category: 'status' },
+            { char: '❎', name: '带叉号按钮', code: 'U+274E', category: 'status' },
+            { char: '➰', name: '卷圈', code: 'U+27B0', category: 'status' },
+            { char: '➿', name: '双卷圈', code: 'U+27BF', category: 'status' },
+            { char: '〽️', name: '部分标记', code: 'U+303D', category: 'status' },
+            { char: '✳️', name: '八角星', code: 'U+2733', category: 'status' },
+            { char: '✴️', name: '八角虚线星', code: 'U+2734', category: 'status' },
+            { char: '❇️', name: '火花', code: 'U+2747', category: 'status' },
+            { char: '©️', name: '版权', code: 'U+00A9', category: 'status' },
+            { char: '®️', name: '注册', code: 'U+00AE', category: 'status' },
+            { char: '™️', name: '商标', code: 'U+2122', category: 'status' },
+            { char: 'ℹ️', name: '信息', code: 'U+2139', category: 'status' },
+            
+            // 箭头符号
+            { char: '⬆️', name: '向上箭头', code: 'U+2B06', category: 'arrows' },
+            { char: '↗️', name: '右上箭头', code: 'U+2197', category: 'arrows' },
+            { char: '➡️', name: '向右箭头', code: 'U+27A1', category: 'arrows' },
+            { char: '↘️', name: '右下箭头', code: 'U+2198', category: 'arrows' },
+            { char: '⬇️', name: '向下箭头', code: 'U+2B07', category: 'arrows' },
+            { char: '↙️', name: '左下箭头', code: 'U+2199', category: 'arrows' },
+            { char: '⬅️', name: '向左箭头', code: 'U+2B05', category: 'arrows' },
+            { char: '↖️', name: '左上箭头', code: 'U+2196', category: 'arrows' },
+            { char: '↕️', name: '上下箭头', code: 'U+2195', category: 'arrows' },
+            { char: '↔️', name: '左右箭头', code: 'U+2194', category: 'arrows' },
+            { char: '↩️', name: '右箭头弯曲向左', code: 'U+21A9', category: 'arrows' },
+            { char: '↪️', name: '左箭头弯曲向右', code: 'U+21AA', category: 'arrows' },
+            { char: '⤴️', name: '右箭头弯曲向上', code: 'U+2934', category: 'arrows' },
+            { char: '⤵️', name: '右箭头弯曲向下', code: 'U+2935', category: 'arrows' },
+            { char: '🔃', name: '顺时针垂直箭头', code: 'U+1F503', category: 'arrows' },
+            { char: '🔄', name: '逆时针箭头', code: 'U+1F504', category: 'arrows' },
+            { char: '🔙', name: '返回箭头', code: 'U+1F519', category: 'arrows' },
+            { char: '🔚', name: '结束箭头', code: 'U+1F51A', category: 'arrows' },
+            { char: '🔛', name: '进行中箭头', code: 'U+1F51B', category: 'arrows' },
+            { char: '🔜', name: '即将到来箭头', code: 'U+1F51C', category: 'arrows' },
+            { char: '🔝', name: '顶部箭头', code: 'U+1F51D', category: 'arrows' },
+            
+            // 数学符号
+            { char: '➕', name: '加号', code: 'U+2795', category: 'math' },
+            { char: '➖', name: '减号', code: 'U+2796', category: 'math' },
+            { char: '✖️', name: '乘号', code: 'U+2716', category: 'math' },
+            { char: '➗', name: '除号', code: 'U+2797', category: 'math' },
+            { char: '♾️', name: '无穷大', code: 'U+267E', category: 'math' },
+            { char: '®', name: '注册符号', code: 'U+00AE', category: 'math' },
+            { char: '©', name: '版权符号', code: 'U+00A9', category: 'math' },
+            { char: '™', name: '商标符号', code: 'U+2122', category: 'math' },
+            { char: '‰', name: '千分号', code: 'U+2030', category: 'math' },
+            { char: '‱', name: '万分号', code: 'U+2031', category: 'math' },
+            
+            // 货币符号
+            { char: '€', name: '欧元', code: 'U+20AC', category: 'currency' },
+            { char: '£', name: '英镑', code: 'U+00A3', category: 'currency' },
+            { char: '¥', name: '人民币/日元', code: 'U+00A5', category: 'currency' },
+            { char: '₩', name: '韩元', code: 'U+20A9', category: 'currency' },
+            { char: '₽', name: '卢布', code: 'U+20BD', category: 'currency' },
+            { char: '₹', name: '印度卢比', code: 'U+20B9', category: 'currency' },
+            { char: '₺', name: '土耳其里拉', code: 'U+20BA', category: 'currency' },
+            { char: '₴', name: '格里夫纳', code: 'U+20B4', category: 'currency' },
+            { char: '₸', name: '坚戈', code: 'U+20B8', category: 'currency' },
+            { char: '₿', name: '比特币', code: 'U+20BF', category: 'currency' },
+            { char: '¢', name: '分币', code: 'U+00A2', category: 'currency' },
+            { char: '$', name: '美元', code: 'U+0024', category: 'currency' },
+            { char: '¤', name: '货币符号', code: 'U+00A4', category: 'currency' },
+            
+            // 形状符号
+            { char: '🔴', name: '红色圆圈', code: 'U+1F534', category: 'shapes' },
+            { char: '🟠', name: '橙色圆圈', code: 'U+1F7E0', category: 'shapes' },
+            { char: '🟡', name: '黄色圆圈', code: 'U+1F7E1', category: 'shapes' },
+            { char: '🟢', name: '绿色圆圈', code: 'U+1F7E2', category: 'shapes' },
+            { char: '🔵', name: '蓝色圆圈', code: 'U+1F535', category: 'shapes' },
+            { char: '🟣', name: '紫色圆圈', code: 'U+1F7E3', category: 'shapes' },
+            { char: '🟤', name: '棕色圆圈', code: 'U+1F7E4', category: 'shapes' },
+            { char: '⚫', name: '黑色圆圈', code: 'U+26AB', category: 'shapes' },
+            { char: '⚪', name: '白色圆圈', code: 'U+26AA', category: 'shapes' },
+            { char: '🟥', name: '红色方块', code: 'U+1F7E5', category: 'shapes' },
+            { char: '🟧', name: '橙色方块', code: 'U+1F7E7', category: 'shapes' },
+            { char: '🟨', name: '黄色方块', code: 'U+1F7E8', category: 'shapes' },
+            { char: '🟩', name: '绿色方块', code: 'U+1F7E9', category: 'shapes' },
+            { char: '🟦', name: '蓝色方块', code: 'U+1F7E6', category: 'shapes' },
+            { char: '🟪', name: '紫色方块', code: 'U+1F7EA', category: 'shapes' },
+            { char: '🟫', name: '棕色方块', code: 'U+1F7EB', category: 'shapes' },
+            { char: '⬛', name: '黑色大方块', code: 'U+2B1B', category: 'shapes' },
+            { char: '⬜', name: '白色大方块', code: 'U+2B1C', category: 'shapes' },
+            { char: '◼️', name: '黑色中方块', code: 'U+25FC', category: 'shapes' },
+            { char: '◻️', name: '白色中方块', code: 'U+25FB', category: 'shapes' },
+            { char: '◾', name: '黑色中小方块', code: 'U+25FE', category: 'shapes' },
+            { char: '◽', name: '白色中小方块', code: 'U+25FD', category: 'shapes' },
+            { char: '▪️', name: '黑色小方块', code: 'U+25AA', category: 'shapes' },
+            { char: '▫️', name: '白色小方块', code: 'U+25AB', category: 'shapes' },
+            { char: '🔶', name: '大橙色菱形', code: 'U+1F536', category: 'shapes' },
+            { char: '🔷', name: '大蓝色菱形', code: 'U+1F537', category: 'shapes' },
+            { char: '🔸', name: '小橙色菱形', code: 'U+1F538', category: 'shapes' },
+            { char: '🔹', name: '小蓝色菱形', code: 'U+1F539', category: 'shapes' },
+            { char: '🔺', name: '红色三角向上', code: 'U+1F53A', category: 'shapes' },
+            { char: '🔻', name: '红色三角向下', code: 'U+1F53B', category: 'shapes' },
+            { char: '💠', name: '带点菱形', code: 'U+1F4A0', category: 'shapes' },
+            { char: '🔘', name: '单选按钮', code: 'U+1F518', category: 'shapes' },
+            { char: '🔳', name: '白色方形按钮', code: 'U+1F533', category: 'shapes' },
+            { char: '🔲', name: '黑色方形按钮', code: 'U+1F532', category: 'shapes' },
+            
+            // 天气符号
+            { char: '☀️', name: '太阳', code: 'U+2600', category: 'weather' },
+            { char: '🌤️', name: '少云', code: 'U+1F324', category: 'weather' },
+            { char: '⛅', name: '多云', code: 'U+26C5', category: 'weather' },
+            { char: '🌥️', name: '多云', code: 'U+1F325', category: 'weather' },
+            { char: '☁️', name: '阴天', code: 'U+2601', category: 'weather' },
+            { char: '🌦️', name: '雨云', code: 'U+1F326', category: 'weather' },
+            { char: '🌧️', name: '下雨', code: 'U+1F327', category: 'weather' },
+            { char: '⛈️', name: '雷雨', code: 'U+26C8', category: 'weather' },
+            { char: '🌩️', name: '闪电', code: 'U+1F329', category: 'weather' },
+            { char: '🌨️', name: '下雪', code: 'U+1F328', category: 'weather' },
+            { char: '❄️', name: '雪花', code: 'U+2744', category: 'weather' },
+            { char: '🌪️', name: '龙卷风', code: 'U+1F32A', category: 'weather' },
+            { char: '🌫️', name: '雾', code: 'U+1F32B', category: 'weather' },
+            { char: '💨', name: '疾风', code: 'U+1F4A8', category: 'weather' },
+            { char: '💧', name: '水滴', code: 'U+1F4A7', category: 'weather' },
+            { char: '💦', name: '汗滴', code: 'U+1F4A6', category: 'weather' },
+            { char: '☔', name: '雨伞', code: 'U+2614', category: 'weather' },
+            { char: '☂️', name: '伞', code: 'U+2602', category: 'weather' },
+            { char: '🌈', name: '彩虹', code: 'U+1F308', category: 'weather' },
+            { char: '🌊', name: '波浪', code: 'U+1F30A', category: 'weather' },
+            
+            // 工具符号
+            { char: '🔧', name: '扳手', code: 'U+1F527', category: 'tools' },
+            { char: '🔨', name: '锤子', code: 'U+1F528', category: 'tools' },
+            { char: '⚒️', name: '锤子和镐', code: 'U+2692', category: 'tools' },
+            { char: '🛠️', name: '锤子和扳手', code: 'U+1F6E0', category: 'tools' },
+            { char: '⛏️', name: '镐', code: 'U+26CF', category: 'tools' },
+            { char: '🔩', name: '螺母和螺栓', code: 'U+1F529', category: 'tools' },
+            { char: '⚙️', name: '齿轮', code: 'U+2699', category: 'tools' },
+            { char: '🔗', name: '链接', code: 'U+1F517', category: 'tools' },
+            { char: '⛓️', name: '链条', code: 'U+26D3', category: 'tools' },
+            { char: '📎', name: '回形针', code: 'U+1F4CE', category: 'tools' },
+            { char: '🖇️', name: '回形针连接', code: 'U+1F587', category: 'tools' },
+            { char: '📏', name: '直尺', code: 'U+1F4CF', category: 'tools' },
+            { char: '📐', name: '三角尺', code: 'U+1F4D0', category: 'tools' },
+            { char: '✂️', name: '剪刀', code: 'U+2702', category: 'tools' },
+            { char: '🔒', name: '锁定', code: 'U+1F512', category: 'tools' },
+            { char: '🔓', name: '解锁', code: 'U+1F513', category: 'tools' },
+            { char: '🔏', name: '用笔锁定', code: 'U+1F50F', category: 'tools' },
+            { char: '🔐', name: '用钥匙锁定', code: 'U+1F510', category: 'tools' },
+            { char: '🔑', name: '钥匙', code: 'U+1F511', category: 'tools' },
+            { char: '🗝️', name: '旧钥匙', code: 'U+1F5DD', category: 'tools' },
+            { char: '🔦', name: '手电筒', code: 'U+1F526', category: 'tools' },
+            { char: '🕯️', name: '蜡烛', code: 'U+1F56F', category: 'tools' },
+            { char: '💡', name: '灯泡', code: 'U+1F4A1', category: 'tools' },
+            { char: '🔌', name: '插头', code: 'U+1F50C', category: 'tools' }
+        ];
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // 创建分类标签
+            createCategoryTabs();
+            
+            // 显示所有符号
+            displaySymbols(symbolsData);
+            
+            // 设置事件监听器
+            setupEventListeners();
+        }
+
+        function createCategoryTabs() {
+            const categoryTabs = document.getElementById('category-tabs');
+            const categories = [...new Set(symbolsData.map(symbol => symbol.category))];
+            
+            // 添加"全部"分类
+            categories.unshift('all');
+            
+            categories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'category-tab';
+                if (category === 'all') {
+                    button.classList.add('active');
+                    button.textContent = '全部符号';
+                } else {
+                    button.textContent = getCategoryName(category);
+                }
+                
+                button.setAttribute('data-category', category);
+                categoryTabs.appendChild(button);
+            });
+        }
+
+        function getCategoryName(category) {
+            const categoryNames = {
+                'warning': '警告符号',
+                'status': '状态符号',
+                'arrows': '箭头符号',
+                'math': '数学符号',
+                'currency': '货币符号',
+                'shapes': '形状符号',
+                'weather': '天气符号',
+                'tools': '工具符号'
+            };
+            
+            return categoryNames[category] || category;
+        }
+
+        function displaySymbols(symbols) {
+            const symbolsGrid = document.getElementById('symbols-grid');
+            symbolsGrid.innerHTML = '';
+            
+            if (symbols.length === 0) {
+                symbolsGrid.innerHTML = '<div class="no-results">未找到匹配的符号</div>';
+                return;
+            }
+            
+            symbols.forEach(symbol => {
+                const card = document.createElement('div');
+                card.className = 'symbol-card';
+                card.innerHTML = `
+                    <div class="symbol-char">${symbol.char}</div>
+                    <div class="symbol-name">${symbol.name}</div>
+                    <div class="symbol-code">${symbol.code}</div>
+                `;
+                
+                // 点击复制功能
+                card.addEventListener('click', function() {
+                    copyToClipboard(symbol.char);
+                });
+                
+                symbolsGrid.appendChild(card);
+            });
+        }
+
+        function setupEventListeners() {
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                filterSymbols();
+            });
+            
+            // 分类筛选
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除其他标签的active类
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    // 为当前标签添加active类
+                    this.classList.add('active');
+                    
+                    filterSymbols();
+                });
+            });
+        }
+
+        function filterSymbols() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const activeCategory = document.querySelector('.category-tab.active').getAttribute('data-category');
+            
+            let filteredSymbols = symbolsData;
+            
+            // 按分类筛选
+            if (activeCategory !== 'all') {
+                filteredSymbols = filteredSymbols.filter(symbol => symbol.category === activeCategory);
+            }
+            
+            // 按搜索词筛选
+            if (searchTerm) {
+                filteredSymbols = filteredSymbols.filter(symbol => 
+                    symbol.name.toLowerCase().includes(searchTerm) || 
+                    symbol.code.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displaySymbols(filteredSymbols);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('已复制: ' + text);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                // 备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('已复制: ' + text);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('copy-notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
