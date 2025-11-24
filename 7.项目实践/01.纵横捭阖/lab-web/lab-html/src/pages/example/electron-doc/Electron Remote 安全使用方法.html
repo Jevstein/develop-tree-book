@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron Remote 模块安全使用指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .warning-banner {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .warning-banner h2 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background: #f2f2f2;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .demo-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .remote-demo, .ipc-demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .remote-demo {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .ipc-demo {
+            border-left: 4px solid #27ae60;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .remote-btn {
+            background: #e74c3c;
+        }
+        
+        .ipc-btn {
+            background: #27ae60;
+        }
+        
+        .demo-result {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-success {
+            color: #27ae60;
+        }
+        
+        .log-error {
+            color: #e74c3c;
+        }
+        
+        .log-info {
+            color: #3498db;
+        }
+        
+        .log-warning {
+            color: #e67e22;
+        }
+        
+        .usage-scenarios {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .usage-scenarios h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .scenario {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .scenario h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .migration-guide {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .migration-guide h2 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .security-considerations {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .security-considerations h2 {
+            color: #721c24;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Electron Remote 模块安全使用指南</h1>
+            <p>安全使用 getMediaAccessStatus 及替代方案</p>
+        </header>
+        
+        <div class="content">
+            <div class="warning-banner">
+                <h2>⚠️ 重要安全警告</h2>
+                <p><strong>Electron 的 remote 模块已过时</strong>，从 Electron 14 开始默认禁用，在 Electron 12 中标记为废弃。</p>
+                <p>建议使用 IPC 通信作为替代方案，仅在必要时使用 @electron/remote 包。</p>
+            </div>
+            
+            <h2>getMediaAccessStatus 方法介绍</h2>
+            <p><code>getMediaAccessStatus</code> 是 <code>systemPreferences</code> 模块的方法，用于检查媒体设备（摄像头、麦克风等）的访问权限状态。</p>
+            
+            <div class="code-block">
+// 方法签名
+systemPreferences.getMediaAccessStatus(mediaType: string): Promise&lt;string&gt;
+
+// 支持的 mediaType 值
+'camera'     // 摄像头
+'microphone' // 麦克风
+'screen'     // 屏幕录制
+            </div>
+            
+            <div class="demo-area">
+                <div class="remote-demo">
+                    <h2>使用 remote 模块（不推荐）</h2>
+                    <div class="code-block">
+// 主进程启用 remote（不安全）
+// main.js
+const { app, BrowserWindow } = require('electron');
+
+// 启用 remote 模块（不推荐）
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true, // 启用 remote
+      contextIsolation: false  // 必须禁用上下文隔离
+    }
+  });
+});
+
+// 渲染进程
+const { remote } = require('electron');
+const { systemPreferences } = remote;
+
+// 使用 getMediaAccessStatus
+async function checkMediaAccess() {
+  try {
+    const cameraStatus = await systemPreferences.getMediaAccessStatus('camera');
+    const micStatus = await systemPreferences.getMediaAccessStatus('microphone');
+    
+    console.log('摄像头状态:', cameraStatus);
+    console.log('麦克风状态:', micStatus);
+    
+    return { camera: cameraStatus, microphone: micStatus };
+  } catch (error) {
+    console.error('检查媒体权限失败:', error);
+    throw error;
+  }
+}
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="remote-btn" id="test-remote">测试 remote 方式</button>
+                        <button class="remote-btn" id="test-remote-secure">测试安全 remote</button>
+                    </div>
+                    
+                    <div class="demo-result" id="remote-result">
+                        remote 测试结果将显示在这里...
+                    </div>
+                </div>
+                
+                <div class="ipc-demo">
+                    <h2>使用 IPC 通信（推荐）</h2>
+                    <div class="code-block">
+// 主进程 - main.js
+const { app, BrowserWindow, ipcMain, systemPreferences } = require('electron');
+const path = require('path');
+
+// 安全的窗口配置
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: false,           // 禁用 nodeIntegration
+      contextIsolation: true,            // 启用上下文隔离
+      preload: path.join(__dirname, 'preload.js') // 预加载脚本
+    }
+  });
+});
+
+// 处理媒体权限检查请求
+ipcMain.handle('get-media-access-status', async (event, mediaType) => {
+  // 验证 mediaType 参数
+  const allowedTypes = ['camera', 'microphone', 'screen'];
+  if (!allowedTypes.includes(mediaType)) {
+    throw new Error(`不支持的媒体类型: ${mediaType}`);
+  }
+  
+  try {
+    return await systemPreferences.getMediaAccessStatus(mediaType);
+  } catch (error) {
+    console.error(`获取 ${mediaType} 权限状态失败:`, error);
+    throw error;
+  }
+});
+
+// 预加载脚本 - preload.js
+const { contextBridge, ipcRenderer } = require('electron');
+
+// 安全地暴露 API 到渲染进程
+contextBridge.exposeInMainWorld('electronAPI', {
+  getMediaAccessStatus: (mediaType) => 
+    ipcRenderer.invoke('get-media-access-status', mediaType)
+});
+
+// 渲染进程
+async function checkMediaAccessSafe() {
+  try {
+    const cameraStatus = await window.electronAPI.getMediaAccessStatus('camera');
+    const micStatus = await window.electronAPI.getMediaAccessStatus('microphone');
+    
+    console.log('摄像头状态:', cameraStatus);
+    console.log('麦克风状态:', micStatus);
+    
+    return { camera: cameraStatus, microphone: micStatus };
+  } catch (error) {
+    console.error('检查媒体权限失败:', error);
+    throw error;
+  }
+}
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="ipc-btn" id="test-ipc">测试 IPC 方式</button>
+                        <button class="ipc-btn" id="test-ipc-bulk">测试批量检查</button>
+                    </div>
+                    
+                    <div class="demo-result" id="ipc-result">
+                        IPC 测试结果将显示在这里...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="usage-scenarios">
+                <h2>完整实现方案</h2>
+                
+                <div class="scenario">
+                    <h3>方案1：使用 @electron/remote（过渡方案）</h3>
+                    <div class="code-block">
+// 1. 安装 @electron/remote
+// npm install @electron/remote
+
+// 2. 主进程配置 - main.js
+const { app, BrowserWindow } = require('electron');
+const remote = require('@electron/remote/main');
+
+// 初始化 remote
+remote.initialize();
+
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false, // 需要禁用上下文隔离
+      enableRemoteModule: false // 使用 @electron/remote 替代
+    }
+  });
+  
+  // 启用 remote
+  remote.enable(mainWindow.webContents);
+});
+
+// 3. 渲染进程使用
+const { systemPreferences } = require('@electron/remote');
+
+async function checkMediaAccess() {
+  const status = await systemPreferences.getMediaAccessStatus('camera');
+  return status;
+}
+                    </div>
+                </div>
+                
+                <div class="scenario">
+                    <h3>方案2：安全的 IPC 实现（推荐）</h3>
+                    <div class="code-block">
+// 主进程 - main.js
+const { app, BrowserWindow, ipcMain, systemPreferences, dialog } = require('electron');
+const path = require('path');
+
+class MediaPermissionManager {
+  constructor() {
+    this.setupIPCHandlers();
+  }
+  
+  setupIPCHandlers() {
+    // 单个媒体类型检查
+    ipcMain.handle('media:get-status', async (event, mediaType) => {
+      return this.getMediaAccessStatus(mediaType);
+    });
+    
+    // 批量检查所有媒体类型
+    ipcMain.handle('media:get-all-status', async (event) => {
+      return this.getAllMediaAccessStatus();
+    });
+    
+    // 请求媒体权限
+    ipcMain.handle('media:request-access', async (event, mediaType) => {
+      return this.requestMediaAccess(mediaType, event.sender);
+    });
+  }
+  
+  async getMediaAccessStatus(mediaType) {
+    // 验证媒体类型
+    const allowedTypes = ['camera', 'microphone', 'screen'];
+    if (!allowedTypes.includes(mediaType)) {
+      throw new Error(`不支持的媒体类型: ${mediaType}`);
+    }
+    
+    try {
+      const status = await systemPreferences.getMediaAccessStatus(mediaType);
+      return {
+        type: mediaType,
+        status: status,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error(`获取 ${mediaType} 权限状态失败:`, error);
+      throw new Error(`无法获取 ${mediaType} 权限状态`);
+    }
+  }
+  
+  async getAllMediaAccessStatus() {
+    const mediaTypes = ['camera', 'microphone', 'screen'];
+    const results = {};
+    
+    for (const mediaType of mediaTypes) {
+      try {
+        results[mediaType] = await this.getMediaAccessStatus(mediaType);
+      } catch (error) {
+        results[mediaType] = { error: error.message };
+      }
+    }
+    
+    return results;
+  }
+  
+  async requestMediaAccess(mediaType, webContents) {
+    // 检查当前状态
+    const currentStatus = await this.getMediaAccessStatus(mediaType);
+    
+    if (currentStatus.status === 'granted') {
+      return { success: true, alreadyGranted: true };
+    }
+    
+    // 显示权限请求对话框
+    const mediaNames = {
+      camera: '摄像头',
+      microphone: '麦克风',
+      screen: '屏幕录制'
+    };
+    
+    const { response } = await dialog.showMessageBox(webContents.getOwnerBrowserWindow(), {
+      type: 'question',
+      buttons: ['允许', '拒绝'],
+      defaultId: 0,
+      message: `应用需要访问您的${mediaNames[mediaType]}权限`,
+      detail: '此权限用于视频通话、录音或屏幕共享功能'
+    });
+    
+    if (response === 0) {
+      // 在实际应用中，这里会触发系统权限请求
+      // 注意：getMediaAccessStatus 只检查状态，不请求权限
+      // 实际权限请求需要调用其他 API 或由用户操作触发
+      return { 
+        success: true, 
+        userApproved: true,
+        note: '系统权限对话框将随后显示'
+      };
+    } else {
+      return { 
+        success: false, 
+        userApproved: false,
+        reason: '用户拒绝授权'
+      };
+    }
+  }
+}
+
+// 初始化
+const mediaManager = new MediaPermissionManager();
+
+// 创建安全窗口
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
+  });
+  
+  mainWindow.loadFile('index.html');
+});
+                    </div>
+                </div>
+                
+                <div class="scenario">
+                    <h3>方案3：预加载脚本配置</h3>
+                    <div class="code-block">
+// preload.js - 安全的 API 暴露
+const { contextBridge, ipcRenderer } = require('electron');
+
+// 媒体权限 API
+const mediaAPI = {
+  // 获取单个媒体状态
+  getMediaStatus: (mediaType) => 
+    ipcRenderer.invoke('media:get-status', mediaType),
+  
+  // 获取所有媒体状态
+  getAllMediaStatus: () => 
+    ipcRenderer.invoke('media:get-all-status'),
+  
+  // 请求媒体访问权限
+  requestMediaAccess: (mediaType) => 
+    ipcRenderer.invoke('media:request-access', mediaType),
+  
+  // 监听权限变化（如果支持）
+  onMediaAccessChanged: (callback) => {
+    // 注意：实际实现可能需要额外的主进程事件
+    ipcRenderer.on('media-access-changed', callback);
+    
+    return () => {
+      ipcRenderer.removeListener('media-access-changed', callback);
+    };
+  }
+};
+
+// 应用配置 API
+const configAPI = {
+  getVersion: () => ipcRenderer.invoke('config:get-version'),
+  getPlatform: () => process.platform
+};
+
+// 安全地暴露 API
+contextBridge.exposeInMainWorld('electronAPI', {
+  media: mediaAPI,
+  config: configAPI,
+  
+  // 添加验证和调试方法
+  validateMediaType: (mediaType) => {
+    const allowedTypes = ['camera', 'microphone', 'screen'];
+    return allowedTypes.includes(mediaType);
+  }
+});
+
+// 渲染进程使用 - renderer.js
+class MediaAccessManager {
+  constructor() {
+    this.mediaStates = {};
+    this.init();
+  }
+  
+  async init() {
+    await this.checkAllMediaAccess();
+    this.setupEventListeners();
+  }
+  
+  // 检查所有媒体权限
+  async checkAllMediaAccess() {
+    try {
+      this.mediaStates = await window.electronAPI.media.getAllMediaStatus();
+      this.updateUI();
+      return this.mediaStates;
+    } catch (error) {
+      console.error('检查媒体权限失败:', error);
+      this.showError('无法检查媒体权限状态');
+      return {};
+    }
+  }
+  
+  // 检查特定媒体权限
+  async checkMediaAccess(mediaType) {
+    if (!window.electronAPI.validateMediaType(mediaType)) {
+      throw new Error(`不支持的媒体类型: ${mediaType}`);
+    }
+    
+    try {
+      const result = await window.electronAPI.media.getMediaStatus(mediaType);
+      this.mediaStates[mediaType] = result;
+      this.updateUI();
+      return result;
+    } catch (error) {
+      console.error(`检查 ${mediaType} 权限失败:`, error);
+      this.mediaStates[mediaType] = { error: error.message };
+      throw error;
+    }
+  }
+  
+  // 请求媒体权限
+  async requestMediaAccess(mediaType) {
+    if (!window.electronAPI.validateMediaType(mediaType)) {
+      throw new Error(`不支持的媒体类型: ${mediaType}`);
+    }
+    
+    try {
+      const result = await window.electronAPI.media.requestMediaAccess(mediaType);
+      
+      if (result.success) {
+        // 重新检查状态
+        await this.checkMediaAccess(mediaType);
+        this.showSuccess(`${mediaType} 权限请求成功`);
+      } else {
+        this.showError(`权限请求被拒绝: ${result.reason}`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`请求 ${mediaType} 权限失败:`, error);
+      this.showError('权限请求失败');
+      throw error;
+    }
+  }
+  
+  // 更新界面
+  updateUI() {
+    // 更新权限状态显示
+    for (const [mediaType, state] of Object.entries(this.mediaStates)) {
+      const element = document.getElementById(`${mediaType}-status`);
+      if (element) {
+        if (state.error) {
+          element.textContent = `错误: ${state.error}`;
+          element.className = 'status-error';
+        } else {
+          element.textContent = this.getStatusText(state.status);
+          element.className = `status-${state.status}`;
+        }
+      }
+    }
+  }
+  
+  getStatusText(status) {
+    const statusMap = {
+      'granted': '已授权',
+      'denied': '已拒绝',
+      'restricted': '受限制',
+      'not-determined': '未决定'
+    };
+    
+    return statusMap[status] || status;
+  }
+  
+  setupEventListeners() {
+    // 设置按钮事件
+    document.getElementById('check-camera').addEventListener('click', () => {
+      this.checkMediaAccess('camera');
+    });
+    
+    document.getElementById('request-camera').addEventListener('click', () => {
+      this.requestMediaAccess('camera');
+    });
+    
+    // 定期检查权限状态
+    setInterval(() => {
+      this.checkAllMediaAccess();
+    }, 30000); // 每30秒检查一次
+  }
+  
+  showError(message) {
+    // 显示错误提示
+    console.error('媒体权限错误:', message);
+  }
+  
+  showSuccess(message) {
+    // 显示成功提示
+    console.log('媒体权限成功:', message);
+  }
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  window.mediaManager = new MediaAccessManager();
+});
+                    </div>
+                </div>
+            </div>
+            
+            <div class="migration-guide">
+                <h2>从 remote 迁移到 IPC 的指南</h2>
+                
+                <h3>迁移步骤</h3>
+                <ol>
+                    <li><strong>分析现有 remote 使用</strong> - 识别所有使用 remote 的代码</li>
+                    <li><strong>设计 IPC API</strong> - 为每个 remote 调用创建对应的 IPC 处理程序</li>
+                    <li><strong>实现预加载脚本</strong> - 安全地暴露 API 到渲染进程</li>
+                    <li><strong>更新渲染进程代码</strong> - 替换 remote 调用为 IPC 调用</li>
+                    <li><strong>加强安全配置</strong> - 启用上下文隔离，禁用 nodeIntegration</li>
+                </ol>
+                
+                <h3>代码迁移示例</h3>
+                <div class="code-block">
+// 迁移前：使用 remote（不安全）
+const { remote } = require('electron');
+const { systemPreferences, dialog, app } = remote;
+
+// 各种 remote 调用
+const cameraStatus = await systemPreferences.getMediaAccessStatus('camera');
+dialog.showErrorBox('错误', '发生了一个错误');
+app.quit();
+
+// 迁移后：使用 IPC（安全）
+// 主进程 - 添加 IPC 处理程序
+ipcMain.handle('system:get-media-status', (event, mediaType) => {
+  return systemPreferences.getMediaAccessStatus(mediaType);
+});
+
+ipcMain.handle('dialog:show-error', (event, title, content) => {
+  dialog.showErrorBox(title, content);
+});
+
+ipcMain.handle('app:quit', () => {
+  app.quit();
+});
+
+// 预加载脚本 - 暴露 API
+contextBridge.exposeInMainWorld('electronAPI', {
+  getMediaStatus: (mediaType) => ipcRenderer.invoke('system:get-media-status', mediaType),
+  showError: (title, content) => ipcRenderer.invoke('dialog:show-error', title, content),
+  quitApp: () => ipcRenderer.invoke('app:quit')
+});
+
+// 渲染进程 - 使用新 API
+const cameraStatus = await window.electronAPI.getMediaStatus('camera');
+window.electronAPI.showError('错误', '发生了一个错误');
+window.electronAPI.quitApp();
+                </div>
+            </div>
+            
+            <div class="security-considerations">
+                <h2>安全注意事项</h2>
+                
+                <h3>启用 remote 的风险</h3>
+                <ul>
+                    <li><strong>扩大攻击面</strong> - 渲染进程可以访问所有主进程模块</li>
+                    <li><strong>上下文隔离失效</strong> - 必须禁用上下文隔离才能使用 remote</li>
+                    <li><strong>代码注入风险</strong> - 恶意代码可以执行任意主进程操作</li>
+                </ul>
+                
+                <h3>安全配置对比</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>安全特性</th>
+                            <th>使用 remote（不安全）</th>
+                            <th>使用 IPC（安全）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>上下文隔离</strong></td>
+                            <td>必须禁用</td>
+                            <td>可以启用</td>
+                        </tr>
+                        <tr>
+                            <td><strong>nodeIntegration</strong></td>
+                            <td>通常启用</td>
+                            <td>可以禁用</td>
+                        </tr>
+                        <tr>
+                            <td><strong>攻击面</strong></td>
+                            <td>整个主进程 API</td>
+                            <td>有限的预定义 API</td>
+                        </tr>
+                        <tr>
+                            <td><strong>代码审查</strong></td>
+                            <td>难以审计</td>
+                            <td>明确的 API 边界</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>安全最佳实践</h3>
+                <div class="code-block">
+// 1. 永远不要使用这样的配置
+new BrowserWindow({
+  webPreferences: {
+    nodeIntegration: true,
+    contextIsolation: false,
+    enableRemoteModule: true, // 高危配置！
+    webSecurity: false        // 非常危险！
+  }
+});
+
+// 2. 使用安全配置
+new BrowserWindow({
+  webPreferences: {
+    nodeIntegration: false,           // 禁用 Node.js 集成
+    contextIsolation: true,           // 启用上下文隔离
+    enableRemoteModule: false,        // 禁用 remote 模块
+    webSecurity: true,               // 启用 Web 安全
+    allowRunningInsecureContent: false, // 禁止不安全内容
+    preload: path.join(__dirname, 'preload.js') // 使用预加载脚本
+  }
+});
+
+// 3. 在预加载脚本中验证和过滤
+contextBridge.exposeInMainWorld('electronAPI', {
+  // 安全的 API - 只有明确允许的操作
+  getMediaStatus: async (mediaType) => {
+    // 输入验证
+    if (!['camera', 'microphone', 'screen'].includes(mediaType)) {
+      throw new Error('无效的媒体类型');
+    }
+    
+    return ipcRenderer.invoke('media:get-status', mediaType);
+  },
+  
+  // 限制敏感操作
+  quitApp: async () => {
+    // 可以添加确认对话框或其他保护
+    const { response } = await dialog.showMessageBox({
+      type: 'question',
+      buttons: ['退出', '取消'],
+      message: '确定要退出应用吗？'
+    });
+    
+    if (response === 0) {
+      return ipcRenderer.invoke('app:quit');
+    }
+  }
+});
+                </div>
+            </div>
+            
+            <h2>实际应用示例</h2>
+            
+            <div class="code-block">
+// 完整的媒体权限管理组件
+class MediaPermissions extends HTMLElement {
+  constructor() {
+    super();
+    this.mediaStates = {};
+    this.attachShadow({ mode: 'open' });
+    this.render();
+    this.init();
+  }
+  
+  async init() {
+    try {
+      await this.loadMediaStatus();
+      this.setupEventListeners();
+    } catch (error) {
+      this.showError('初始化媒体权限组件失败');
+    }
+  }
+  
+  async loadMediaStatus() {
+    try {
+      this.mediaStates = await window.electronAPI.media.getAllMediaStatus();
+      this.render();
+    } catch (error) {
+      console.error('加载媒体状态失败:', error);
+      this.mediaStates = {
+        camera: { error: '加载失败' },
+        microphone: { error: '加载失败' },
+        screen: { error: '加载失败' }
+      };
+      this.render();
+    }
+  }
+  
+  render() {
+    this.shadowRoot.innerHTML = `
+      <style>
+        .media-permissions {
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          padding: 16px;
+          background: #f8f9fa;
+        }
+        
+        .media-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .media-item:last-child {
+          border-bottom: none;
+        }
+        
+        .media-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .status-granted { color: #27ae60; }
+        .status-denied { color: #e74c3c; }
+        .status-restricted { color: #f39c12; }
+        .status-not-determined { color: #95a5a6; }
+        .status-error { color: #e74c3c; }
+        
+        button {
+          background: #3498db;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        
+        button:disabled {
+          background: #bdc3c7;
+          cursor: not-allowed;
+        }
+      </style>
+      
+      <div class="media-permissions">
+        <h3>媒体权限状态</h3>
+        
+        <div class="media-item">
+          <div class="media-info">
+            <span>📷 摄像头</span>
+            <span class="status-${this.getMediaStatus('camera')}">
+              ${this.getStatusText('camera')}
+            </span>
+          </div>
+          <button id="request-camera">请求访问</button>
+        </div>
+        
+        <div class="media-item">
+          <div class="media-info">
+            <span>🎤 麦克风</span>
+            <span class="status-${this.getMediaStatus('microphone')}">
+              ${this.getStatusText('microphone')}
+            </span>
+          </div>
+          <button id="request-mic">请求访问</button>
+        </div>
+        
+        <div class="media-item">
+          <div class="media-info">
+            <span>🖥️ 屏幕录制</span>
+            <span class="status-${this.getMediaStatus('screen')}">
+              ${this.getStatusText('screen')}
+            </span>
+          </div>
+          <button id="request-screen">请求访问</button>
+        </div>
+        
+        <div style="margin-top: 12px; text-align: center;">
+          <button id="refresh-status">刷新状态</button>
+        </div>
+      </div>
+    `;
+  }
+  
+  getMediaStatus(mediaType) {
+    const state = this.mediaStates[mediaType];
+    if (!state || state.error) return 'error';
+    return state.status || 'not-determined';
+  }
+  
+  getStatusText(mediaType) {
+    const state = this.mediaStates[mediaType];
+    if (!state) return '未知';
+    if (state.error) return `错误: ${state.error}`;
+    
+    const statusMap = {
+      'granted': '已授权',
+      'denied': '已拒绝', 
+      'restricted': '受限制',
+      'not-determined': '未决定'
+    };
+    
+    return statusMap[state.status] || state.status;
+  }
+  
+  setupEventListeners() {
+    this.shadowRoot.getElementById('refresh-status').addEventListener('click', () => {
+      this.loadMediaStatus();
+    });
+    
+    this.shadowRoot.getElementById('request-camera').addEventListener('click', () => {
+      this.requestMediaAccess('camera');
+    });
+    
+    this.shadowRoot.getElementById('request-mic').addEventListener('click', () => {
+      this.requestMediaAccess('microphone');
+    });
+    
+    this.shadowRoot.getElementById('request-screen').addEventListener('click', () => {
+      this.requestMediaAccess('screen');
+    });
+  }
+  
+  async requestMediaAccess(mediaType) {
+    const button = this.shadowRoot.getElementById(`request-${mediaType}`);
+    button.disabled = true;
+    button.textContent = '请求中...';
+    
+    try {
+      await window.electronAPI.media.requestMediaAccess(mediaType);
+      await this.loadMediaStatus(); // 刷新状态
+    } catch (error) {
+      this.showError(`请求 ${mediaType} 权限失败`);
+    } finally {
+      button.disabled = false;
+      button.textContent = '请求访问';
+    }
+  }
+  
+  showError(message) {
+    // 实现错误提示
+    console.error(message);
+  }
+}
+
+// 注册自定义元素
+customElements.define('media-permissions', MediaPermissions);
+
+// 在 HTML 中使用
+// &lt;media-permissions&gt;&lt;/media-permissions&gt;
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 演示代码
+        class DemoMediaManager {
+            constructor() {
+                this.mediaStates = {};
+                this.init();
+            }
+            
+            async init() {
+                // 模拟媒体权限状态
+                this.mediaStates = {
+                    camera: { status: 'not-determined' },
+                    microphone: { status: 'not-determined' },
+                    screen: { status: 'not-determined' }
+                };
+            }
+            
+            // 模拟 remote 方式
+            async simulateRemoteAccess() {
+                addLog('remote-result', '模拟 remote 方式获取媒体权限状态...', 'info');
+                
+                try {
+                    // 模拟 remote 调用
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const cameraStatus = this.mediaStates.camera.status;
+                    const micStatus = this.mediaStates.microphone.status;
+                    
+                    addLog('remote-result', `摄像头状态: ${cameraStatus}`, 'success');
+                    addLog('remote-result', `麦克风状态: ${micStatus}`, 'success');
+                    addLog('remote-result', '⚠️ 注意: 使用 remote 存在安全风险', 'warning');
+                    
+                } catch (error) {
+                    addLog('remote-result', `错误: ${error.message}`, 'error');
+                }
+            }
+            
+            // 模拟安全 remote
+            async simulateSecureRemote() {
+                addLog('remote-result', '模拟安全 remote 方式...', 'info');
+                
+                try {
+                    // 模拟参数验证
+                    const validateMediaType = (type) => {
+                        const allowed = ['camera', 'microphone', 'screen'];
+                        if (!allowed.includes(type)) {
+                            throw new Error(`无效的媒体类型: ${type}`);
+                        }
+                        return true;
+                    };
+                    
+                    validateMediaType('camera');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 150));
+                    
+                    addLog('remote-result', '参数验证通过', 'success');
+                    addLog('remote-result', '执行安全 remote 调用', 'success');
+                    addLog('remote-result', '✅ 安全措施: 输入验证, 错误处理', 'success');
+                    
+                } catch (error) {
+                    addLog('remote-result', `安全错误: ${error.message}`, 'error');
+                }
+            }
+            
+            // 模拟 IPC 方式
+            async simulateIPCAccess() {
+                addLog('ipc-result', '模拟 IPC 方式获取媒体权限状态...', 'info');
+                
+                try {
+                    // 模拟 IPC 调用
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const cameraStatus = this.mediaStates.camera.status;
+                    const micStatus = this.mediaStates.microphone.status;
+                    
+                    addLog('ipc-result', `摄像头状态: ${cameraStatus}`, 'success');
+                    addLog('ipc-result', `麦克风状态: ${micStatus}`, 'success');
+                    addLog('ipc-result', '✅ 安全特性: 上下文隔离, 有限 API 暴露', 'success');
+                    
+                } catch (error) {
+                    addLog('ipc-result', `错误: ${error.message}`, 'error');
+                }
+            }
+            
+            // 模拟批量检查
+            async simulateBulkCheck() {
+                addLog('ipc-result', '模拟批量检查所有媒体权限...', 'info');
+                
+                const mediaTypes = ['camera', 'microphone', 'screen'];
+                
+                for (const type of mediaTypes) {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        const status = this.mediaStates[type].status;
+                        
+                        addLog('ipc-result', `${type} 状态: ${status}`, 'success');
+                    } catch (error) {
+                        addLog('ipc-result', `${type} 检查失败: ${error.message}`, 'error');
+                    }
+                }
+                
+                addLog('ipc-result', '批量检查完成', 'success');
+            }
+        }
+        
+        // 创建演示实例
+        const demoManager = new DemoMediaManager();
+        
+        // 日志函数
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 绑定按钮事件
+        document.getElementById('test-remote').addEventListener('click', () => {
+            document.getElementById('remote-result').innerHTML = '';
+            demoManager.simulateRemoteAccess();
+        });
+        
+        document.getElementById('test-remote-secure').addEventListener('click', () => {
+            document.getElementById('remote-result').innerHTML = '';
+            demoManager.simulateSecureRemote();
+        });
+        
+        document.getElementById('test-ipc').addEventListener('click', () => {
+            document.getElementById('ipc-result').innerHTML = '';
+            demoManager.simulateIPCAccess();
+        });
+        
+        document.getElementById('test-ipc-bulk').addEventListener('click', () => {
+            document.getElementById('ipc-result').innerHTML = '';
+            demoManager.simulateBulkCheck();
+        });
+    </script>
+</body>
+</html>

@@ -41,13 +41,44 @@
   
   
   
+* 用法调整
+  
+  ```tsx
+  window.weappDsksdk = {
+    debugger: {
+      getDskApi: Fuction,
+      openDebugger: Fuction,
+    },
+    ipcRenderer: {// 兼容旧版本require IpcRenderer的写法
+      on: Fuction,
+      send: Fuction,
+      invoke: Fuction,
+      removeAllListeners: Fuction,
+    },
+    app: {
+      getVersion: Fuction,
+      getName: Fuction,
+      getIcon: Fuction,
+    },
+    remote: {
+      
+    }
+  };
+  ```
+  
+  
+  
+  
+  
 ### 2、如何减少兼容风险？
 
 * 1）`require/emRequire`、`process`等 Node.js 全局变量被移除，以下都不能用：
 
+  ```shell
   'electron'、'electron-is'、'electron-store'、'@electron/remote'、'os'、'fs-extra' 、'fs'、'path'...
+  ```
 
-  --> 全部改成IPC接口，调用对象window.electronAPI
+  --> 全部改成IPC接口，调用对象window.weappDskApi
 
 * 2）兼容老客户端：老客户端可以使用web新基线；新客户端不能使用老web基线
 
@@ -61,7 +92,7 @@
 
 * 7）需要修改的模块：weapp-emmessage、weapp-emjssdk、云盘模块、em7、em10、公共组件(待确认)
 
-* 8）<font color=red>定制客户老web基线</font>：只能用老客户端，还得在老客户端加新功能；如果升级到了新web基线，如何将老客户端定制的功能合到新客户端？
+* 8）<font color=red>定制客户端老web基线</font>：只能用老客户端，还得在老客户端加新功能；如果升级到了新web基线，如何将老客户端定制的功能合到新客户端？
 
   
 
@@ -93,6 +124,18 @@
 * 新接口RPC：send/invoke 共用IPC接口，将api函数名反射成type
 
 ![](../../../7.项目实践/01.纵横捭阖/lab-web/lab-html/src/assets/images/iframe-electron.png)
+
+
+
+
+
+### 5、具体实现？
+
+* 1.多个window共用ipcMain
+
+* 2.新版本方法存在检测
+
+
 
 
 

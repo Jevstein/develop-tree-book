@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron-Store 安全模式使用指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .warning-banner {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .warning-banner h2 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .demo-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .secure-demo, .insecure-demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .secure-demo {
+            border-left: 4px solid #27ae60;
+        }
+        
+        .insecure-demo {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .secure-btn {
+            background: #27ae60;
+        }
+        
+        .insecure-btn {
+            background: #e74c3c;
+        }
+        
+        .demo-result {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-success {
+            color: #27ae60;
+        }
+        
+        .log-error {
+            color: #e74c3c;
+        }
+        
+        .log-info {
+            color: #3498db;
+        }
+        
+        .log-warning {
+            color: #e67e22;
+        }
+        
+        .usage-scenarios {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .usage-scenarios h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .scenario {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .scenario h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .best-practice {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .best-practice h2 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .security-considerations {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .security-considerations h2 {
+            color: #721c24;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background: #f2f2f2;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Electron-Store 安全模式使用指南</h1>
+            <p>在安全上下文中正确使用 electron-store 进行数据持久化</p>
+        </header>
+        
+        <div class="content">
+            <div class="warning-banner">
+                <h2>⚠️ 重要安全提示</h2>
+                <p>在 Electron 安全模式下（启用上下文隔离、禁用 nodeIntegration），electron-store 不能直接在渲染进程中使用。</p>
+                <p>必须通过预加载脚本和 IPC 通信来安全地访问存储功能。</p>
+            </div>
+            
+            <h2>Electron-Store 安全配置</h2>
+            
+            <div class="demo-area">
+                <div class="secure-demo">
+                    <h2>安全模式实现（推荐）</h2>
+                    <div class="code-block">
+// 1. 主进程 - 创建安全的 Store 管理器
+// main.js
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const Store = require('electron-store');
+
+// 初始化 Store
+const store = new Store({
+  encryptionKey: 'your-secret-encryption-key', // 加密存储
+  name: 'app-config', // 配置文件名
+  watch: true // 监听变化
+});
+
+class SecureStoreManager {
+  constructor() {
+    this.store = store;
+    this.setupIPCHandlers();
+  }
+  
+  setupIPCHandlers() {
+    // 获取值
+    ipcMain.handle('store:get', (event, key, defaultValue) => {
+      return this.get(key, defaultValue);
+    });
+    
+    // 设置值
+    ipcMain.handle('store:set', (event, key, value) => {
+      return this.set(key, value);
+    });
+    
+    // 删除值
+    ipcMain.handle('store:delete', (event, key) => {
+      return this.delete(key);
+    });
+    
+    // 检查是否存在
+    ipcMain.handle('store:has', (event, key) => {
+      return this.has(key);
+    });
+    
+    // 获取所有值
+    ipcMain.handle('store:getAll', () => {
+      return this.getAll();
+    });
+    
+    // 清空存储
+    ipcMain.handle('store:clear', () => {
+      return this.clear();
+    });
+  }
+  
+  // 安全的 get 方法
+  get(key, defaultValue) {
+    // 验证 key 格式
+    if (typeof key !== 'string') {
+      throw new Error('Key must be a string');
+    }
+    
+    // 限制可访问的键
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    if (!allowedKeys.includes(key)) {
+      throw new Error(`Access to key '${key}' is not allowed`);
+    }
+    
+    return this.store.get(key, defaultValue);
+  }
+  
+  // 安全的 set 方法
+  set(key, value) {
+    // 验证输入
+    if (typeof key !== 'string') {
+      throw new Error('Key must be a string');
+    }
+    
+    // 限制可设置的键
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    if (!allowedKeys.includes(key)) {
+      throw new Error(`Setting key '${key}' is not allowed`);
+    }
+    
+    // 验证值类型
+    if (!this.isValidValue(value)) {
+      throw new Error('Invalid value type');
+    }
+    
+    this.store.set(key, value);
+    return true;
+  }
+  
+  // 验证值类型
+  isValidValue(value) {
+    const allowedTypes = ['string', 'number', 'boolean', 'object', 'array'];
+    const type = Array.isArray(value) ? 'array' : typeof value;
+    
+    return allowedTypes.includes(type);
+  }
+  
+  delete(key) {
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    if (!allowedKeys.includes(key)) {
+      throw new Error(`Deleting key '${key}' is not allowed`);
+    }
+    
+    this.store.delete(key);
+    return true;
+  }
+  
+  has(key) {
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    if (!allowedKeys.includes(key)) {
+      return false;
+    }
+    
+    return this.store.has(key);
+  }
+  
+  getAll() {
+    // 只返回允许的键
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    const allData = this.store.store;
+    const filteredData = {};
+    
+    allowedKeys.forEach(key => {
+      if (key in allData) {
+        filteredData[key] = allData[key];
+      }
+    });
+    
+    return filteredData;
+  }
+  
+  clear() {
+    // 安全清空：只删除允许的键
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    allowedKeys.forEach(key => {
+      this.store.delete(key);
+    });
+    
+    return true;
+  }
+}
+
+// 初始化 Store 管理器
+const storeManager = new SecureStoreManager();
+
+// 创建安全窗口
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: false, // 禁用 nodeIntegration
+      contextIsolation: true, // 启用上下文隔离
+      enableRemoteModule: false, // 禁用 remote 模块
+      preload: path.join(__dirname, 'preload.js') // 预加载脚本
+    }
+  });
+  
+  mainWindow.loadFile('index.html');
+});
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="secure-btn" id="test-secure-get">测试安全获取</button>
+                        <button class="secure-btn" id="test-secure-set">测试安全设置</button>
+                        <button class="secure-btn" id="test-secure-validation">测试安全验证</button>
+                    </div>
+                    
+                    <div class="demo-result" id="secure-result">
+                        安全模式测试结果将显示在这里...
+                    </div>
+                </div>
+                
+                <div class="insecure-demo">
+                    <h2>不安全用法（避免使用）</h2>
+                    <div class="code-block">
+// ❌ 不安全的用法 - 直接在渲染进程中使用
+// renderer.js (危险!)
+const Store = require('electron-store');
+
+// 直接在渲染进程创建 store (不安全)
+const store = new Store();
+
+// 任意键值操作 (无限制)
+store.set('any-key', 'sensitive-data'); // 可能存储敏感信息
+
+// 读取任意数据
+const data = store.get('password'); // 可能泄露敏感信息
+
+// ❌ 不安全的窗口配置
+// main.js (危险配置)
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true, // 危险: 启用 nodeIntegration
+      contextIsolation: false, // 危险: 禁用上下文隔离
+      enableRemoteModule: true // 危险: 启用 remote
+    }
+  });
+});
+
+// ❌ 不安全的存储操作
+// 存储敏感信息 (危险!)
+store.set('user-credentials', {
+  username: 'admin',
+  password: 'plaintext-password' // 明文存储密码!
+});
+
+// 无验证的数据存储
+store.set('malicious-key', {
+  __proto__: null, // 可能触发原型污染
+  toString: () => '恶意代码'
+});
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="insecure-btn" id="test-insecure-get">测试不安全获取</button>
+                        <button class="insecure-btn" id="test-insecure-set">测试不安全设置</button>
+                        <button class="insecure-btn" id="test-insecure-bypass">测试安全绕过</button>
+                    </div>
+                    
+                    <div class="demo-result" id="insecure-result">
+                        不安全模式测试结果将显示在这里...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="usage-scenarios">
+                <h2>完整的安全实现方案</h2>
+                
+                <div class="scenario">
+                    <h3>1. 预加载脚本配置</h3>
+                    <div class="code-block">
+// preload.js - 安全的 API 暴露
+const { contextBridge, ipcRenderer } = require('electron');
+
+// 创建安全的存储 API
+const storageAPI = {
+  // 获取存储值
+  get: (key, defaultValue) => {
+    return ipcRenderer.invoke('store:get', key, defaultValue);
+  },
+  
+  // 设置存储值
+  set: (key, value) => {
+    return ipcRenderer.invoke('store:set', key, value);
+  },
+  
+  // 删除存储值
+  delete: (key) => {
+    return ipcRenderer.invoke('store:delete', key);
+  },
+  
+  // 检查键是否存在
+  has: (key) => {
+    return ipcRenderer.invoke('store:has', key);
+  },
+  
+  // 获取所有数据 (过滤后)
+  getAll: () => {
+    return ipcRenderer.invoke('store:getAll');
+  },
+  
+  // 清空存储 (安全清空)
+  clear: () => {
+    return ipcRenderer.invoke('store:clear');
+  },
+  
+  // 监听存储变化
+  onChanged: (callback) => {
+    const wrappedCallback = (event, changes) => {
+      // 过滤变化，只传递允许的键
+      const filteredChanges = {};
+      const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+      
+      allowedKeys.forEach(key => {
+        if (key in changes) {
+          filteredChanges[key] = changes[key];
+        }
+      });
+      
+      if (Object.keys(filteredChanges).length > 0) {
+        callback(filteredChanges);
+      }
+    };
+    
+    ipcRenderer.on('store-changed', wrappedCallback);
+    
+    // 返回清理函数
+    return () => {
+      ipcRenderer.removeListener('store-changed', wrappedCallback);
+    };
+  }
+};
+
+// 安全地暴露 API 到渲染进程
+contextBridge.exposeInMainWorld('electronStorage', storageAPI);
+
+// 添加类型检查和验证工具
+contextBridge.exposeInMainWorld('electronUtils', {
+  // 验证键是否允许
+  isValidStorageKey: (key) => {
+    const allowedKeys = ['theme', 'language', 'settings', 'user-preferences'];
+    return allowedKeys.includes(key);
+  },
+  
+  // 验证值类型
+  isValidStorageValue: (value) => {
+    const type = Array.isArray(value) ? 'array' : typeof value;
+    const allowedTypes = ['string', 'number', 'boolean', 'object', 'array'];
+    return allowedTypes.includes(type);
+  },
+  
+  // 数据加密 (简单示例)
+  encrypt: (data) => {
+    // 在实际应用中，使用更强的加密算法
+    return btoa(JSON.stringify(data));
+  },
+  
+  // 数据解密
+  decrypt: (encryptedData) => {
+    try {
+      return JSON.parse(atob(encryptedData));
+    } catch {
+      return null;
+    }
+  }
+});
+                    </div>
+                </div>
+                
+                <div class="scenario">
+                    <h3>2. 增强的主进程 Store 管理器</h3>
+                    <div class="code-block">
+// store-manager.js - 增强的安全存储管理器
+const Store = require('electron-store');
+const crypto = require('crypto');
+const path = require('path');
+
+class EnhancedStoreManager {
+  constructor(options = {}) {
+    // 默认配置
+    const defaultOptions = {
+      name: 'app-data',
+      encryptionKey: this.generateEncryptionKey(),
+      watch: true,
+      migrations: {
+        '1.0.0': (store) => {
+          // 数据迁移逻辑
+          if (store.get('old-key')) {
+            store.set('new-key', store.get('old-key'));
+            store.delete('old-key');
+          }
+        }
+      }
+    };
+    
+    this.store = new Store({ ...defaultOptions, ...options });
+    this.allowedKeys = new Set([
+      'theme', 'language', 'settings', 'user-preferences',
+      'window-state', 'recent-files', 'ui-state'
+    ]);
+    
+    this.sensitiveKeys = new Set(['user-token', 'api-key']);
+    this.setupChangeListener();
+  }
+  
+  // 生成加密密钥
+  generateEncryptionKey() {
+    // 在实际应用中，应该从安全的地方获取密钥
+    return process.env.STORE_ENCRYPTION_KEY || 'fallback-secret-key';
+  }
+  
+  // 设置变化监听器
+  setupChangeListener() {
+    this.store.onDidChange('', (newValue, oldValue) => {
+      // 通知所有窗口存储已变化
+      const { ipcMain, BrowserWindow } = require('electron');
+      
+      BrowserWindow.getAllWindows().forEach(win => {
+        if (!win.isDestroyed()) {
+          win.webContents.send('store-changed', {
+            newValue: this.sanitizeData(newValue),
+            oldValue: this.sanitizeData(oldValue)
+          });
+        }
+      });
+    });
+  }
+  
+  // 数据清理（移除敏感信息）
+  sanitizeData(data) {
+    if (typeof data !== 'object' || data === null) {
+      return data;
+    }
+    
+    const sanitized = { ...data };
+    this.sensitiveKeys.forEach(key => {
+      if (key in sanitized) {
+        sanitized[key] = '***HIDDEN***';
+      }
+    });
+    
+    return sanitized;
+  }
+  
+  // 安全的获取方法
+  async get(key, defaultValue) {
+    this.validateKey(key);
+    
+    let value = this.store.get(key, defaultValue);
+    
+    // 如果是敏感键，记录访问日志
+    if (this.sensitiveKeys.has(key)) {
+      this.logAccess('get', key);
+    }
+    
+    return value;
+  }
+  
+  // 安全的设置方法
+  async set(key, value) {
+    this.validateKey(key);
+    this.validateValue(value);
+    
+    // 加密敏感数据
+    const processedValue = this.sensitiveKeys.has(key) 
+      ? this.encryptValue(value) 
+      : value;
+    
+    this.store.set(key, processedValue);
+    
+    // 记录设置操作
+    this.logAccess('set', key);
+    
+    return true;
+  }
+  
+  // 验证键
+  validateKey(key) {
+    if (typeof key !== 'string') {
+      throw new Error('Storage key must be a string');
+    }
+    
+    if (!this.allowedKeys.has(key)) {
+      throw new Error(`Access to key '${key}' is not allowed`);
+    }
+  }
+  
+  // 验证值
+  validateValue(value) {
+    const type = Array.isArray(value) ? 'array' : typeof value;
+    const allowedTypes = ['string', 'number', 'boolean', 'object', 'array'];
+    
+    if (!allowedTypes.includes(type)) {
+      throw new Error(`Invalid value type: ${type}`);
+    }
+    
+    // 防止存储过大的数据
+    if (JSON.stringify(value).length > 1000000) { // 1MB 限制
+      throw new Error('Value too large to store');
+    }
+  }
+  
+  // 加密值（简单示例）
+  encryptValue(value) {
+    // 在实际应用中，使用更强的加密
+    const cipher = crypto.createCipher('aes-256-ctr', this.store.options.encryptionKey);
+    let encrypted = cipher.update(JSON.stringify(value), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { encrypted: true, data: encrypted };
+  }
+  
+  // 解密值
+  decryptValue(encryptedValue) {
+    if (!encryptedValue.encrypted) {
+      return encryptedValue;
+    }
+    
+    try {
+      const decipher = crypto.createDecipher('aes-256-ctr', this.store.options.encryptionKey);
+      let decrypted = decipher.update(encryptedValue.data, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return JSON.parse(decrypted);
+    } catch (error) {
+      throw new Error('Failed to decrypt value');
+    }
+  }
+  
+  // 记录访问日志
+  logAccess(operation, key) {
+    console.log(`[Store] ${operation.toUpperCase()} operation on key: ${key}`, {
+      timestamp: new Date().toISOString(),
+      operation,
+      key
+    });
+  }
+  
+  // 备份存储
+  async backup() {
+    const backupPath = path.join(
+      this.store.path, 
+      `backup-${Date.now()}.json`
+    );
+    
+    const fs = require('fs').promises;
+    await fs.writeFile(backupPath, JSON.stringify(this.store.store, null, 2));
+    
+    return backupPath;
+  }
+  
+  // 恢复备份
+  async restore(backupPath) {
+    const fs = require('fs').promises;
+    const backupData = await fs.readFile(backupPath, 'utf8');
+    const data = JSON.parse(backupData);
+    
+    // 验证备份数据
+    for (const key in data) {
+      this.validateKey(key);
+      this.validateValue(data[key]);
+    }
+    
+    this.store.store = data;
+    return true;
+  }
+}
+
+module.exports = EnhancedStoreManager;
+                    </div>
+                </div>
+                
+                <div class="scenario">
+                    <h3>3. 渲染进程使用示例</h3>
+                    <div class="code-block">
+// renderer.js - 安全的使用方式
+class SecureStorageClient {
+  constructor() {
+    this.initialize();
+  }
+  
+  async initialize() {
+    try {
+      // 验证 API 是否可用
+      if (!window.electronStorage) {
+        throw new Error('Storage API not available');
+      }
+      
+      // 加载初始数据
+      await this.loadInitialData();
+      
+      // 设置变化监听
+      this.setupChangeListener();
+      
+      console.log('Secure storage client initialized');
+    } catch (error) {
+      console.error('Failed to initialize storage client:', error);
+    }
+  }
+  
+  // 加载初始数据
+  async loadInitialData() {
+    try {
+      this.theme = await window.electronStorage.get('theme', 'light');
+      this.language = await window.electronStorage.get('language', 'zh-CN');
+      this.settings = await window.electronStorage.get('settings', {});
+      
+      this.applyStoredSettings();
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+    }
+  }
+  
+  // 应用存储的设置
+  applyStoredSettings() {
+    // 应用主题
+    document.documentElement.setAttribute('data-theme', this.theme);
+    
+    // 应用语言
+    document.documentElement.lang = this.language;
+    
+    // 应用其他设置
+    if (this.settings.fontSize) {
+      document.documentElement.style.fontSize = this.settings.fontSize;
+    }
+  }
+  
+  // 设置变化监听
+  setupChangeListener() {
+    if (window.electronStorage && window.electronStorage.onChanged) {
+      this.changeListener = window.electronStorage.onChanged((changes) => {
+        this.handleStorageChanges(changes);
+      });
+    }
+  }
+  
+  // 处理存储变化
+  handleStorageChanges(changes) {
+    console.log('Storage changed:', changes);
+    
+    if (changes.theme) {
+      this.theme = changes.theme.newValue;
+      document.documentElement.setAttribute('data-theme', this.theme);
+    }
+    
+    if (changes.language) {
+      this.language = changes.language.newValue;
+      document.documentElement.lang = this.language;
+      this.notifyLanguageChange();
+    }
+    
+    if (changes.settings) {
+      this.settings = changes.settings.newValue;
+      this.applyStoredSettings();
+    }
+  }
+  
+  // 安全地设置值
+  async set(key, value) {
+    try {
+      // 前端验证
+      if (!window.electronUtils.isValidStorageKey(key)) {
+        throw new Error(`Invalid key: ${key}`);
+      }
+      
+      if (!window.electronUtils.isValidStorageValue(value)) {
+        throw new Error(`Invalid value for key: ${key}`);
+      }
+      
+      await window.electronStorage.set(key, value);
+      console.log(`Successfully set ${key}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to set ${key}:`, error);
+      this.showError(`保存失败: ${error.message}`);
+      return false;
+    }
+  }
+  
+  // 安全地获取值
+  async get(key, defaultValue) {
+    try {
+      if (!window.electronUtils.isValidStorageKey(key)) {
+        return defaultValue;
+      }
+      
+      return await window.electronStorage.get(key, defaultValue);
+    } catch (error) {
+      console.error(`Failed to get ${key}:`, error);
+      return defaultValue;
+    }
+  }
+  
+  // 通知语言变化
+  notifyLanguageChange() {
+    // 触发自定义事件，让其他组件响应语言变化
+    const event = new CustomEvent('language-changed', {
+      detail: { language: this.language }
+    });
+    window.dispatchEvent(event);
+  }
+  
+  // 显示错误
+  showError(message) {
+    // 在实际应用中，使用 UI 框架显示错误
+    const errorElement = document.createElement('div');
+    errorElement.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #e74c3c;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 4px;
+      z-index: 10000;
+    `;
+    errorElement.textContent = message;
+    document.body.appendChild(errorElement);
+    
+    setTimeout(() => {
+      document.body.removeChild(errorElement);
+    }, 5000);
+  }
+  
+  // 清理
+  destroy() {
+    if (this.changeListener) {
+      this.changeListener();
+    }
+  }
+}
+
+// 使用示例
+document.addEventListener('DOMContentLoaded', () => {
+  window.storageClient = new SecureStorageClient();
+  
+  // 示例：保存主题设置
+  document.getElementById('theme-toggle').addEventListener('click', async () => {
+    const currentTheme = await window.storageClient.get('theme', 'light');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    await window.storageClient.set('theme', newTheme);
+  });
+  
+  // 示例：保存用户设置
+  document.getElementById('save-settings').addEventListener('click', async () => {
+    const settings = {
+      fontSize: document.getElementById('font-size').value,
+      animations: document.getElementById('animations').checked,
+      notifications: document.getElementById('notifications').checked
+    };
+    
+    await window.storageClient.set('settings', settings);
+  });
+});
+                    </div>
+                </div>
+            </div>
+            
+            <div class="security-considerations">
+                <h2>安全注意事项</h2>
+                
+                <h3>加密存储</h3>
+                <div class="code-block">
+// 使用加密存储保护敏感数据
+const Store = require('electron-store');
+
+// 重要：使用强加密密钥
+const store = new Store({
+  encryptionKey: process.env.STORE_ENCRYPTION_KEY, // 从环境变量获取
+  name: 'secure-data'
+});
+
+// 或者使用应用特有的密钥
+const crypto = require('crypto');
+const machineId = require('node-machine-id').machineIdSync();
+
+// 基于机器ID生成加密密钥
+const encryptionKey = crypto
+  .createHash('sha256')
+  .update(machineId + 'your-app-secret')
+  .digest('hex')
+  .substring(0, 32);
+
+const secureStore = new Store({
+  encryptionKey: encryptionKey
+});
+                </div>
+                
+                <h3>输入验证和清理</h3>
+                <div class="code-block">
+// 严格的输入验证
+class ValidatedStore {
+  constructor(store) {
+    this.store = store;
+    this.allowedKeys = new Set(['theme', 'settings', 'preferences']);
+    this.maxSize = 1000000; // 1MB
+  }
+  
+  set(key, value) {
+    // 验证键
+    if (!this.allowedKeys.has(key)) {
+      throw new Error(`Key not allowed: ${key}`);
+    }
+    
+    // 验证值大小
+    const valueSize = JSON.stringify(value).length;
+    if (valueSize > this.maxSize) {
+      throw new Error(`Value too large: ${valueSize} bytes`);
+    }
+    
+    // 验证值类型
+    if (!this.isValidValue(value)) {
+      throw new Error('Invalid value type');
+    }
+    
+    // 清理数据（防止原型污染等）
+    const cleanedValue = this.cleanValue(value);
+    
+    this.store.set(key, cleanedValue);
+  }
+  
+  isValidValue(value) {
+    // 检查类型
+    const type = typeof value;
+    if (type !== 'string' && type !== 'number' && type !== 'boolean' && 
+        type !== 'object' && !Array.isArray(value)) {
+      return false;
+    }
+    
+    // 检查循环引用
+    try {
+      JSON.stringify(value);
+    } catch {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  cleanValue(value) {
+    // 简单的清理函数
+    if (value && typeof value === 'object') {
+      // 移除 __proto__ 等特殊属性
+      const { __proto__, ...cleaned } = value;
+      return cleaned;
+    }
+    
+    return value;
+  }
+}
+                </div>
+            </div>
+            
+            <div class="best-practice">
+                <h2>最佳实践总结</h2>
+                
+                <h3>安全配置清单</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>安全措施</th>
+                            <th>推荐做法</th>
+                            <th>避免做法</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>窗口配置</strong></td>
+                            <td>启用上下文隔离，禁用 nodeIntegration</td>
+                            <td>禁用上下文隔离，启用 nodeIntegration</td>
+                        </tr>
+                        <tr>
+                            <td><strong>存储访问</strong></td>
+                            <td>通过预加载脚本和 IPC 通信</td>
+                            <td>直接在渲染进程访问 electron-store</td>
+                        </tr>
+                        <tr>
+                            <td><strong>数据验证</strong></td>
+                            <td>前后端双重验证</td>
+                            <td>无验证或仅前端验证</td>
+                        </tr>
+                        <tr>
+                            <td><strong>加密</strong></td>
+                            <td>使用强加密密钥加密敏感数据</td>
+                            <td>明文存储或使用弱加密</td>
+                        </tr>
+                        <tr>
+                            <td><strong>键限制</strong></td>
+                            <td>白名单机制，限制可访问的键</td>
+                            <td>允许任意键访问</td>
+                        </tr>
+                        <tr>
+                            <td><strong>错误处理</strong></td>
+                            <td>详细的错误日志和用户友好的错误信息</td>
+                            <td>静默失败或泄露敏感信息</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>部署建议</h3>
+                <ul>
+                    <li><strong>环境变量</strong>：从环境变量获取加密密钥，不要硬编码</li>
+                    <li><strong>定期轮换</strong>：定期轮换加密密钥</li>
+                    <li><strong>备份策略</strong>：实现自动备份和恢复机制</li>
+                    <li><strong>监控日志</strong>：记录所有存储访问操作</li>
+                    <li><strong>数据迁移</strong>：提供平滑的数据迁移路径</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 演示代码
+        class DemoStorage {
+            constructor() {
+                this.data = {
+                    theme: 'light',
+                    language: 'zh-CN',
+                    settings: { fontSize: '16px', animations: true }
+                };
+                this.allowedKeys = new Set(['theme', 'language', 'settings']);
+            }
+            
+            // 模拟安全获取
+            async secureGet(key, defaultValue) {
+                addLog('secure-result', `安全获取: ${key}`, 'info');
+                
+                if (!this.allowedKeys.has(key)) {
+                    addLog('secure-result', `错误: 不允许访问键 '${key}'`, 'error');
+                    throw new Error(`Access to key '${key}' is not allowed`);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const value = this.data[key] !== undefined ? this.data[key] : defaultValue;
+                addLog('secure-result', `获取成功: ${key} = ${JSON.stringify(value)}`, 'success');
+                
+                return value;
+            }
+            
+            // 模拟安全设置
+            async secureSet(key, value) {
+                addLog('secure-result', `安全设置: ${key} = ${JSON.stringify(value)}`, 'info');
+                
+                if (!this.allowedKeys.has(key)) {
+                    addLog('secure-result', `错误: 不允许设置键 '${key}'`, 'error');
+                    throw new Error(`Setting key '${key}' is not allowed`);
+                }
+                
+                // 验证值类型
+                const type = Array.isArray(value) ? 'array' : typeof value;
+                const allowedTypes = ['string', 'number', 'boolean', 'object', 'array'];
+                
+                if (!allowedTypes.includes(type)) {
+                    addLog('secure-result', `错误: 无效的值类型 '${type}'`, 'error');
+                    throw new Error(`Invalid value type: ${type}`);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
+                this.data[key] = value;
+                addLog('secure-result', `设置成功: ${key}`, 'success');
+                
+                return true;
+            }
+            
+            // 模拟不安全操作
+            async insecureGet(key, defaultValue) {
+                addLog('insecure-result', `不安全获取: ${key}`, 'warning');
+                
+                // 无验证，直接访问
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                const value = this.data[key] !== undefined ? this.data[key] : defaultValue;
+                addLog('insecure-result', `获取成功: ${key} = ${JSON.stringify(value)}`, 'success');
+                
+                return value;
+            }
+            
+            async insecureSet(key, value) {
+                addLog('insecure-result', `不安全设置: ${key} = ${JSON.stringify(value)}`, 'warning');
+                
+                // 无验证，直接设置
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                this.data[key] = value;
+                addLog('insecure-result', `设置成功: ${key}`, 'success');
+                
+                return true;
+            }
+        }
+        
+        // 创建演示实例
+        const demoStorage = new DemoStorage();
+        
+        // 日志函数
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 绑定按钮事件
+        document.getElementById('test-secure-get').addEventListener('click', async () => {
+            addLog('secure-result', '开始安全获取测试...', 'info');
+            
+            try {
+                const theme = await demoStorage.secureGet('theme', 'light');
+                addLog('secure-result', `当前主题: ${theme}`, 'success');
+            } catch (error) {
+                addLog('secure-result', `获取失败: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-secure-set').addEventListener('click', async () => {
+            addLog('secure-result', '开始安全设置测试...', 'info');
+            
+            try {
+                await demoStorage.secureSet('theme', 'dark');
+                addLog('secure-result', '主题已更新为 dark', 'success');
+            } catch (error) {
+                addLog('secure-result', `设置失败: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-secure-validation').addEventListener('click', async () => {
+            addLog('secure-result', '测试安全验证...', 'info');
+            
+            // 测试无效键
+            try {
+                await demoStorage.secureSet('invalid-key', 'test');
+            } catch (error) {
+                addLog('secure-result', `预期错误: ${error.message}`, 'warning');
+            }
+            
+            // 测试无效值
+            try {
+                await demoStorage.secureSet('theme', () => { console.log('恶意函数'); });
+            } catch (error) {
+                addLog('secure-result', `预期错误: ${error.message}`, 'warning');
+            }
+        });
+        
+        document.getElementById('test-insecure-get').addEventListener('click', async () => {
+            addLog('insecure-result', '开始不安全获取测试...', 'warning');
+            
+            try {
+                const theme = await demoStorage.insecureGet('theme', 'light');
+                addLog('insecure-result', `当前主题: ${theme}`, 'success');
+                
+                // 尝试获取不存在或不允许的键
+                const secret = await demoStorage.insecureGet('secret-key', 'default');
+                addLog('insecure-result', `秘密键值: ${secret}`, 'warning');
+            } catch (error) {
+                addLog('insecure-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-insecure-set').addEventListener('click', async () => {
+            addLog('insecure-result', '开始不安全设置测试...', 'warning');
+            
+            try {
+                await demoStorage.insecureSet('any-key', '任意值');
+                addLog('insecure-result', '任意键值设置成功', 'warning');
+                
+                await demoStorage.insecureSet('malicious', { 
+                    toString: () => '恶意代码',
+                    __proto__: null 
+                });
+                addLog('insecure-result', '潜在危险对象设置成功', 'error');
+            } catch (error) {
+                addLog('insecure-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-insecure-bypass').addEventListener('click', async () => {
+            addLog('insecure-result', '演示安全绕过风险...', 'error');
+            addLog('insecure-result', '在不安全模式下，攻击者可以:', 'error');
+            addLog('insecure-result', '1. 读取敏感数据', 'error');
+            addLog('insecure-result', '2. 修改任意配置', 'error');
+            addLog('insecure-result', '3. 注入恶意数据', 'error');
+            addLog('insecure-result', '4. 触发原型污染攻击', 'error');
+        });
+    </script>
+</body>
+</html>

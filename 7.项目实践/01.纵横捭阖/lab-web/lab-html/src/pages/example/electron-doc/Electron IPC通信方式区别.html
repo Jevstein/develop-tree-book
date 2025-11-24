@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electron IPC 通信方式详解</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background: #f2f2f2;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .invoke-row {
+            background-color: #e8f5e9;
+        }
+        
+        .send-row {
+            background-color: #e3f2fd;
+        }
+        
+        .sendsync-row {
+            background-color: #fff3e0;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .demo-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .invoke-demo, .send-demo, .sendsync-demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .invoke-demo {
+            border-left: 4px solid #4caf50;
+        }
+        
+        .send-demo {
+            border-left: 4px solid #2196f3;
+        }
+        
+        .sendsync-demo {
+            border-left: 4px solid #ff9800;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .invoke-btn {
+            background: #4caf50;
+        }
+        
+        .send-btn {
+            background: #2196f3;
+        }
+        
+        .sendsync-btn {
+            background: #ff9800;
+        }
+        
+        .demo-result {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-success {
+            color: #4caf50;
+        }
+        
+        .log-error {
+            color: #f44336;
+        }
+        
+        .log-info {
+            color: #2196f3;
+        }
+        
+        .log-warning {
+            color: #ff9800;
+        }
+        
+        .usage-scenarios {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .usage-scenarios h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .scenario {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .scenario h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .best-practice {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .best-practice h2 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .performance-comparison {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .performance-chart {
+            display: flex;
+            height: 200px;
+            align-items: flex-end;
+            justify-content: space-around;
+            margin: 20px 0;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 20px;
+        }
+        
+        .chart-bar {
+            width: 60px;
+            background: #3498db;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s;
+        }
+        
+        .chart-bar.invoke {
+            background: #4caf50;
+        }
+        
+        .chart-bar.send {
+            background: #2196f3;
+        }
+        
+        .chart-bar.sendsync {
+            background: #ff9800;
+        }
+        
+        .chart-label {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Electron IPC 通信方式详解</h1>
+            <p>invoke、send 和 sendSync 的全面对比与示例</p>
+        </header>
+        
+        <div class="content">
+            <h2>三种 IPC 方式核心区别</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>特性</th>
+                        <th>ipcRenderer.invoke()</th>
+                        <th>ipcRenderer.send()</th>
+                        <th>ipcRenderer.sendSync()</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="invoke-row">
+                        <td><strong>通信模式</strong></td>
+                        <td>异步请求-响应</td>
+                        <td>异步单向消息</td>
+                        <td>同步请求-响应</td>
+                    </tr>
+                    <tr class="send-row">
+                        <td><strong>返回值</strong></td>
+                        <td>Promise (async/await)</td>
+                        <td>无返回值</td>
+                        <td>直接返回值</td>
+                    </tr>
+                    <tr class="sendsync-row">
+                        <td><strong>阻塞性</strong></td>
+                        <td>非阻塞</td>
+                        <td>非阻塞</td>
+                        <td>阻塞渲染进程</td>
+                    </tr>
+                    <tr class="invoke-row">
+                        <td><strong>错误处理</strong></td>
+                        <td>Promise.catch() 或 try-catch</td>
+                        <td>事件监听错误</td>
+                        <td>try-catch</td>
+                    </tr>
+                    <tr class="send-row">
+                        <td><strong>主进程监听</strong></td>
+                        <td>ipcMain.handle()</td>
+                        <td>ipcMain.on()</td>
+                        <td>ipcMain.on()</td>
+                    </tr>
+                    <tr class="sendsync-row">
+                        <td><strong>主进程响应</strong></td>
+                        <td>return 或 Promise.resolve</td>
+                        <td>event.reply()</td>
+                        <td>event.returnValue</td>
+                    </tr>
+                    <tr class="invoke-row">
+                        <td><strong>适用场景</strong></td>
+                        <td>需要响应的异步操作</td>
+                        <td>单向通知或长时间操作</td>
+                        <td>快速同步操作</td>
+                    </tr>
+                    <tr class="send-row">
+                        <td><strong>代码复杂度</strong></td>
+                        <td>低 (推荐)</td>
+                        <td>中</td>
+                        <td>低 (谨慎使用)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="demo-area">
+                <div class="invoke-demo">
+                    <h2>invoke/handle 示例</h2>
+                    <div class="code-block">
+// 渲染进程
+const result = await ipcRenderer.invoke('get-user-data', userId);
+
+// 主进程
+ipcMain.handle('get-user-data', async (event, userId) => {
+    const user = await database.getUser(userId);
+    return user; // 直接返回
+});
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="invoke-btn" id="test-invoke">测试 invoke</button>
+                        <button class="invoke-btn" id="test-invoke-error">测试 invoke 错误</button>
+                        <button class="invoke-btn" id="test-invoke-delay">测试 invoke 延迟</button>
+                    </div>
+                    
+                    <div class="demo-result" id="invoke-result">
+                        invoke 操作日志将显示在这里...
+                    </div>
+                </div>
+                
+                <div class="send-demo">
+                    <h2>send/on 示例</h2>
+                    <div class="code-block">
+// 渲染进程
+ipcRenderer.send('start-task', taskData);
+ipcRenderer.on('task-progress', updateProgress);
+ipcRenderer.once('task-complete', handleResult);
+
+// 主进程
+ipcMain.on('start-task', (event, taskData) => {
+    // 长时间任务
+    event.reply('task-progress', {percent: 50});
+    event.reply('task-complete', result);
+});
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="send-btn" id="test-send">测试 send</button>
+                        <button class="send-btn" id="test-send-progress">测试 send 进度</button>
+                        <button class="send-btn" id="test-send-multi">测试 send 多监听</button>
+                    </div>
+                    
+                    <div class="demo-result" id="send-result">
+                        send 操作日志将显示在这里...
+                    </div>
+                </div>
+                
+                <div class="sendsync-demo">
+                    <h2>sendSync 示例</h2>
+                    <div class="code-block">
+// 渲染进程
+try {
+    const config = ipcRenderer.sendSync('get-config');
+} catch (error) {
+    // 错误处理
+}
+
+// 主进程
+ipcMain.on('get-config', (event) => {
+    event.returnValue = configData;
+});
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button class="sendsync-btn" id="test-sendsync">测试 sendSync</button>
+                        <button class="sendsync-btn" id="test-sendsync-error">测试 sendSync 错误</button>
+                        <button class="sendsync-btn" id="test-sendsync-delay">测试 sendSync 延迟</button>
+                    </div>
+                    
+                    <div class="demo-result" id="sendsync-result">
+                        sendSync 操作日志将显示在这里...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-comparison">
+                <h2>性能对比演示</h2>
+                <p>模拟100次IPC调用的时间对比（毫秒）</p>
+                
+                <div class="performance-chart" id="performance-chart">
+                    <div class="chart-container">
+                        <div class="chart-bar invoke" id="invoke-bar" style="height: 100px;">100ms</div>
+                        <div class="chart-label">invoke</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-bar send" id="send-bar" style="height: 120px;">120ms</div>
+                        <div class="chart-label">send</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-bar sendsync" id="sendsync-bar" style="height: 80px;">80ms</div>
+                        <div class="chart-label">sendSync</div>
+                    </div>
+                </div>
+                
+                <button id="run-performance-test">运行性能测试</button>
+                <div id="performance-result" class="demo-result" style="margin-top: 20px;">
+                    性能测试结果将显示在这里...
+                </div>
+            </div>
+            
+            <div class="usage-scenarios">
+                <h2>使用场景详解</h2>
+                
+                <div class="scenario">
+                    <h3>场景1：用户数据获取 - 使用 invoke（推荐）</h3>
+                    <div class="code-block">
+// 渲染进程 - 简洁的异步代码
+async function loadUserProfile(userId) {
+    try {
+        showLoading();
+        const userData = await ipcRenderer.invoke('get-user-profile', userId);
+        displayUserProfile(userData);
+    } catch (error) {
+        showError('加载用户资料失败: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+// 主进程 - 清晰的处理器
+ipcMain.handle('get-user-profile', async (event, userId) => {
+    // 参数验证
+    if (!userId) {
+        throw new Error('用户ID不能为空');
+    }
+    
+    // 异步操作
+    const user = await database.getUser(userId);
+    const profile = await fetchUserProfile(user.profileUrl);
+    
+    return { ...user, profile };
+});
+                    </div>
+                    <p><strong>优势</strong>：代码简洁，错误处理方便，非阻塞UI</p>
+                </div>
+                
+                <div class="scenario">
+                    <h3>场景2：文件上传进度 - 使用 send</h3>
+                    <div class="code-block">
+// 渲染进程 - 进度监听
+function uploadFile(file) {
+    // 发送上传请求
+    ipcRenderer.send('start-file-upload', file);
+    
+    // 监听进度更新
+    ipcRenderer.on('upload-progress', (event, progress) => {
+        updateProgressBar(progress.percentage);
+    });
+    
+    // 监听完成
+    ipcRenderer.once('upload-complete', (event, result) => {
+        showSuccess('上传完成');
+        handleUploadResult(result);
+    });
+    
+    // 监听错误
+    ipcRenderer.once('upload-error', (event, error) => {
+        showError('上传失败: ' + error);
+    });
+}
+
+// 主进程 - 长时间操作
+ipcMain.on('start-file-upload', async (event, file) => {
+    try {
+        const uploader = new FileUploader(file);
+        
+        uploader.on('progress', (progress) => {
+            event.reply('upload-progress', progress);
+        });
+        
+        const result = await uploader.upload();
+        event.reply('upload-complete', result);
+    } catch (error) {
+        event.reply('upload-error', error.message);
+    }
+});
+                    </div>
+                    <p><strong>优势</strong>：适合长时间操作，支持进度反馈，多事件通信</p>
+                </div>
+                
+                <div class="scenario">
+                    <h3>场景3：应用配置读取 - 使用 sendSync</h3>
+                    <div class="code-block">
+// 渲染进程 - 同步获取配置
+function initializeApp() {
+    try {
+        // 快速同步获取配置
+        const config = ipcRenderer.sendSync('get-app-config');
+        
+        // 立即使用配置
+        applyConfiguration(config);
+        setupAppWithConfig(config);
+        
+    } catch (error) {
+        // 使用默认配置
+        useDefaultConfiguration();
+        console.warn('使用默认配置: ' + error.message);
+    }
+}
+
+// 主进程 - 快速同步响应
+ipcMain.on('get-app-config', (event) => {
+    try {
+        // 从文件同步读取配置
+        const configPath = getConfigPath();
+        if (!fs.existsSync(configPath)) {
+            throw new Error('配置文件不存在');
+        }
+        
+        const configData = fs.readFileSync(configPath, 'utf8');
+        const config = JSON.parse(configData);
+        
+        event.returnValue = config;
+    } catch (error) {
+        // 发送错误信息
+        event.returnValue = { error: error.message };
+    }
+});
+                    </div>
+                    <p><strong>优势</strong>：立即获取结果，代码简单，适合快速操作</p>
+                    <p><strong>注意</strong>：仅适用于耗时极短的操作（&lt;100ms）</p>
+                </div>
+            </div>
+            
+            <div class="best-practice">
+                <h2>最佳实践指南</h2>
+                
+                <h3>1. 优先使用 invoke/handle</h3>
+                <ul>
+                    <li>代码更简洁，支持 async/await</li>
+                    <li>内置错误处理机制</li>
+                    <li>不会阻塞渲染进程</li>
+                    <li>Electron 官方推荐的新模式</li>
+                </ul>
+                
+                <h3>2. send/on 适用于复杂场景</h3>
+                <ul>
+                    <li>需要进度更新的长时间操作</li>
+                    <li>多个事件需要通信的场景</li>
+                    <li>单向通知不需要响应的情况</li>
+                </ul>
+                
+                <h3>3. 谨慎使用 sendSync</h3>
+                <ul>
+                    <li>仅用于耗时极短的操作（&lt;100ms）</li>
+                    <li>避免在渲染进程繁忙时使用</li>
+                    <li>始终使用 try-catch 包装</li>
+                    <li>考虑是否有异步替代方案</li>
+                </ul>
+                
+                <h3>4. 错误处理规范</h3>
+                <div class="code-block">
+// invoke - 使用 try-catch
+try {
+    const result = await ipcRenderer.invoke('some-action');
+} catch (error) {
+    // 处理错误
+}
+
+// send - 监听错误事件
+ipcRenderer.send('some-action');
+ipcRenderer.once('action-error', (event, error) => {
+    // 处理错误
+});
+
+// sendSync - 同步 try-catch
+try {
+    const result = ipcRenderer.sendSync('some-action');
+} catch (error) {
+    // 处理错误
+}
+                </div>
+                
+                <h3>5. 性能优化建议</h3>
+                <ul>
+                    <li>批量处理多个IPC调用</li>
+                    <li>避免频繁的小消息通信</li>
+                    <li>使用数据压缩对于大数据传输</li>
+                    <li>考虑使用Web Workers处理CPU密集型任务</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟 Electron IPC 行为
+        class MockIPCRenderer {
+            constructor() {
+                this.handlers = new Map();
+                this.listeners = new Map();
+                this.messageId = 0;
+            }
+            
+            // 模拟 invoke
+            invoke(channel, data) {
+                return new Promise((resolve, reject) => {
+                    const id = ++this.messageId;
+                    
+                    // 模拟网络延迟
+                    setTimeout(() => {
+                        if (this.handlers.has(channel)) {
+                            try {
+                                const handler = this.handlers.get(channel);
+                                const result = handler({}, data);
+                                resolve(result);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        } else {
+                            reject(new Error(`No handler registered for channel: ${channel}`));
+                        }
+                    }, Math.random() * 100 + 50); // 50-150ms 延迟
+                });
+            }
+            
+            // 模拟 send
+            send(channel, data) {
+                setTimeout(() => {
+                    if (this.listeners.has(channel)) {
+                        const listeners = this.listeners.get(channel);
+                        listeners.forEach(callback => {
+                            callback({}, data);
+                        });
+                    }
+                }, 10);
+            }
+            
+            // 模拟 sendSync
+            sendSync(channel, data) {
+                if (this.handlers.has(channel)) {
+                    try {
+                        const handler = this.handlers.get(channel);
+                        return handler({ returnValue: null }, data);
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+                throw new Error(`No handler registered for channel: ${channel}`);
+            }
+            
+            // 模拟 on
+            on(channel, callback) {
+                if (!this.listeners.has(channel)) {
+                    this.listeners.set(channel, []);
+                }
+                this.listeners.get(channel).push(callback);
+            }
+            
+            // 模拟 once
+            once(channel, callback) {
+                const onceCallback = (event, data) => {
+                    callback(event, data);
+                    this.removeListener(channel, onceCallback);
+                };
+                this.on(channel, onceCallback);
+            }
+            
+            // 模拟 removeListener
+            removeListener(channel, callback) {
+                if (this.listeners.has(channel)) {
+                    const listeners = this.listeners.get(channel);
+                    const index = listeners.indexOf(callback);
+                    if (index > -1) {
+                        listeners.splice(index, 1);
+                    }
+                }
+            }
+            
+            // 注册处理器（模拟主进程）
+            handle(channel, handler) {
+                this.handlers.set(channel, handler);
+            }
+        }
+        
+        // 创建模拟的 ipcRenderer
+        const ipcRenderer = new MockIPCRenderer();
+        
+        // 注册模拟处理器
+        ipcRenderer.handle('get-user-data', async (event, userId) => {
+            if (userId === 'error') {
+                throw new Error('用户不存在');
+            }
+            
+            // 模拟异步操作
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            return {
+                id: userId,
+                name: '张三',
+                email: 'zhangsan@example.com',
+                avatar: 'https://example.com/avatar.jpg'
+            };
+        });
+        
+        ipcRenderer.handle('get-config', (event) => {
+            return {
+                theme: 'dark',
+                language: 'zh-CN',
+                version: '1.0.0'
+            };
+        });
+        
+        // 添加事件监听器
+        ipcRenderer.on('task-progress', (event, progress) => {
+            addLog('send-result', `任务进度: ${progress}%`, 'info');
+        });
+        
+        // 演示函数
+        function addLog(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 绑定按钮事件
+        document.getElementById('test-invoke').addEventListener('click', async () => {
+            addLog('invoke-result', '调用 invoke...', 'info');
+            
+            try {
+                const result = await ipcRenderer.invoke('get-user-data', 'user123');
+                addLog('invoke-result', `成功: ${JSON.stringify(result)}`, 'success');
+            } catch (error) {
+                addLog('invoke-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-invoke-error').addEventListener('click', async () => {
+            addLog('invoke-result', '调用 invoke (模拟错误)...', 'info');
+            
+            try {
+                const result = await ipcRenderer.invoke('get-user-data', 'error');
+                addLog('invoke-result', `成功: ${JSON.stringify(result)}`, 'success');
+            } catch (error) {
+                addLog('invoke-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-invoke-delay').addEventListener('click', async () => {
+            addLog('invoke-result', '调用 invoke (模拟延迟)...', 'info');
+            
+            try {
+                const startTime = Date.now();
+                const result = await ipcRenderer.invoke('get-user-data', 'user123');
+                const endTime = Date.now();
+                addLog('invoke-result', `成功 (耗时: ${endTime - startTime}ms): ${JSON.stringify(result)}`, 'success');
+            } catch (error) {
+                addLog('invoke-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-send').addEventListener('click', () => {
+            addLog('send-result', '发送消息...', 'info');
+            
+            // 模拟发送消息并接收回复
+            ipcRenderer.send('test-message', { action: 'process' });
+            
+            // 模拟回复
+            setTimeout(() => {
+                addLog('send-result', '收到回复: 处理完成', 'success');
+            }, 200);
+        });
+        
+        document.getElementById('test-send-progress').addEventListener('click', () => {
+            addLog('send-result', '开始长时间任务...', 'info');
+            
+            // 模拟进度更新
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                ipcRenderer.send('task-progress', progress);
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        addLog('send-result', '任务完成!', 'success');
+                    }, 300);
+                }
+            }, 200);
+        });
+        
+        document.getElementById('test-send-multi').addEventListener('click', () => {
+            addLog('send-result', '发送多监听消息...', 'info');
+            
+            // 添加多个监听器
+            ipcRenderer.once('multi-reply-1', (event, data) => {
+                addLog('send-result', `回复1: ${data}`, 'success');
+            });
+            
+            ipcRenderer.once('multi-reply-2', (event, data) => {
+                addLog('send-result', `回复2: ${data}`, 'success');
+            });
+            
+            // 模拟多个回复
+            setTimeout(() => {
+                ipcRenderer.send('multi-reply-1', '第一个回复');
+            }, 100);
+            
+            setTimeout(() => {
+                ipcRenderer.send('multi-reply-2', '第二个回复');
+            }, 300);
+        });
+        
+        document.getElementById('test-sendsync').addEventListener('click', () => {
+            addLog('sendsync-result', '调用 sendSync...', 'info');
+            
+            try {
+                const startTime = Date.now();
+                const result = ipcRenderer.sendSync('get-config');
+                const endTime = Date.now();
+                addLog('sendsync-result', `成功 (耗时: ${endTime - startTime}ms): ${JSON.stringify(result)}`, 'success');
+            } catch (error) {
+                addLog('sendsync-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-sendsync-error').addEventListener('click', () => {
+            addLog('sendsync-result', '调用 sendSync (模拟错误)...', 'info');
+            
+            try {
+                const result = ipcRenderer.sendSync('invalid-channel');
+                addLog('sendsync-result', `成功: ${JSON.stringify(result)}`, 'success');
+            } catch (error) {
+                addLog('sendsync-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('test-sendsync-delay').addEventListener('click', () => {
+            addLog('sendsync-result', '调用 sendSync (模拟延迟)...', 'warning');
+            addLog('sendsync-result', '注意: sendSync 会阻塞渲染进程!', 'warning');
+            
+            try {
+                const startTime = Date.now();
+                // 模拟同步延迟
+                const result = ipcRenderer.sendSync('get-config');
+                const endTime = Date.now();
+                addLog('sendsync-result', `成功 (耗时: ${endTime - startTime}ms): 注意阻塞!`, 'success');
+            } catch (error) {
+                addLog('sendsync-result', `错误: ${error.message}`, 'error');
+            }
+        });
+        
+        // 性能测试
+        document.getElementById('run-performance-test').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('performance-result');
+            resultDiv.innerHTML = '运行性能测试...';
+            
+            // 测试 invoke
+            const invokeStart = Date.now();
+            for (let i = 0; i < 10; i++) {
+                await ipcRenderer.invoke('get-user-data', 'user' + i);
+            }
+            const invokeTime = Date.now() - invokeStart;
+            
+            // 测试 send (模拟)
+            const sendStart = Date.now();
+            for (let i = 0; i < 10; i++) {
+                ipcRenderer.send('test-message', i);
+            }
+            const sendTime = Date.now() - sendStart;
+            
+            // 测试 sendSync
+            const syncStart = Date.now();
+            for (let i = 0; i < 10; i++) {
+                ipcRenderer.sendSync('get-config');
+            }
+            const syncTime = Date.now() - syncStart;
+            
+            // 更新图表
+            document.getElementById('invoke-bar').style.height = (invokeTime / 2) + 'px';
+            document.getElementById('invoke-bar').textContent = invokeTime + 'ms';
+            
+            document.getElementById('send-bar').style.height = (sendTime / 2) + 'px';
+            document.getElementById('send-bar').textContent = sendTime + 'ms';
+            
+            document.getElementById('sendsync-bar').style.height = (syncTime / 2) + 'px';
+            document.getElementById('sendsync-bar').textContent = syncTime + 'ms';
+            
+            // 显示结果
+            resultDiv.innerHTML = `
+                <div class="log-entry log-success">invoke: ${invokeTime}ms (异步非阻塞)</div>
+                <div class="log-entry log-info">send: ${sendTime}ms (异步无返回)</div>
+                <div class="log-entry log-warning">sendSync: ${syncTime}ms (同步阻塞)</div>
+                <div class="log-entry log-info">注意: 这是模拟测试，实际性能因操作复杂度而异</div>
+            `;
+        });
+    </script>
+</body>
+</html>
