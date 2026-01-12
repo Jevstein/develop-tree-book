@@ -115,7 +115,7 @@ class JvtUrlNavi extends JvtHTMLComponent {
           } else {
             const img = document.createElement('div');
             img.className = "icon";
-            img.innerText = '🔗';
+            img.innerText = item?.icon || '🔗';
             itemElement.appendChild(img);
           }
 

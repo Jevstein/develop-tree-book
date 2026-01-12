@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeechRecognition 语音转文字完整实现</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 800px;
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4a6ee0 0%, #6a11cb 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .main-content {
+      padding: 40px;
+    }
+
+    .demo-area {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .control-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      color: white;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #95a5a6;
+    }
+
+    .status-dot.recording {
+      background: #e74c3c;
+      animation: pulse 1.5s infinite;
+    }
+
+    .status-dot.listening {
+      background: #2ecc71;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .status-text {
+      font-size: 16px;
+      color: #2c3e50;
+    }
+
+    .language-selector {
+      margin-bottom: 20px;
+    }
+
+    .language-selector label {
+      display: block;
+      margin-bottom: 8px;
+      color: #34495e;
+      font-weight: 600;
+    }
+
+    .language-selector select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e6ed;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #2c3e50;
+      background: white;
+      cursor: pointer;
+    }
+
+    .transcript-area {
+      margin-bottom: 30px;
+    }
+
+    .transcript-container {
+      background: white;
+      border: 2px solid #e0e6ed;
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 200px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .transcript-text {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #2c3e50;
+    }
+
+    .transcript-text .interim {
+      color: #7f8c8d;
+      opacity: 0.7;
+    }
+
+    .transcript-text .final {
+      color: #2c3e50;
+    }
+
+    .visualizer {
+      width: 100%;
+      height: 100px;
+      background: #2c3e50;
+      border-radius: 10px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visualizer-bar {
+      position: absolute;
+      bottom: 0;
+      width: 4px;
+      background: #3498db;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e8f4fd;
+      border-radius: 10px;
+    }
+
+    .info-section h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .info-item {
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+
+    .info-item h4 {
+      color: #3498db;
+      margin-bottom: 5px;
+    }
+
+    .recordings {
+      margin-top: 20px;
+    }
+
+    .recordings h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .recordings-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .recording-item {
+      padding: 10px 15px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #2ecc71;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .recording-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .recording-time {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .code-block {
+      background: #1a1a1a;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    .keyword {
+      color: #f92672;
+    }
+
+    .function {
+      color: #66d9ef;
+    }
+
+    .string {
+      color: #a6e22e;
+    }
+
+    .comment {
+      color: #75715e;
+    }
+
+    .number {
+      color: #ae81ff;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #7f8c8d;
+      font-size: 14px;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 768px) {
+      .control-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎤 SpeechRecognition 语音转文字</h1>
+      <p class="subtitle">使用 JavaScript Web Speech API 实现实时语音识别</p>
+    </div>
+
+    <div class="main-content">
+      <!-- 控制面板 -->
+      <div class="control-panel">
+        <button id="startBtn" class="btn btn-primary">
+          <span>🎤 开始录音</span>
+        </button>
+        <button id="stopBtn" class="btn btn-danger" disabled>
+          <span>⏹️ 停止录音</span>
+        </button>
+        <button id="pauseBtn" class="btn btn-warning" disabled>
+          <span>⏸️ 暂停</span>
+        </button>
+        <button id="clearBtn" class="btn">
+          <span>🗑️ 清空</span>
+        </button>
+      </div>
+
+      <!-- 状态指示 -->
+      <div class="status-indicator">
+        <div id="statusDot" class="status-dot"></div>
+        <div id="statusText" class="status-text">准备就绪</div>
+      </div>
+
+      <!-- 语言选择 -->
+      <div class="language-selector">
+        <label for="languageSelect">选择识别语言：</label>
+        <select id="languageSelect">
+          <option value="zh-CN">中文 (普通话)</option>
+          <option value="zh-TW">中文 (台湾)</option>
+          <option value="zh-HK">中文 (香港)</option>
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="ja-JP">日本語</option>
+          <option value="ko-KR">한국어</option>
+          <option value="fr-FR">Français</option>
+          <option value="de-DE">Deutsch</option>
+          <option value="es-ES">Español</option>
+        </select>
+      </div>
+
+      <!-- 转录结果显示 -->
+      <div class="transcript-area">
+        <h3>转录结果：</h3>
+        <div class="transcript-container">
+          <div id="transcriptText" class="transcript-text">
+            <!-- 转录文本将在这里显示 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 音频可视化 -->
+      <div class="visualizer" id="visualizer">
+        <div id="volumeLevel" style="position: absolute; top: 10px; left: 10px; color: white; font-size: 12px;">
+          音量: 0%
+        </div>
+      </div>
+
+      <!-- 录音记录 -->
+      <div class="recordings">
+        <h3>📝 历史记录</h3>
+        <div id="recordingsList" class="recordings-list">
+          <!-- 历史记录将在这里显示 -->
+        </div>
+      </div>
+
+      <!-- 信息区域 -->
+      <div class="info-section">
+        <h3>🔍 使用说明</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <h4>支持情况</h4>
+            <p>需要 HTTPS 环境，Chrome 和 Edge 支持最佳</p>
+          </div>
+          <div class="info-item">
+            <h4>麦克风权限</h4>
+            <p>首次使用需要允许麦克风访问</p>
+          </div>
+          <div class="info-item">
+            <h4>实时转录</h4>
+            <p>灰色文字为临时结果，黑色文字为最终结果</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 代码示例 -->
+      <div class="code-block">
+        <pre><span class="keyword">class</span> <span class="function">SpeechToText</span> {
+  <span class="function">constructor</span>() {
+    <span class="keyword">this</span>.recognition = null;
+    <span class="keyword">this</span>.isListening = <span class="keyword">false</span>;
+    <span class="keyword">this</span>.transcript = <span class="string">''</span>;
+    
+    <span class="comment">// 初始化语音识别</span>
+    <span class="keyword">this</span>.<span class="function">initRecognition</span>();
+  }
+  
+  <span class="function">initRecognition</span>() {
+    <span class="keyword">const</span> SpeechRecognition = window.SpeechRecognition || 
+                            window.webkitSpeechRecognition;
+    
+    <span class="keyword">if</span> (!SpeechRecognition) {
+      <span class="keyword">throw new</span> <span class="function">Error</span>(<span class="string">'浏览器不支持语音识别'</span>);
+    }
+    
+    <span class="keyword">this</span>.recognition = <span class="keyword">new</span> <span class="function">SpeechRecognition</span>();
+    
+    <span class="comment">// 配置识别器</span>
+    <span class="keyword">this</span>.recognition.continuous = <span class="keyword">true</span>;
+    <span class="keyword">this</span>.recognition.interimResults = <span class="keyword">true</span>;
+    <span class="keyword">this</span>.recognition.lang = <span class="string">'zh-CN'</span>;
+    
+    <span class="comment">// 绑定事件处理</span>
+    <span class="keyword">this</span>.recognition.onresult = (event) => {
+      <span class="keyword">this</span>.<span class="function">handleResult</span>(event);
+    };
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>基于 Web Speech API 实现 | 支持 Chrome、Edge 等现代浏览器</p>
+    </div>
+  </div>
+
+  <script>
+    class SpeechToText {
+      constructor() {
+        this.recognition = null;
+        this.isListening = false;
+        this.isPaused = false;
+        this.finalTranscript = '';
+        this.interimTranscript = '';
+        this.audioContext = null;
+        this.analyser = null;
+        this.records = JSON.parse(localStorage.getItem('speechRecords')) || [];
+        this.init();
+      }
+
+      init() {
+        this.initRecognition();
+        this.initVisualizer();
+        this.bindEvents();
+        this.renderRecords();
+        this.updateStatus('准备就绪，点击开始按钮开始语音识别', 'ready');
+      }
+
+      initRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+          this.updateStatus('您的浏览器不支持语音识别功能', 'error');
+          document.getElementById('startBtn').disabled = true;
+          return;
+        }
+
+        this.recognition = new SpeechRecognition();
+        this.configureRecognition();
+        this.bindRecognitionEvents();
+      }
+
+      configureRecognition() {
+        const language = document.getElementById('languageSelect').value;
+
+        // 基本配置
+        this.recognition.continuous = true;        // 持续识别
+        this.recognition.interimResults = true;   // 返回中间结果
+        this.recognition.lang = language;         // 设置语言
+        this.recognition.maxAlternatives = 3;     // 返回多个候选结果
+
+        // 高级配置（如果浏览器支持）
+        if (this.recognition.grammars) {
+          // 可以设置语法
+        }
+      }
+
+      bindRecognitionEvents() {
+        this.recognition.onstart = () => {
+          this.isListening = true;
+          this.isPaused = false;
+          this.updateStatus('正在监听中...', 'listening');
+          this.updateButtons();
+        };
+
+        this.recognition.onresult = (event) => {
+          this.handleRecognitionResult(event);
+        };
+
+        this.recognition.onerror = (event) => {
+          this.handleRecognitionError(event);
+        };
+
+        this.recognition.onend = () => {
+          this.isListening = false;
+          this.updateStatus('识别已停止', 'ready');
+          this.updateButtons();
+        };
+
+        this.recognition.onaudiostart = () => {
+          console.log('音频输入开始');
+        };
+
+        this.recognition.onaudioend = () => {
+          console.log('音频输入结束');
+        };
+
+        this.recognition.onsoundstart = () => {
+          console.log('检测到声音');
+        };
+
+        this.recognition.onsoundend = () => {
+          console.log('声音结束');
+        };
+
+        this.recognition.onspeechstart = () => {
+          console.log('检测到语音开始');
+        };
+
+        this.recognition.onspeechend = () => {
+          console.log('语音结束');
+        };
+
+        this.recognition.onnomatch = () => {
+          console.log('没有匹配的识别结果');
+        };
+      }
+
+      handleRecognitionResult(event) {
+        this.interimTranscript = '';
+        this.finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i][0].transcript;
+
+          if (event.results[i].isFinal) {
+            // 最终结果
+            this.finalTranscript += transcript;
+            this.saveToRecords(transcript);
+          } else {
+            // 临时结果
+            this.interimTranscript += transcript;
+          }
+        }
+
+        this.updateTranscript();
+      }
+
+      updateTranscript() {
+        const transcriptEl = document.getElementById('transcriptText');
+        let html = '';
+
+        if (this.finalTranscript) {
+          html += `<div class="final">${this.finalTranscript}</div>`;
+        }
+
+        if (this.interimTranscript) {
+          html += `<div class="interim">${this.interimTranscript}</div>`;
+        }
+
+        transcriptEl.innerHTML = html;
+
+        // 自动滚动到底部
+        transcriptEl.scrollTop = transcriptEl.scrollHeight;
+      }
+
+      handleRecognitionError(event) {
+        let errorMessage = '识别错误: ';
+
+        switch (event.error) {
+          case 'not-allowed':
+          case 'permission-denied':
+            errorMessage += '麦克风权限被拒绝，请允许访问麦克风';
+            break;
+          case 'audio-capture':
+            errorMessage += '无法捕获音频，请检查麦克风';
+            break;
+          case 'no-speech':
+            errorMessage += '没有检测到语音';
+            break;
+          case 'network':
+            errorMessage += '网络错误，请检查网络连接';
+            break;
+          case 'service-not-allowed':
+            errorMessage += '语音识别服务不可用';
+            break;
+          case 'language-not-supported':
+            errorMessage += '不支持所选语言';
+            break;
+          default:
+            errorMessage += event.error;
+        }
+
+        this.updateStatus(errorMessage, 'error');
+        console.error('SpeechRecognition error:', event);
+
+        // 如果错误不是由用户停止引起的，尝试重启
+        if (event.error !== 'aborted' && this.isListening) {
+          setTimeout(() => {
+            if (this.isListening) {
+              this.start();
+            }
+          }, 1000);
+        }
+      }
+
+      async start() {
+        if (!this.recognition) {
+          this.updateStatus('语音识别不可用', 'error');
+          return;
+        }
+
+        if (this.isListening) {
+          this.updateStatus('已经在识别中', 'warning');
+          return;
+        }
+
+        try {
+          // 检查麦克风权限
+          const stream = await navigator.mediaDevices.getUserMedia({
+            // audio: {
+            //   echoCancellation: true,
+            //   noiseSuppression: true,
+            //   autoGainControl: true
+            // }
+            audio: true
+          });
+
+          // // 停止流以防止多个流同时运行
+          // stream.getTracks().forEach(track => track.stop());
+
+          // 设置语言
+          this.recognition.lang = document.getElementById('languageSelect').value;
+
+          // 开始识别
+          this.recognition.start();
+
+          // 开始音频可视化
+          this.startVisualization();
+
+        } catch (error) {
+          this.handlePermissionError(error);
+        }
+      }
+
+      handlePermissionError(error) {
+        let errorMessage = '无法访问麦克风: ';
+
+        if (error.name === 'NotAllowedError') {
+          errorMessage += '麦克风权限被拒绝，请在浏览器设置中允许麦克风访问';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage += '未找到麦克风设备';
+        } else if (error.name === 'NotReadableError') {
+          errorMessage += '麦克风正被其他应用使用';
+        } else {
+          errorMessage += error.message;
+        }
+
+        this.updateStatus(errorMessage, 'error');
+        console.error('麦克风访问错误:', error);
+      }
+
+      stop() {
+        if (this.recognition && this.isListening) {
+          this.recognition.stop();
+          this.isListening = false;
+          this.updateStatus('已停止', 'ready');
+          this.stopVisualization();
+        }
+      }
+
+      pause() {
+        if (this.isListening && !this.isPaused) {
+          this.isPaused = true;
+          this.recognition.stop();
+          this.updateStatus('已暂停', 'paused');
+        } else if (this.isPaused) {
+          this.isPaused = false;
+          this.recognition.start();
+          this.updateStatus('正在监听中...', 'listening');
+        }
+      }
+
+      clear() {
+        this.finalTranscript = '';
+        this.interimTranscript = '';
+        this.updateTranscript();
+        this.updateStatus('已清空', 'ready');
+      }
+
+      saveToRecords(text) {
+        if (!text.trim()) return;
+
+        const record = {
+          id: Date.now(),
+          text: text,
+          language: this.recognition.lang,
+          timestamp: new Date().toLocaleString(),
+          date: Date.now()
+        };
+
+        this.records.unshift(record);
+
+        // 限制保存数量
+        if (this.records.length > 50) {
+          this.records = this.records.slice(0, 50);
+        }
+
+        this.saveRecords();
+        this.renderRecords();
+      }
+
+      saveRecords() {
+        localStorage.setItem('speechRecords', JSON.stringify(this.records));
+      }
+
+      renderRecords() {
+        const listEl = document.getElementById('recordingsList');
+
+        if (this.records.length === 0) {
+          listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">暂无历史记录</div>';
+          return;
+        }
+
+        let html = '';
+        this.records.forEach(record => {
+          html += `
+                        <div class="recording-item" data-id="${record.id}">
+                            <div>${record.text}</div>
+                            <div class="recording-time">
+                                ${record.timestamp} (${this.getLanguageName(record.language)})
+                            </div>
+                        </div>
+                    `;
+        });
+
+        listEl.innerHTML = html;
+
+        // 添加点击事件
+        listEl.querySelectorAll('.recording-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const id = parseInt(item.dataset.id);
+            const record = this.records.find(r => r.id === id);
+            if (record) {
+              this.finalTranscript = record.text;
+              this.interimTranscript = '';
+              this.updateTranscript();
+            }
+          });
+        });
+      }
+
+      getLanguageName(code) {
+        const languages = {
+          'zh-CN': '中文',
+          'zh-TW': '中文(繁体)',
+          'zh-HK': '中文(香港)',
+          'en-US': '英语(美国)',
+          'en-GB': '英语(英国)',
+          'ja-JP': '日语',
+          'ko-KR': '韩语',
+          'fr-FR': '法语',
+          'de-DE': '德语',
+          'es-ES': '西班牙语'
+        };
+
+        return languages[code] || code;
+      }
+
+      initVisualizer() {
+        this.visualizer = document.getElementById('visualizer');
+        this.volumeLevel = document.getElementById('volumeLevel');
+        this.bars = [];
+
+        // 创建可视化条
+        for (let i = 0; i < 64; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'visualizer-bar';
+          this.visualizer.appendChild(bar);
+          this.bars.push(bar);
+        }
+      }
+
+      async startVisualization() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.analyser = this.audioContext.createAnalyser();
+          this.source = this.audioContext.createMediaStreamSource(stream);
+
+          this.analyser.fftSize = 256;
+          this.source.connect(this.analyser);
+
+          this.animateVisualizer();
+
+        } catch (error) {
+          console.error('音频可视化失败:', error);
+        }
+      }
+
+      animateVisualizer() {
+        if (!this.isListening) return;
+
+        const bufferLength = this.analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const draw = () => {
+          if (!this.isListening) return;
+
+          requestAnimationFrame(draw);
+
+          this.analyser.getByteFrequencyData(dataArray);
+
+          // 计算平均音量
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+          }
+          const average = sum / bufferLength;
+          const volumePercent = Math.round((average / 255) * 100);
+
+          // 更新音量显示
+          this.volumeLevel.textContent = `音量: ${volumePercent}%`;
+
+          // 更新可视化条
+          const barWidth = (this.visualizer.offsetWidth - 20) / this.bars.length;
+
+          this.bars.forEach((bar, i) => {
+            const value = dataArray[i] || 0;
+            const height = (value / 255) * this.visualizer.offsetHeight;
+
+            bar.style.height = `${height}px`;
+            bar.style.width = `${barWidth}px`;
+            bar.style.left = `${i * barWidth}px`;
+
+            // 根据音量设置颜色
+            const hue = (value / 255) * 120; // 绿色到红色
+            bar.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+          });
+        };
+
+        draw();
+      }
+
+      stopVisualization() {
+        if (this.audioContext) {
+          this.audioContext.close();
+          this.audioContext = null;
+        }
+
+        // 重置可视化
+        this.bars.forEach(bar => {
+          bar.style.height = '0px';
+        });
+        this.volumeLevel.textContent = '音量: 0%';
+      }
+
+      updateStatus(message, type = 'ready') {
+        const statusText = document.getElementById('statusText');
+        const statusDot = document.getElementById('statusDot');
+
+        statusText.textContent = message;
+
+        // 移除所有状态类
+        statusDot.className = 'status-dot';
+
+        // 添加当前状态类
+        if (type === 'listening') {
+          statusDot.classList.add('listening');
+        } else if (type === 'recording') {
+          statusDot.classList.add('recording');
+        } else if (type === 'error') {
+          statusDot.style.background = '#e74c3c';
+        } else if (type === 'warning') {
+          statusDot.style.background = '#f39c12';
+        } else {
+          statusDot.style.background = '#2ecc71';
+        }
+      }
+
+      updateButtons() {
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+
+        if (this.isListening) {
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          pauseBtn.disabled = false;
+          pauseBtn.innerHTML = this.isPaused ? '<span>▶️ 继续</span>' : '<span>⏸️ 暂停</span>';
+        } else {
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          pauseBtn.disabled = true;
+        }
+      }
+
+      bindEvents() {
+        // 按钮事件
+        document.getElementById('startBtn').addEventListener('click', () => this.start());
+        document.getElementById('stopBtn').addEventListener('click', () => this.stop());
+        document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+        document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+
+        // 语言选择变化
+        document.getElementById('languageSelect').addEventListener('change', () => {
+          if (this.isListening) {
+            this.stop();
+            setTimeout(() => {
+              this.start();
+            }, 300);
+          }
+        });
+
+        // 页面可见性变化
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden && this.isListening) {
+            this.stop();
+          }
+        });
+      }
+    }
+
+    // 初始化应用
+    let speechToText = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        speechToText = new SpeechToText();
+      } catch (error) {
+        console.error('初始化失败:', error);
+        document.getElementById('statusText').textContent = '初始化失败: ' + error.message;
+      }
+    });
+
+    // 导出为全局变量以便调试
+    window.speechToText = speechToText;
+  </script>
+</body>
+
+</html>

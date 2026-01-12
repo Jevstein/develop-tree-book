@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>移动端键盘完成事件监听完整解决方案</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .method-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .method-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .method-tag {
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .method-tag.recommended {
+            background: #27ae60;
+        }
+        
+        .method-tag.advanced {
+            background: #9b59b6;
+        }
+        
+        .demo-area {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            background: white;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .event-log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .compatibility-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .compatibility-table th, .compatibility-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .compatibility-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .warning {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        .keyboard-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .keyboard-type-btn {
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .keyboard-type-btn.active {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>移动端键盘完成事件监听解决方案</h1>
+            <p class="subtitle">监听"完成"、"搜索"、"发送"、"前往"等键盘操作按钮</p>
+        </header>
+        
+        <div class="content">
+            <!-- 方法1：enterkeyhint 属性监听 -->
+            <div class="method-section">
+                <div class="method-header">
+                    <h2>方法1：使用 enterkeyhint 属性 + 键盘事件</h2>
+                    <span class="method-tag recommended">推荐</span>
+                </div>
+                <p>通过设置 <code>enterkeyhint</code> 属性控制键盘按钮类型，并监听 <code>keydown</code> 事件捕获完成操作。</p>
+                
+                <div class="demo-area">
+                    <div class="keyboard-type-selector">
+                        <button class="keyboard-type-btn active" data-type="done">✅ 完成 (done)</button>
+                        <button class="keyboard-type-btn" data-type="search">🔍 搜索 (search)</button>
+                        <button class="keyboard-type-btn" data-type="send">📤 发送 (send)</button>
+                        <button class="keyboard-type-btn" data-type="go">🚀 前往 (go)</button>
+                        <button class="keyboard-type-btn" data-type="next">⏭️ 下一个 (next)</button>
+                        <button class="keyboard-type-btn" data-type="previous">⏮️ 上一个 (previous)</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>输入框 (enterkeyhint="done"):</label>
+                        <input 
+                            type="text" 
+                            id="inputDone" 
+                            enterkeyhint="done"
+                            placeholder="设置 enterkeyhint='done'，按完成键测试"
+                        >
+                    </div>
+                    
+                    <div class="event-log" id="log1">
+                        <div class="log-entry">事件日志：</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+// 方法1：enterkeyhint + 键盘事件监听
+class EnterKeyHintListener {
+    constructor(inputId, logId) {
+        this.input = document.getElementById(inputId);
+        this.log = document.getElementById(logId);
+        this.init();
+    }
+    
+    init() {
+        // 监听键盘按下事件
+        this.input.addEventListener('keydown', (e) => {
+            this.handleKeyDown(e);
+        });
+        
+        // 监听键盘抬起事件
+        this.input.addEventListener('keyup', (e) => {
+            this.handleKeyUp(e);
+        });
+        
+        // 监听输入事件
+        this.input.addEventListener('input', (e) => {
+            this.logEvent('input', `输入: ${e.target.value}`);
+        });
+        
+        // 监听焦点事件
+        this.input.addEventListener('focus', () => {
+            this.logEvent('focus', '获得焦点');
+        });
+        
+        this.input.addEventListener('blur', () => {
+            this.logEvent('blur', '失去焦点');
+        });
+    }
+    
+    handleKeyDown(e) {
+        // 记录所有按键
+        this.logEvent('keydown', `按键: ${e.key}, KeyCode: ${e.keyCode}`);
+        
+        // 检查是否是回车键（完成按钮）
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault(); // 阻止默认行为（如表单提交）
+            e.stopPropagation(); // 阻止事件冒泡
+            
+            this.logEvent('enter', '完成键被按下！');
+            
+            // 根据 enterkeyhint 值执行不同操作
+            const hint = this.input.getAttribute('enterkeyhint') || 'done';
+            this.handleEnterAction(hint);
+            
+            // 模拟处理完成
+            this.processCompletion();
+        }
+    }
+    
+    handleKeyUp(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            this.logEvent('keyup', '完成键抬起');
+        }
+    }
+    
+    handleEnterAction(hint) {
+        const actions = {
+            'done': '完成操作',
+            'search': '搜索操作',
+            'send': '发送操作',
+            'go': '前往操作',
+            'next': '下一个',
+            'previous': '上一个'
+        };
+        
+        const action = actions[hint] || '默认操作';
+        this.logEvent('action', `执行 ${action} (hint=${hint})`);
+    }
+    
+    processCompletion() {
+        const value = this.input.value.trim();
+        if (value) {
+            this.logEvent('process', `处理内容: "${value}"`);
+        }
+        
+        // 可选：失去焦点隐藏键盘
+        // setTimeout(() => this.input.blur(), 100);
+    }
+    
+    logEvent(type, message) {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+        this.log.appendChild(entry);
+        
+        // 自动滚动到底部
+        this.log.scrollTop = this.log.scrollHeight;
+    }
+}
+                </div>
+            </div>
+            
+            <!-- 方法2：表单 submit 事件 -->
+            <div class="method-section">
+                <div class="method-header">
+                    <h2>方法2：表单 submit 事件监听</h2>
+                    <span class="method-tag recommended">标准</span>
+                </div>
+                <p>将输入框放在 <code>&lt;form&gt;</code> 中，监听表单的 submit 事件。</p>
+                
+                <div class="demo-area">
+                    <form id="demoForm">
+                        <div class="input-group">
+                            <label>搜索框 (在表单中):</label>
+                            <input 
+                                type="search" 
+                                id="searchInput"
+                                enterkeyhint="search"
+                                placeholder="输入内容后按搜索键"
+                            >
+                        </div>
+                    </form>
+                    
+                    <div class="event-log" id="log2">
+                        <div class="log-entry">事件日志：</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+// 方法2：表单 submit 事件监听
+class FormSubmitListener {
+    constructor(formId, logId) {
+        this.form = document.getElementById(formId);
+        this.log = document.getElementById(logId);
+        this.init();
+    }
+    
+    init() {
+        // 监听表单提交事件
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault(); // 阻止默认提交行为
+            this.handleFormSubmit(e);
+        });
+        
+        // 也可以监听输入框的键盘事件
+        const input = this.form.querySelector('input[type="search"]');
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                this.logEvent('keydown', '搜索键被按下');
+            }
+        });
+    }
+    
+    handleFormSubmit(e) {
+        const input = this.form.querySelector('input[type="search"]');
+        const value = input.value.trim();
+        
+        this.logEvent('submit', `表单提交，搜索内容: "${value}"`);
+        
+        if (value) {
+            // 执行搜索操作
+            this.performSearch(value);
+        }
+        
+        // 清空输入框
+        input.value = '';
+        input.blur(); // 隐藏键盘
+    }
+    
+    performSearch(query) {
+        this.logEvent('search', `执行搜索: "${query}"`);
+        
+        // 模拟搜索延迟
+        setTimeout(() => {
+            this.logEvent('result', `找到 ${Math.floor(Math.random() * 100)} 个结果`);
+        }, 500);
+    }
+    
+    logEvent(type, message) {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+        this.log.appendChild(entry);
+        this.log.scrollTop = this.log.scrollHeight;
+    }
+}
+                </div>
+            </div>
+            
+            <!-- 方法3：input 事件 + inputType 检测 -->
+            <div class="method-section">
+                <div class="method-header">
+                    <h2>方法3：input 事件 + inputType 检测</h2>
+                    <span class="method-tag">高级</span>
+                </div>
+                <p>通过 <code>input</code> 事件的 <code>inputType</code> 属性检测插入行操作。</p>
+                
+                <div class="demo-area">
+                    <div class="input-group">
+                        <label>多行文本输入框:</label>
+                        <textarea 
+                            id="multilineInput"
+                            rows="4"
+                            enterkeyhint="send"
+                            placeholder="输入多行文本，按发送键测试"
+                        ></textarea>
+                    </div>
+                    
+                    <div class="event-log" id="log3">
+                        <div class="log-entry">事件日志：</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+// 方法3：input 事件 + inputType 检测
+class InputTypeListener {
+    constructor(textareaId, logId) {
+        this.textarea = document.getElementById(textareaId);
+        this.log = document.getElementById(logId);
+        this.init();
+    }
+    
+    init() {
+        // 监听 input 事件
+        this.textarea.addEventListener('input', (e) => {
+            this.handleInput(e);
+        });
+        
+        // 监听键盘事件
+        this.textarea.addEventListener('keydown', (e) => {
+            this.handleKeyDown(e);
+        });
+        
+        // 监听 composition 事件（处理中文输入法）
+        this.textarea.addEventListener('compositionstart', () => {
+            this.logEvent('composition', '开始中文输入');
+        });
+        
+        this.textarea.addEventListener('compositionend', () => {
+            this.logEvent('composition', '结束中文输入');
+        });
+    }
+    
+    handleInput(e) {
+        const inputType = e.inputType;
+        
+        if (inputType === 'insertLineBreak') {
+            // 检测到换行符插入
+            this.logEvent('inputType', '检测到插入行（可能是完成键）');
+            this.handleSendAction();
+        } else if (inputType === 'insertText') {
+            // 普通文本输入
+            this.logEvent('input', '文本输入');
+        }
+    }
+    
+    handleKeyDown(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            if (e.shiftKey) {
+                // Shift+Enter 换行
+                this.logEvent('keydown', 'Shift+Enter: 换行');
+                return; // 允许默认换行行为
+            } else {
+                // 单独的 Enter 键
+                e.preventDefault();
+                this.logEvent('keydown', 'Enter: 发送操作');
+                this.handleSendAction();
+            }
+        }
+    }
+    
+    handleSendAction() {
+        const value = this.textarea.value.trim();
+        if (value) {
+            this.logEvent('send', `发送内容: "${value}"`);
+            this.textarea.value = ''; // 清空内容
+            this.textarea.blur(); // 隐藏键盘
+        }
+    }
+    
+    logEvent(type, message) {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+        this.log.appendChild(entry);
+        this.log.scrollTop = this.log.scrollHeight;
+    }
+}
+                </div>
+            </div>
+            
+            <!-- 方法4：blur 事件检测 -->
+            <div class="method-section">
+                <div class="method-header">
+                    <h2>方法4：blur 事件 + 超时检测</h2>
+                    <span class="method-tag">补充方案</span>
+                </div>
+                <p>通过检测输入框失去焦点的时间差来判断是否是点击完成键。</p>
+                
+                <div class="demo-area">
+                    <div class="input-group">
+                        <label>通用输入框:</label>
+                        <input 
+                            type="text" 
+                            id="blurInput"
+                            placeholder="输入内容后点击完成键或点击其他地方"
+                        >
+                    </div>
+                    
+                    <div class="event-log" id="log4">
+                        <div class="log-entry">事件日志：</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+// 方法4：blur 事件检测完成操作
+class BlurDetector {
+    constructor(inputId, logId) {
+        this.input = document.getElementById(inputId);
+        this.log = document.getElementById(logId);
+        this.lastKeyTime = 0;
+        this.blurTimeout = null;
+        this.init();
+    }
+    
+    init() {
+        // 记录最后一次按键时间
+        this.input.addEventListener('keydown', (e) => {
+            this.lastKeyTime = Date.now();
+            
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                this.logEvent('keydown', '检测到 Enter 键按下');
+            }
+        });
+        
+        // 监听 blur 事件
+        this.input.addEventListener('blur', () => {
+            this.handleBlur();
+        });
+        
+        // 监听 focus 事件
+        this.input.addEventListener('focus', () => {
+            this.logEvent('focus', '获得焦点');
+        });
+    }
+    
+    handleBlur() {
+        const now = Date.now();
+        const timeDiff = now - this.lastKeyTime;
+        
+        // 如果距离最后一次按键时间很短（小于300ms），可能是点击了完成键
+        if (timeDiff < 300 && this.lastKeyTime > 0) {
+            this.logEvent('blur', `可能是完成键操作 (${timeDiff}ms)`);
+            this.processCompletion();
+        } else {
+            this.logEvent('blur', '普通失去焦点');
+        }
+        
+        // 清除超时检测
+        if (this.blurTimeout) {
+            clearTimeout(this.blurTimeout);
+        }
+        
+        this.lastKeyTime = 0;
+    }
+    
+    processCompletion() {
+        const value = this.input.value.trim();
+        if (value) {
+            this.logEvent('complete', `处理完成: "${value}"`);
+        }
+    }
+    
+    logEvent(type, message) {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+        this.log.appendChild(entry);
+        this.log.scrollTop = this.log.scrollHeight;
+    }
+}
+                </div>
+            </div>
+            
+            <!-- 兼容性表格 -->
+            <div class="method-section">
+                <h3>📱 兼容性表格</h3>
+                <table class="compatibility-table">
+                    <thead>
+                        <tr>
+                            <th>方法</th>
+                            <th>iOS Safari</th>
+                            <th>Android Chrome</th>
+                            <th>微信浏览器</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>enterkeyhint 属性</td>
+                            <td class="success">iOS 12+</td>
+                            <td class="success">Chrome 68+</td>
+                            <td class="warning">有限支持</td>
+                            <td>控制键盘按钮类型</td>
+                        </tr>
+                        <tr>
+                            <td>keydown Enter 事件</td>
+                            <td class="success">全支持</td>
+                            <td class="success">全支持</td>
+                            <td class="success">全支持</td>
+                            <td>最可靠的检测方法</td>
+                        </tr>
+                        <tr>
+                            <td>表单 submit 事件</td>
+                            <td class="success">全支持</td>
+                            <td class="success">全支持</td>
+                            <td class="success">全支持</td>
+                            <td>需要包裹在 form 中</td>
+                        </tr>
+                        <tr>
+                            <td>inputType 检测</td>
+                            <td class="warning">部分支持</td>
+                            <td class="success">支持</td>
+                            <td class="warning">有限支持</td>
+                            <td>可检测插入行操作</td>
+                        </tr>
+                        <tr>
+                            <td>blur 时间差检测</td>
+                            <td class="warning">不准确</td>
+                            <td class="warning">不准确</td>
+                            <td class="warning">不准确</td>
+                            <td>作为补充方案</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 最佳实践 -->
+            <div class="method-section">
+                <h3>💡 最佳实践建议</h3>
+                <div style="padding: 20px; background: #e8f4fd; border-radius: 8px;">
+                    <h4>组合使用多种方法：</h4>
+                    <pre style="background: white; padding: 15px; border-radius: 5px; font-family: monospace;">
+// 组合使用示例
+function setupCompleteListener(input) {
+    // 1. 设置 enterkeyhint
+    input.setAttribute('enterkeyhint', 'send');
+    
+    // 2. 监听 keydown Enter
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleComplete();
+        }
+    });
+    
+    // 3. 如果是 form，监听 submit
+    if (input.form) {
+        input.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleComplete();
+        });
+    }
+    
+    // 4. 监听 blur 作为补充
+    let lastKeyTime = 0;
+    input.addEventListener('keydown', () => lastKeyTime = Date.now());
+    input.addEventListener('blur', () => {
+        if (Date.now() - lastKeyTime < 200) {
+            handleComplete();
+        }
+    });
+    
+    function handleComplete() {
+        console.log('完成操作:', input.value);
+        input.blur(); // 隐藏键盘
+    }
+}</pre>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 移动端键盘完成事件监听解决方案 | 支持 iOS 和 Android 设备</p>
+        </footer>
+    </div>
+    
+    <div class="status-indicator" id="statusIndicator">
+        状态: 就绪
+    </div>
+
+    <script>
+        // 更新状态
+        function updateStatus(message) {
+            const statusElement = document.getElementById('statusIndicator');
+            if (statusElement) {
+                statusElement.textContent = `状态: ${message}`;
+            }
+        }
+        
+        // 键盘类型选择器
+        document.querySelectorAll('.keyboard-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有 active
+                document.querySelectorAll('.keyboard-type-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                
+                // 设置当前 active
+                btn.classList.add('active');
+                
+                // 更新输入框的 enterkeyhint
+                const type = btn.dataset.type;
+                const input = document.getElementById('inputDone');
+                input.setAttribute('enterkeyhint', type);
+                input.placeholder = `设置 enterkeyhint='${type}'，按完成键测试`;
+                
+                updateStatus(`已设置为 ${type} 模式`);
+            });
+        });
+        
+        // 方法1：EnterKeyHintListener
+        class EnterKeyHintListener {
+            constructor(inputId, logId) {
+                this.input = document.getElementById(inputId);
+                this.log = document.getElementById(logId);
+                this.init();
+            }
+            
+            init() {
+                // 监听键盘按下事件
+                this.input.addEventListener('keydown', (e) => {
+                    this.handleKeyDown(e);
+                });
+                
+                // 监听键盘抬起事件
+                this.input.addEventListener('keyup', (e) => {
+                    this.handleKeyUp(e);
+                });
+                
+                // 监听输入事件
+                this.input.addEventListener('input', (e) => {
+                    this.logEvent('input', `输入: ${e.target.value}`);
+                });
+                
+                // 监听焦点事件
+                this.input.addEventListener('focus', () => {
+                    this.logEvent('focus', '获得焦点');
+                });
+                
+                this.input.addEventListener('blur', () => {
+                    this.logEvent('blur', '失去焦点');
+                });
+            }
+            
+            handleKeyDown(e) {
+                // 记录所有按键
+                this.logEvent('keydown', `按键: ${e.key}, KeyCode: ${e.keyCode}`);
+                
+                // 检查是否是回车键（完成按钮）
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    this.logEvent('enter', '完成键被按下！');
+                    
+                    const hint = this.input.getAttribute('enterkeyhint') || 'done';
+                    this.handleEnterAction(hint);
+                    
+                    this.processCompletion();
+                }
+            }
+            
+            handleKeyUp(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    this.logEvent('keyup', '完成键抬起');
+                }
+            }
+            
+            handleEnterAction(hint) {
+                const actions = {
+                    'done': '完成操作',
+                    'search': '搜索操作',
+                    'send': '发送操作',
+                    'go': '前往操作',
+                    'next': '下一个',
+                    'previous': '上一个'
+                };
+                
+                const action = actions[hint] || '默认操作';
+                this.logEvent('action', `执行 ${action} (hint=${hint})`);
+            }
+            
+            processCompletion() {
+                const value = this.input.value.trim();
+                if (value) {
+                    this.logEvent('process', `处理内容: "${value}"`);
+                }
+            }
+            
+            logEvent(type, message) {
+                const time = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+                this.log.appendChild(entry);
+                this.log.scrollTop = this.log.scrollHeight;
+            }
+        }
+        
+        // 方法2：FormSubmitListener
+        class FormSubmitListener {
+            constructor(formId, logId) {
+                this.form = document.getElementById(formId);
+                this.log = document.getElementById(logId);
+                this.init();
+            }
+            
+            init() {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleFormSubmit(e);
+                });
+                
+                const input = this.form.querySelector('input[type="search"]');
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        this.logEvent('keydown', '搜索键被按下');
+                    }
+                });
+            }
+            
+            handleFormSubmit(e) {
+                const input = this.form.querySelector('input[type="search"]');
+                const value = input.value.trim();
+                
+                this.logEvent('submit', `表单提交，搜索内容: "${value}"`);
+                
+                if (value) {
+                    this.performSearch(value);
+                }
+                
+                input.value = '';
+                input.blur();
+            }
+            
+            performSearch(query) {
+                this.logEvent('search', `执行搜索: "${query}"`);
+                
+                setTimeout(() => {
+                    this.logEvent('result', `找到 ${Math.floor(Math.random() * 100)} 个结果`);
+                }, 500);
+            }
+            
+            logEvent(type, message) {
+                const time = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+                this.log.appendChild(entry);
+                this.log.scrollTop = this.log.scrollHeight;
+            }
+        }
+        
+        // 方法3：InputTypeListener
+        class InputTypeListener {
+            constructor(textareaId, logId) {
+                this.textarea = document.getElementById(textareaId);
+                this.log = document.getElementById(logId);
+                this.init();
+            }
+            
+            init() {
+                this.textarea.addEventListener('input', (e) => {
+                    this.handleInput(e);
+                });
+                
+                this.textarea.addEventListener('keydown', (e) => {
+                    this.handleKeyDown(e);
+                });
+                
+                this.textarea.addEventListener('compositionstart', () => {
+                    this.logEvent('composition', '开始中文输入');
+                });
+                
+                this.textarea.addEventListener('compositionend', () => {
+                    this.logEvent('composition', '结束中文输入');
+                });
+            }
+            
+            handleInput(e) {
+                const inputType = e.inputType;
+                
+                if (inputType === 'insertLineBreak') {
+                    this.logEvent('inputType', '检测到插入行（可能是完成键）');
+                    this.handleSendAction();
+                } else if (inputType === 'insertText') {
+                    this.logEvent('input', '文本输入');
+                }
+            }
+            
+            handleKeyDown(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    if (e.shiftKey) {
+                        this.logEvent('keydown', 'Shift+Enter: 换行');
+                        return;
+                    } else {
+                        e.preventDefault();
+                        this.logEvent('keydown', 'Enter: 发送操作');
+                        this.handleSendAction();
+                    }
+                }
+            }
+            
+            handleSendAction() {
+                const value = this.textarea.value.trim();
+                if (value) {
+                    this.logEvent('send', `发送内容: "${value}"`);
+                    this.textarea.value = '';
+                    this.textarea.blur();
+                }
+            }
+            
+            logEvent(type, message) {
+                const time = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+                this.log.appendChild(entry);
+                this.log.scrollTop = this.log.scrollHeight;
+            }
+        }
+        
+        // 方法4：BlurDetector
+        class BlurDetector {
+            constructor(inputId, logId) {
+                this.input = document.getElementById(inputId);
+                this.log = document.getElementById(logId);
+                this.lastKeyTime = 0;
+                this.blurTimeout = null;
+                this.init();
+            }
+            
+            init() {
+                this.input.addEventListener('keydown', (e) => {
+                    this.lastKeyTime = Date.now();
+                    
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        this.logEvent('keydown', '检测到 Enter 键按下');
+                    }
+                });
+                
+                this.input.addEventListener('blur', () => {
+                    this.handleBlur();
+                });
+                
+                this.input.addEventListener('focus', () => {
+                    this.logEvent('focus', '获得焦点');
+                });
+            }
+            
+            handleBlur() {
+                const now = Date.now();
+                const timeDiff = now - this.lastKeyTime;
+                
+                if (timeDiff < 300 && this.lastKeyTime > 0) {
+                    this.logEvent('blur', `可能是完成键操作 (${timeDiff}ms)`);
+                    this.processCompletion();
+                } else {
+                    this.logEvent('blur', '普通失去焦点');
+                }
+                
+                if (this.blurTimeout) {
+                    clearTimeout(this.blurTimeout);
+                }
+                
+                this.lastKeyTime = 0;
+            }
+            
+            processCompletion() {
+                const value = this.input.value.trim();
+                if (value) {
+                    this.logEvent('complete', `处理完成: "${value}"`);
+                }
+            }
+            
+            logEvent(type, message) {
+                const time = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<strong>[${time}] ${type}:</strong> ${message}`;
+                this.log.appendChild(entry);
+                this.log.scrollTop = this.log.scrollHeight;
+            }
+        }
+        
+        // 初始化所有监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 方法1
+            const method1 = new EnterKeyHintListener('inputDone', 'log1');
+            
+            // 方法2
+            const method2 = new FormSubmitListener('demoForm', 'log2');
+            
+            // 方法3
+            const method3 = new InputTypeListener('multilineInput', 'log3');
+            
+            // 方法4
+            const method4 = new BlurDetector('blurInput', 'log4');
+            
+            updateStatus('所有监听器已初始化');
+            
+            // 添加键盘模拟器
+            setupKeyboardSimulator();
+        });
+        
+        // 键盘模拟器（演示用）
+        function setupKeyboardSimulator() {
+            const keyboardHTML = `
+                <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #f0f0f0; border-top: 1px solid #ccc; padding: 10px; display: none;" id="keyboardSimulator">
+                    <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 5px;">
+                        ${'qwertyuiop'.split('').map(key => `<button style="padding: 10px; background: white; border: 1px solid #ddd;" class="keyboard-key">${key}</button>`).join('')}
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; margin-bottom: 5px;">
+                        ${'asdfghjkl'.split('').map(key => `<button style="padding: 10px; background: white; border: 1px solid #ddd;" class="keyboard-key">${key}</button>`).join('')}
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button style="flex: 2; padding: 10px; background: white; border: 1px solid #ddd;" id="enterKey">↵ 完成</button>
+                        <button style="flex: 8; padding: 10px; background: white; border: 1px solid #ddd;" class="keyboard-key">空格</button>
+                        <button style="flex: 1; padding: 10px; background: white; border: 1px solid #ddd;" id="hideKeyboard">隐藏</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', keyboardHTML);
+            
+            const simulator = document.getElementById('keyboardSimulator');
+            const enterKey = document.getElementById('enterKey');
+            const hideBtn = document.getElementById('hideKeyboard');
+            
+            // 当输入框获得焦点时显示键盘
+            document.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('focus', () => {
+                    simulator.style.display = 'block';
+                });
+                
+                input.addEventListener('blur', () => {
+                    // 延迟隐藏，避免点击键盘按钮时立即隐藏
+                    setTimeout(() => {
+                        simulator.style.display = 'none';
+                    }, 100);
+                });
+            });
+            
+            // 键盘按键
+            document.querySelectorAll('.keyboard-key').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const activeElement = document.activeElement;
+                    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                        const start = activeElement.selectionStart;
+                        const end = activeElement.selectionEnd;
+                        const value = activeElement.value;
+                        
+                        activeElement.value = value.substring(0, start) + btn.textContent.trim() + value.substring(end);
+                        activeElement.selectionStart = activeElement.selectionEnd = start + 1;
+                        
+                        // 触发 input 事件
+                        const event = new Event('input', { bubbles: true });
+                        activeElement.dispatchEvent(event);
+                    }
+                });
+            });
+            
+            // 完成键
+            enterKey.addEventListener('click', () => {
+                const activeElement = document.activeElement;
+                if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                    // 模拟 Enter 键按下
+                    const enterEvent = new KeyboardEvent('keydown', {
+                        key: 'Enter',
+                        keyCode: 13,
+                        bubbles: true
+                    });
+                    activeElement.dispatchEvent(enterEvent);
+                    
+                    // 如果是表单，触发 submit
+                    if (activeElement.form) {
+                        activeElement.form.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                    
+                    // 隐藏键盘
+                    simulator.style.display = 'none';
+                    activeElement.blur();
+                }
+            });
+            
+            // 隐藏键盘按钮
+            hideBtn.addEventListener('click', () => {
+                simulator.style.display = 'none';
+                const activeElement = document.activeElement;
+                if (activeElement) {
+                    activeElement.blur();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
