@@ -17,6 +17,7 @@
 6、MarsCode: # 豆包旗下的智能编程助手，提供以智能代码补全为代表的核心能力，支持主流编程语言及 IDE，能在编码过程中提供单行或整个函数的建议，同时支持在用户编码过程中提供代码解释、单测生成、问题修复、技术问答等辅助功能，提升编码效率与质量
 7.CursorCode (Cursor for VSCode) # a free AI coder with GPT
 8.One Dark Pro # Atom's iconic One Dark theme for Visual Studio Code.
+9.git-gui # https://git-scm.com/install/mac
 ```
 
 

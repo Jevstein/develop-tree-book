@@ -373,6 +373,17 @@ $ npm run start: 运行项目
 $ npm uninstall npm -g: 卸载
 $ npm cache clean --force: 清理缓存
 
+# 发布
+$ npm login: 登录
+$ npm publish: 发布
+$ npm publish --access=restricted: 发布私包
+
+-- 精细访问令牌: 
+https://www.npmjs.com/ -> account -> granular-access-tokens -> npm_71nXXXOA6(令牌字符串)
+1.临时发布：NODE_AUTH_TOKEN=npm_71nXXXOA6 npm publish
+2.永久发布：npm config set //registry.npmjs.org/:_authToken=npm_71nXXXOA6
+
+
 
 ```
 
@@ -629,7 +640,11 @@ async function runUPXCompression(file) {
 
 ```bash
 1. 创建项目
+# 使用 npx
 $ npx create-react-app my-ts-app --template typescript
+# 或使用 yarn
+$ yarn create react-app my-ts-app --template typescript
+
 
 2. 进入项目目录
 $ cd my-ts-app
@@ -933,9 +948,179 @@ deno run app.ts
 
   
 
+#### 1.3【实操】如何调用另一个项目的函数？
 
+​	假如有项目weapp-desksdk，weapp-desksdk项目中有函数testApp()。如何在项目weapp-desksdk-demo中调用weapp-desksdk导出的testApp()函数呢？详解如下：
 
+##### 1.3.1 创建两个项目
 
+```bash
+# 创建项目：
+$ yarn create react-app weapp-desksdk --template typescript
+$ yarn create react-app weapp-desksdk-demo --template typescript
+
+# 目录如下：
+.
+├── weapp-desksdk
+│   ├── README.md
+│   ├── dist # 自动生成：通过命令 yarn build:lib 生成
+│   ├── node_modules
+│   ├── package.json # 手动调整：编译文件，配置命令yarn build:lib
+│   ├── public
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.test.tsx
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── index.tsx
+│   │   ├── logo.svg
+│   │   ├── react-app-env.d.ts
+│   │   ├── reportWebVitals.ts
+│   │   ├── setupTests.ts
+│   │   ├── test.tsx # 手动新增：导出函数testApp()
+│   │   └── lib.ts # 手动新增：导出文件
+│   ├── tsconfig.json
+│   ├── tsconfig.lib.json # 手动新增: 配置./dist、src/lib.ts
+│   └── yarn.lock
+└── weapp-desksdk-demo
+    ├── README.md
+    ├── node_modules
+		│   └── weapp-desksdk # 自动生成：通过 yarn add file:../weapp-desksdk 生成
+    ├── package.json
+    ├── public
+    ├── src
+    │   └── index.tsx # 手动调整：调用weapp-desksdk导出的函数testApp()
+    ├── tsconfig.json
+    └── yarn.lock
+```
+
+##### 1.3.2 子项目导出函数
+
+  在子项目weapp-desksdk中修改如下：
+
+* 1、导出文件或函数
+
+  ```jsx
+  // src/test.tsx
+  export function testApp() {
+    const i = 100;
+    const j = 200;
+    const sum = `testApp i=${i}, j=${j}, i+j=${i + j}`;
+    console.error(sum);
+    alert(sum);
+  }
+  ```
+
+* 2、创建导出入口
+
+  ```ts
+  // src/lib.ts
+  export { testApp } from './test';
+  // 或
+  export * from './test';
+  ```
+
+* 3、配置 TypeScript 编译
+
+  ```json
+  // tsconfig.lib.json
+  {
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "declaration": true,          // 生成 .d.ts 类型声明
+      "outDir": "./dist",           // 输出目录
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "jsx": "react-jsx"            // 如果使用了 JSX
+    },
+    "include": ["src/lib.ts"],      // 只编译入口文件及其依赖
+    "exclude": ["node_modules", "dist"]
+  }
+  ```
+
+  此时可以执行命令：tsc -p tsconfig.lib.json 或 npx tsc -p tsconfig.lib.json ，
+
+  执行完毕可看到以下文件：
+
+  └── dist
+     	├── lib.d.ts
+     	├── lib.js
+     	├── test.d.ts
+     	└── test.js
+
+* 4、修改package.json
+
+  ```json
+  {
+    "name": "weapp-desksdk",          // 包名，可自定义
+    "version": "1.0.0",
+    "main": "dist/lib.js",       			// 主入口
+    "types": "dist/lib.d.ts",    			// 类型声明
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "build:lib": "tsc -p tsconfig.lib.json",// 编译导出命令
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
+    },
+  }
+  ```
+
+* 5、 编译
+
+  ```bash
+  $ yarn build:lib
+  ```
+
+  结果如步骤3。
+
+  
+
+##### 1.3.3 宿主项目引用子项目的函数
+
+* 1、本地调试
+
+  ```bash
+  # 1、在 weapp-desksdk 中执行：
+  $ cd weapp-desksdk
+  $ yarn link   # 注册包
+  
+  # 2、在 weapp-desksdk-demo 中执行：
+  $ cd weapp-desksdk-demo
+  $ yarn link weapp-desksdk
+  
+  # 3、注意：确保 weapp-desksdk 的代码已编译，每次修改 weapp-desksdk 的代码后，需要重新运行 tsc -p tsconfig.lib.json 生成新的 dist，weapp-desksdk-demo 中才会看到变化。也可以使用 tsc --watch 自动监视编译。在 A 中导入使用 同方法一。
+  
+  # 4、取消链接：
+  $ yarn unlink "weapp-desksdk" 
+  ```
+  
+* 2、本地安装
+
+  ```bash
+  # 1、确保 weapp-desksdk 和 weapp-desksdk-demo 在同一目录下，如：
+  .
+  ├── weapp-desksdk
+  └── weapp-desksdk-demo
+  
+  # 2、添加本地依赖，在weapp-desksdk-demo 目录下 执行：
+  $ yarn add file:../weapp-desksdk
+  # 或使用 npm
+  $ npm install ../weapp-desksdk
+  # 这会创建一个软链接或复制文件到 weapp-desksdk-demo/node_modules` 中，并更新 `package.json` 的依赖项。
+  
+  # 3、在项目 weapp-desksdk-demo 中调用代码，如在weapp-desksdk-demo/index.tsx中加入代码，如下：
+  import { testApp } from 'weapp-desksdk';
+  testApp();
+  
+  # 4、运行yarn start，即可看到实际效果
+  ```
+
+* 3、发布安装
+
+  见：web开发环境完全搭建指南 --> 常用命令 --> npm --> 发布
 
 
 
@@ -1059,7 +1244,7 @@ $ yarn add sass node-sass -dev
 export NODE_OPTIONS=--openssl-legacy-provider
 export NODE_OPTIONS="${NODE_OPTIONS/--openssl-legacy-provider/}"
 
-#Windows
+# Windows
 set NODE_OPTIONS=--openssl-legacy-provider
 set NODE_OPTIONS=%NODE_OPTIONS:--openssl-legacy-provider=%
 

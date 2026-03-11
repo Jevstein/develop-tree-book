@@ -81,6 +81,11 @@ $ git commit -m 'xxx'
 
 -- 2）修改最后一次提交[日志]
 	$ git commit --amend
+	
+-- 3）修改指定的一次提交[日志]
+	$ git log --oneline -5 # 查看近5行日志
+  $ git rebase -i HEAD~2 # 修改第2行日志，在编辑器中将对应提交的'pick'改为'reword'
+  $ git push origin HEAD:<commit_branch>
 
 # 5、查看
 $ git status
