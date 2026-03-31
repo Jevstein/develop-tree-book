@@ -1118,6 +1118,8 @@ $ yarn create react-app weapp-desksdk-demo --template typescript
   # 4、运行yarn start，即可看到实际效果
   ```
 
+  升级更新可用：yarn upgrade weapp-desksdk
+
 * 3、发布安装
 
   见：web开发环境完全搭建指南 --> 常用命令 --> npm --> 发布

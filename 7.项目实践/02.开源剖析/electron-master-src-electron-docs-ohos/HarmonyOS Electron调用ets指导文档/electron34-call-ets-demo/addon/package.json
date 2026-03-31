@@ -1,0 +1,16 @@
+{
+  "name": "electron-addon",
+  "version": "0.0.0",
+  "description": "Build Node-API native addon with CMake and node-addon-api C++ wrapper.",
+  "main": "hello.js",
+  "private": true,
+  "dependencies": {
+    "bindings": "~1.5.0",
+    "cmake-js": "^7.3.0",
+    "node-addon-api": "^8.1.0"
+  },
+  "scripts": {
+    "install": "cmake-js compile",
+    "test": "node hello.js"
+  }
+}
