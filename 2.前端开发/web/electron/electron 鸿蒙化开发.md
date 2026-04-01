@@ -63,23 +63,23 @@ libelectron-20241204.2
 │   ├── libadapter.so
 │   └── libelectron.so
 └── ohos_hap
-    ├── .hvigor # 内有缓存，DevEco-Studio 运行前可删除，否则可能残余上一次打包的 bundleName
-    ├── .idea # 内有缓存，DevEco-Studio 运行前可删
+    ├── .hvigor # 内有缓存，DevEco-Studio 运行前可删除，否则可能残留上一次打包的 bundleName
+    ├── .idea # 内有缓存，DevEco-Studio 运行前可删，否则可能残留上一次打包的 bundleName
     ├── AppScope
     ├── build-profile.json5
     ├── build
     │   └── outputs
-    │   		└── default
-    │   				└── ohos_hap-default-signed.app  # 用于上架鸿蒙商店的app包
+    │       └── default
+    │           └── ohos_hap-default-signed.app  # 用于上架鸿蒙商店的app包
     ├── electron
     │   ├── build
-    │   │		└──electron-default-signed.hap # 用于运行到鸿蒙真机上调试的包
+    │   │   └──electron-default-signed.hap # 用于运行到鸿蒙真机上调试的包
     │   ├── build-profile.json5
     │   ├── hvigorfile.ts
     │   ├── libs
     │   │   └── arm64-v8a # 鸿蒙化的库，保存在此
-		│   │   		├── libadapter.so
-		│   │   		└── libelectron.so
+    │   │       ├── libadapter.so
+    │   │       └── libelectron.so
     │   ├── oh-package.json5
     │   ├── oh_modules
     │   └── src
@@ -106,8 +106,8 @@ libelectron-20241204.2
             │   ├── module.json5
             │   └── resources
             │       └── resfile
-            │       			└── resources
-            │          				└── app # 放置js文件的目录
+            │           └── resources
+            │               └── app # 放置js文件的目录
             └── test
 ```
 
@@ -160,7 +160,7 @@ libelectron-20241204.2
 ├── eteams.p12         # DevEco-Studio - build - Generate Key & CSR本地生成
 ├── eteams-debug.cer   # 调试证书
 ├── eteams-release.cer # 发布证书
-├── eteamsDebug.p7b		 # profile 调试类型
+├── eteamsDebug.p7b    # profile 调试类型
 └── eteamsRelease.p7b  # profile 发布类型
 ```
 
@@ -412,9 +412,9 @@ ohos_hap
 ├── electron
 │   └── libs
 │       └── arm64-v8a
-│       		├── electron-addon.node # 供js调用: PathAdapter::GetDir("GetDir");
-│       		├── libadaptertest.so		# 通过 getNativeContext 注册GetDir()
-│       		└── libaki_jsbind.so		# aki 库
+│           ├── electron-addon.node # 供js调用: PathAdapter::GetDir("GetDir");
+│           ├── libadaptertest.so # 通过 getNativeContext 注册GetDir()
+│           └── libaki_jsbind.so # aki 库
 ├── library
 │   ├── Index.ets # 导出: xx/MainPage，xx/NativeTest - JsBindingTest
 │   ├── libs
@@ -422,18 +422,18 @@ ohos_hap
 │   ├── oh-package.json5  # 配置 'libadaptertest.so': 'file:xx/libadaptertest'
 │   └── src
 │       └── main
-│       		├── cpp
-│       		│   └── types
-│       		│       └── libadaptertest
-│       		│           ├── index.d.ts # 导出 export const getNativeContext: () => NativeContext;
-│       		│           └── oh-package.json5 # 配置 libadaptertest.so
-│       		├── ets
-│       		│   ├── interface
-│       		│   │   └── interface.ts # 声明 JSBind 和 NativeContext 接口
-│       		│   └── utils
-│       		│       └── NativeTest.ets # 4、绑定并实现JsBindingTest.currentContext.JSBind.bindFunction("getDir")
-│       		├── module.json5
-│       		└── resources
+│           ├── cpp
+│           │   └── types
+│           │       └── libadaptertest
+│           │           ├── index.d.ts # 导出 export const getNativeContext: () => NativeContext;
+│           │           └── oh-package.json5 # 配置 libadaptertest.so
+│           ├── ets
+│           │   ├── interface
+│           │   │   └── interface.ts # 声明 JSBind 和 NativeContext 接口
+│           │   └── utils
+│           │       └── NativeTest.ets # 4、绑定并实现JsBindingTest.currentContext.JSBind.bindFunction("getDir")
+│           ├── module.json5
+│           └── resources
 └── web_engine
     ├── oh-package.json5 # 3、引用共享包 "library": "file:../library"
     └── src
@@ -441,12 +441,12 @@ ohos_hap
             ├── cpp
             ├── ets
             │   └── application
-            │   		└── WebAbilityStage.ets # 2、绑定：JsBindingMethod.bind(); JsBindingTest.bind();
+            │       └── WebAbilityStage.ets # 2、绑定：JsBindingMethod.bind(); JsBindingTest.bind();
             ├── module.json5
             └── resources
                 └── resfile
-                			└── resources
-                   				└── app # 1、js文件：require('electron-addon.node').getDir()
+                    	└── resources
+                           └── app # 1、js文件：require('electron-addon.node').getDir()
 ```
 
 ## 3、核心原理
