@@ -38,7 +38,7 @@
 
 详见文档：[Electron鸿蒙化指导文档](https://gitcode.com/openharmony-sig/electron/tree/master)
 
-所谓鸿蒙化，就是将electron源代码编译成鸿蒙操作系统下可以运行的libelectron.so库文件。同理，如果客户端还依赖其他第三方库，如sqlite、libffmpeg、libpty等，也都要做鸿蒙化处理，分别编译成sqlite.node、libffmpeg.so、libpty.so，由此可被js调用。
+所谓鸿蒙化，就是将electron源代码编译成鸿蒙操作系统下可以运行的libelectron.so库文件。同理，如果客户端还依赖其他第三方库，如sqlite、libffmpeg、libpty等，也都要做鸿蒙化处理，分别编译成sqlite.node、libffmpeg.so、libpty.so等，由此可被js调用。
 
 另外，华为也提供了已经编译好的electron框架，称之为“日构建”，用户不需要自己对electron源码进行鸿蒙化了。
 
@@ -160,8 +160,8 @@ libelectron-20241204.2
 ├── eteams.p12         # DevEco-Studio - build - Generate Key & CSR本地生成
 ├── eteams-debug.cer   # 调试证书
 ├── eteams-release.cer # 发布证书
-├── eteamsDebug.p7b		 # 调试profile
-└── eteamsRelease.p7b  # 发布profile
+├── eteamsDebug.p7b		 # profile 调试类型
+└── eteamsRelease.p7b  # profile 发布类型
 ```
 
 
@@ -172,7 +172,7 @@ libelectron-20241204.2
 
 ![GenerateKeyCsr](./images/harmony-GenerateKeyCsr.png)
 
-配置后，将在本地产生xxx.p12和xxx.csr两个文件。同时牢记当前设置的 Key Alias 和 Password，后面 DevEco-Studio 中配置的时候需要用到。
+配置后，将在本地产生xxx.p12和xxx.csr两个文件。同时记住当前设置的 Key Alias 和 Password，后面 DevEco-Studio 中配置的时候需要用到。
 
 
 
@@ -204,7 +204,7 @@ libelectron-20241204.2
 
 ![device](./images/harmony-device.png)
 
-添加设备的目的是为了在指定的鸿蒙设备中运行app，故这里的UDID是鸿蒙设备（如鸿蒙笔记本）中的唯一标识码，可用命令“hdc shell bm get -u”获取。
+添加设备的目的是为了在指定的鸿蒙设备中运行app，故这里的UDID是鸿蒙设备（如鸿蒙笔记本）中的唯一标识码，该标识码可用命令“hdc shell bm get -u”获取。
 
 
 
