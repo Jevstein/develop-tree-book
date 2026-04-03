@@ -37,8 +37,8 @@ class JvtUrlNavi extends JvtHTMLComponent {
   }
 
   constructor(props) {
-    super({ prefix: 'url-navi' });   
-    
+    super({ prefix: 'url-navi' });
+
     const {
       rootId,
       data,
@@ -75,7 +75,43 @@ class JvtUrlNavi extends JvtHTMLComponent {
     this._update();
   }
 
+  _AddLogo(item, itemElement) {
+    const { icon, url } = item;
+
+    let iconUrl = icon;
+    if (!iconUrl) {
+      if (url) {
+        const urlObj = new URL(url);
+        iconUrl = `${urlObj.origin}/favicon.ico`;
+      } else {
+        iconUrl = '🔗';
+      }
+    }
+
+    if (iconUrl.indexOf('http') !== 0) {
+      const textImage = document.createElement('div');
+      textImage.className = "icon";
+      textImage.innerText = iconUrl;
+      textImage.style.fontSize = '14px';
+      textImage.style.padding = '0 1px';
+      itemElement.prepend(textImage);// itemElement.appendChild(textImage);
+      return;
+    }
+
+    const image = new Image();
+    image.className = "icon";
+    image.src = iconUrl;
+    image.width = '16';
+    image.height = '16';
+    image.onerror = () => {
+      image.parentNode && image.parentNode.removeChild(image);
+      this._AddLogo({}, itemElement);
+    };
+    itemElement.appendChild(image);
+  }
+
   _update() {
+
     Object.keys(this._data).forEach(key => {
       const parentElement = document.querySelector(`.weblab-urlnavi-${key}`);
       parentElement.innerHTML = '';
@@ -104,20 +140,7 @@ class JvtUrlNavi extends JvtHTMLComponent {
           itemElement.setAttribute('class', 'item');
 
           // logo
-          if (item.url && item.url.indexOf('http') === 0) {
-            const urlObj = new URL(item.url);
-            const img = new Image();
-            img.className = "icon";
-            img.src = item.icon || `${urlObj.origin}/favicon.ico`;
-            img.width = '16';
-            img.height = '16';
-            itemElement.appendChild(img);
-          } else {
-            const img = document.createElement('div');
-            img.className = "icon";
-            img.innerText = item?.icon || '🔗';
-            itemElement.appendChild(img);
-          }
+          this._AddLogo(item, itemElement);
 
           // a标签
           const aElement = document.createElement('a');

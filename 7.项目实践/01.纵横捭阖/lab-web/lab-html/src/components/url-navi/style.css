@@ -135,6 +135,7 @@
       .item {
         display: flex;
         justify-items: center;
+        align-items: center;
         margin: 5px 0;
 
         .icon {
