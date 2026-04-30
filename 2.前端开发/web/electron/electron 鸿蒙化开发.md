@@ -148,6 +148,8 @@ libelectron-20241204.2
 
 如此，便建立了一个完整的鸿蒙 electron 客户端项目。
 
+【注意】：以上步骤，weapp-em-desktop 已做了脚本化处理，只需执行 yarn eb app=xx os=osoh 即可一键生成完整的ohos_hap项目。
+
 
 
 ## 3. 生成证书
@@ -366,9 +368,126 @@ hdc install electron-default-signed.hap
 [提ir单](https://issuereporter.developer.huawei.com/my-created)
 
 * 邀请测试
+
 * 应用商店下载
 
-# 三、electron调用ets
+  
+
+# 三、发布方式
+
+1、全网发布（公开上架），
+  特点：华为应用市场（AppGallery）可下载
+  适用：标准包
+  条件：个人或企业开发者、软著、ICP备案、经营许可证、金融/游戏专项资质
+
+2、开放式测试（Open Beta、分阶段发布）
+  特点：灰度发布 - 在正式发布前，邀请部分用户进行体验和反馈（需指定设备）
+  适用：分阶段发布
+  条件：个人或企业开发者、软著、ICP备案
+  限制：测试版本仍需通过基础审核，测试结束后可转为全网或非公开发布。
+
+3、非公开发布（定向分发）
+  特点：不进入华为应用市场，仅通过专属链接定向分发给特定用户
+  适用：定制化服务
+  条件：必须为企业开发者、软著、ICP备案、只能使用发布证书
+  限制：一旦选择非公开发布，无法再转为全网发布
+  设备限制：目前不支持大屏、智能手表、运动手表、智能座舱等设备类型
+
+4、离线分发（离线部署-inhouse）
+  特点：不进入华为应用市场，面向企业用户离线分发
+  适用：大型企业内部使用的定制化服务，可将安装包HAP上传配置到客户应用后台
+  条件：必须为企业开发者
+
+
+
+## 1、公开发布
+
+​	前面步骤提到“APP上架”就是采用的公开发布，这种方式需要推动客户升级服务端，涉及到商务。
+
+
+
+## 2、非公开发布
+
+​	详见见文档[非公开发布](https://developer.huawei.com/consumer/cn/doc/app/agc-help-non-public-release-0000002278016482)
+​	UAD非公开发布，选择这个就无法再公开发布了，这个可以根据不同客户的服务端版本，分别定制包，通过链接发给客户下载，应用市场是搜不到的。
+
+
+
+## 3、离线发布
+
+​	详见文档[HEM离线安装](https://developer.huawei.com/consumer/cn/doc/app/agc-help-enterprise-cert-0000002248177978)
+
+​	不上架直接发安装包给客户使用，是通过HEM离线安装的方式，但这个有个要求，就是得有合规的In-house企业证书，用In–house企业证书完成HAP包的合规签名，然后分发，这个无需访问应用市场，不上架。
+
+​	详细操作步骤（注意：若是第二次离线发布，则直接看第三步-EMM 控制台）：
+
+### 1. 录入企业认证资料
+
+ 用企业主账号登录，[录入企业认证资料](https://developer.huawei.com/business/cn/console/)。如图：
+
+![录入企业认证资料](./images/harmony-lx-luruzil.png)
+
+认证通过，一般1~3个工作日。
+
+
+
+### 2. EMM APP部署操作流程(COPE)
+
+打开文档[EMM APP部署操作流程(COPE)](https://developer.huawei.com/business/cn/doc/HEM/hem-kuaisukaitong-osnext-cope-0000002268995666)，如图。
+
+![EMM APP部署操作流程(COPE)](./images/harmony-emmcope.png)
+
+认证通过，一般1~3个工作日。
+
+
+
+### 3. EMM 控制台
+
+打开[EMM 控制台](https://developer.huawei.com/consumer/cn/console/service/AppService/service/1068),上传MDM应用。
+
+![harmony-EMM](./images/harmony-EMM.png)
+
+#### 1、测试SN管理 
+
+上传SN序列号及设备号
+
+#### 2、EnterpriseAdminExtensionAbility
+
+详见[EnterpriseAdminExtensionAbility开发指南](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/mdm-kit-admin-V5)
+
+* 1）创建 EnterpriseAdminExtensionAbility.ets 文件: 
+
+  harmony/ohos_hap/electron/src/main/ets/EnterpriseAdminAbility/EnterpriseAdminAbility.ets
+
+* 配置module.json5：
+
+  harmony/ohos_hap/electron/src/main/module.json5
+
+  ```json
+  "requestPermissions": [
+  	{
+  		"name": "ohos.permission.MANAGE_ENTERPRISE_DEVICE_ADMIN"
+  	},
+  ],
+  "extensionAbilities": [
+  	{
+  		"name": "EnterpriseAdminAbility",
+  		"type": "enterpriseAdmin",
+  		"exported": true,
+  		"srcEntry": "./ets/EnterpriseAdminAbility/EnterpriseAdminAbility.ets"
+  	}
+  ]
+  ```
+
+  
+
+#### 3、上传应用包
+
+  ![harmony-uploadapp](./images/harmony-uploadapp.png)
+
+
+
+# 四、electron调用ets
 
 详见 [HarmonyOS Electron调用ets指导文档](https://gitcode.com/openharmony-sig/electron/tree/master/src/electron/docs/ohos)
 
@@ -465,7 +584,7 @@ electron js -> electron-addon.node -> libadaptertest.so -> libaki_jsbind.so -> l
 
 
 
-# 四、问题处理
+# 五、问题处理
 
 
 
@@ -528,7 +647,7 @@ module.exports = {
 
 
 
-# 五、实用技巧
+# 六、实用技巧
 
 ## 1、hdc命令
 工具链目录：Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains

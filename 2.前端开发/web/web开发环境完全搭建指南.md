@@ -1097,7 +1097,7 @@ $ yarn create react-app weapp-desksdk-demo --template typescript
   $ yarn unlink "weapp-desksdk" 
   ```
   
-* 2、本地安装
+* 2、本地安装&调试
 
   ```bash
   # 1、确保 weapp-desksdk 和 weapp-desksdk-demo 在同一目录下，如：
@@ -1120,7 +1120,42 @@ $ yarn create react-app weapp-desksdk-demo --template typescript
 
   升级更新可用：yarn upgrade weapp-desksdk
 
-* 3、发布安装
+* 3、本地安装
+
+  如上一步本地安装调试，执行 yarn add file:../weapp-desksdk 后，会将 weapp-desksdk 所有文件（包括src源码）都复制到weapp-desksdk-demo/node_modules目录下。如何只安装指定的文件和文件夹呢？此时要用到 yarn pack 命令，具体如下：
+  
+  ```bash
+  # 1、确保 weapp-desksdk 和 weapp-desksdk-demo 在同一目录下，如：
+  .
+  ├── weapp-desksdk
+  │   └── package.json # 指定安装文件或文件夹
+  └── weapp-desksdk-demo
+  
+  # 2、指定导出的安装文件，修改 weapp-desksdk 的 package.json 文件内容：
+  {
+    "files": [
+        "/dist/**/*"
+     ],
+   }
+   
+  # 3、在 weapp-desksdk 根目录执行命令：
+  $ yarn pack
+  # 此时会生成压缩包"weapp-desksdk-v0.0.1.tgz"
+   
+  # 4、添加本地依赖，在weapp-desksdk-demo 目录下 执行：
+  $ yarn add file:../weapp-desksdk/weapp-desksdk-v0.0.1.tgz
+  # 或使用 npm
+  $ npm install ../weapp-desksdk/weapp-desksdk-v0.0.1.tgz
+  # 这会创建一个软链接或复制文件到 weapp-desksdk-demo/node_modules` 中，并更新 `package.json` 的依赖项。
+  
+  # 6、在项目 weapp-desksdk-demo 中调用代码，如在weapp-desksdk-demo/index.tsx中加入代码，如下：
+  import { testApp } from 'weapp-desksdk';
+  testApp();
+  
+  # 7、运行yarn start，即可看到实际效果
+  ```
+  
+* 4、发布安装
 
   见：web开发环境完全搭建指南 --> 常用命令 --> npm --> 发布
 

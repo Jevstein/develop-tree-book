@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拖拽缩略图保存原图示例</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background-color: #f5f7fb;
+    }
+    .demo-card {
+      background: white;
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    h2 {
+      color: #1e293b;
+      margin-top: 0;
+    }
+    .thumbnail-container {
+      display: inline-block;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .thumbnail-container:hover {
+      transform: scale(1.02);
+    }
+    img {
+      display: block;
+      cursor: grab;
+      user-select: none;
+    }
+    img:active {
+      cursor: grabbing;
+    }
+    .info {
+      margin-top: 1.5rem;
+      background-color: #f1f5f9;
+      padding: 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      text-align: left;
+      color: #334155;
+    }
+    code {
+      background: #e2e8f0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+    .tip {
+      background-color: #eef2ff;
+      border-left: 4px solid #3b82f6;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="demo-card">
+  <h2>🖱️ 拖拽下方缩略图到桌面 / 文件夹</h2>
+  <p>显示的是<strong>缩略图</strong> (200x150)，拖拽保存的会是<strong>原图</strong> (1000x800)</p>
+
+  <div class="thumbnail-container">
+    <!-- 
+      缩略图: 使用 picsum 的小尺寸图片 (ID 随机，可换成你喜欢的)
+      原图: 同一图片的高清大尺寸 (1200x800)
+      注意 data-original 属性存放原始大图的 URL
+    -->
+    <img 
+      id="dragImage"
+      class="image"
+      draggable="true"
+      src="https://picsum.photos/id/104/200/150"
+      data-original="https://picsum.photos/id/104/1200/800"
+      alt="拖拽我保存原图"
+      width="200"
+      height="150"
+      style="border-radius: 12px;"
+    />
+  </div>
+
+  <div class="info">
+    📌 <strong>技术原理</strong><br>
+    • 监听 <code>dragstart</code> 事件<br>
+    • 清除浏览器默认拖拽数据 (<code>clearData()</code>)<br>
+    • 设置 <code>text/uri-list</code> → 原图URL<br>
+    • 设置 <code>DownloadURL</code> → <code>mime类型:文件名:原图URL</code><br>
+    • 保存时文件名自动从原图URL中提取（例如 <code>1200_800.jpg</code>）
+  </div>
+
+  <div class="tip">
+    💡 尝试将图片拖到电脑桌面 / 文件夹 / 下载目录，保存的文件是 <strong>1200x800</strong> 的高清原图，而不是显示的 200x150 小图。
+  </div>
+</div>
+
+<script>
+  (function() {
+    const imgElement = document.getElementById('dragImage');
+
+    if (!imgElement) return;
+
+    // 拖拽开始处理函数
+    function onDragStart(event) {
+      // 获取原图地址 (从 data-original 属性读取)
+      const originalSrc = event.target.getAttribute('data-original');
+      if (!originalSrc) {
+        console.warn('未设置 data-original 属性，无法保存原图');
+        return;
+      }
+
+      // 【重要】清除浏览器自动设置的拖拽数据（否则会拖拽当前缩略图）
+      event.dataTransfer.clearData();
+      // 设置拖拽效果：复制（可看到 + 号鼠标样式）
+      event.dataTransfer.effectAllowed = 'copy';
+
+      // 从原图 URL 中智能提取文件名和 MIME 类型
+      let fileName = extractFileName(originalSrc);
+      let mimeType = getMimeType(fileName);
+
+      // 设置标准拖拽 URI 列表（Windows / macOS 文件管理器通用）
+      // 这一步确保拖拽到桌面时知道要下载哪个 URL
+      event.dataTransfer.setData('text/uri-list', originalSrc);
+      
+      // 设置 Chrome、Edge、新版 Safari 等支持的 DownloadURL 格式
+      // 格式: "mime类型:文件名:下载地址"
+      event.dataTransfer.setData('DownloadURL', `${mimeType}:${fileName}:${originalSrc}`);
+
+      // （可选）自定义拖拽时的预览图，不设置则使用当前图片的半透明克隆
+      // 若要完全自定义，可取消注释下面代码:
+      // const dragIcon = document.createElement('img');
+      // dragIcon.src = originalSrc; // 甚至可以预览原图，但为了性能不建议用大图
+      // dragIcon.style.width = '100px';
+      // event.dataTransfer.setDragImage(dragIcon, 0, 0);
+    }
+
+    // 辅助函数: 从 URL 中提取文件名 (去除路径和查询参数)
+    function extractFileName(url) {
+      try {
+        // 去除 URL 后面的参数 (# 和 ?)
+        let path = url.split('?')[0].split('#')[0];
+        // 取最后一段作为文件名
+        let segments = path.split('/');
+        let rawName = segments.pop();
+        if (rawName && rawName.includes('.')) {
+          return rawName;
+        }
+        // 如果没有扩展名，根据常见图片服务补充 .jpg
+        return rawName ? `${rawName}.jpg` : 'image.jpg';
+      } catch(e) {
+        return 'image.jpg';
+      }
+    }
+
+    // 根据文件扩展名返回对应的 MIME 类型
+    function getMimeType(fileName) {
+      const ext = fileName.split('.').pop().toLowerCase();
+      const mimeMap = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif',
+        'webp': 'image/webp',
+        'bmp': 'image/bmp',
+        'svg': 'image/svg+xml',
+        'avif': 'image/avif'
+      };
+      return mimeMap[ext] || 'application/octet-stream';
+    }
+
+    // 绑定拖拽事件
+    imgElement.addEventListener('dragstart', onDragStart);
+    
+    // 可选：在控制台输出提示，便于调试
+    console.log('✓ 拖拽增强已启用 — 缩略图拖拽会保存原图');
+  })();
+</script>
+</body>
+</html>
