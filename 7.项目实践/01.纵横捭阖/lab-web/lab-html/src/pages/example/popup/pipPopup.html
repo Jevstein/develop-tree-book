@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture-in-Picture 浮动弹窗演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .feature-desc {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: #4CAF50;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .secondary-btn {
+            background: #f1f3f4;
+            color: #333;
+        }
+        
+        .secondary-btn:hover {
+            background: #e8eaed;
+        }
+        
+        .danger-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+        
+        .danger-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        }
+        
+        .pip-status {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .pip-status.visible {
+            display: block;
+        }
+        
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-text {
+            font-weight: 600;
+            color: #2e7d32;
+        }
+        
+        footer {
+            text-align: center;
+            color: #7f8c8d;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            button {
+                flex: 1;
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📺 Picture-in-Picture 浮动弹窗演示</h1>
+            <p class="subtitle">使用浏览器原生画中画API，创建跨窗口显示的浮动弹窗</p>
+        </header>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">真正的跨窗口显示</h3>
+                <p class="feature-desc">即使切换到其他应用或标签页，弹窗也会保持显示在屏幕最上层</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">完全可定制</h3>
+                <p class="feature-desc">自定义弹窗内容、颜色、尺寸和显示样式</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">实时更新</h3>
+                <p class="feature-desc">弹窗内容可实时更新，支持动态显示信息</p>
+            </div>
+        </div>
+        
+        <div class="pip-status" id="pipStatus">
+            <div class="status-content">
+                <div class="status-dot"></div>
+                <div class="status-text" id="statusText">弹窗正在运行中</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">弹窗标题</label>
+                <input type="text" id="popupTitle" value="重要通知" placeholder="请输入弹窗标题">
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">弹窗内容</label>
+                <textarea id="popupContent" placeholder="请输入要显示的内容">这是一个使用浏览器原生Picture-in-Picture API实现的浮动弹窗演示。
+
+当前时间：<span id="currentTime"></span>
+
+功能特性：
+✅ 跨窗口显示
+✅ 实时更新内容
+✅ 可自定义样式
+✅ 响应式设计
+
+您可以将此弹窗拖动到屏幕任意位置，即使切换到其他应用也能看到。</textarea>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">弹窗尺寸</label>
+                <select id="popupSize">
+                    <option value="small">小尺寸 (300x200)</option>
+                    <option value="medium" selected>中尺寸 (400x300)</option>
+                    <option value="large">大尺寸 (500x400)</option>
+                    <option value="custom">自定义尺寸</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">背景颜色</label>
+                <div class="color-picker">
+                    <div class="color-option selected" style="background: #ffffff;" data-color="#ffffff" data-text="#333333"></div>
+                    <div class="color-option" style="background: #fff8e1;" data-color="#fff8e1" data-text="#5d4037"></div>
+                    <div class="color-option" style="background: #e8f5e8;" data-color="#e8f5e8" data-text="#2e7d32"></div>
+                    <div class="color-option" style="background: #e3f2fd;" data-color="#e3f2fd" data-text="#1565c0"></div>
+                    <div class="color-option" style="background: #f3e5f5;" data-color="#f3e5f5" data-text="#7b1fa2"></div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="primary-btn" id="startBtn">
+                    <span>▶️</span> 启动画中画弹窗
+                </button>
+                <button class="secondary-btn" id="updateBtn">
+                    <span>🔄</span> 更新内容
+                </button>
+                <button class="danger-btn" id="stopBtn">
+                    <span>⏹️</span> 关闭弹窗
+                </button>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">演示示例</label>
+            <div class="buttons">
+                <button class="secondary-btn" onclick="loadExample('clock')">
+                    <span>⏰</span> 时钟示例
+                </button>
+                <button class="secondary-btn" onclick="loadExample('counter')">
+                    <span>🧮</span> 计数器示例
+                </button>
+                <button class="secondary-btn" onclick="loadExample('notification')">
+                    <span>🔔</span> 通知示例
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2024 PiP Floating Popup Demo | 基于浏览器原生Picture-in-Picture API</p>
+            <p>支持：Chrome 70+, Edge 79+, Safari 13+ 等现代浏览器</p>
+        </footer>
+    </div>
+
+    <!-- 隐藏的画布和视频元素 -->
+    <canvas id="pipCanvas" class="hidden"></canvas>
+    <video id="pipVideo" class="hidden" muted autoplay></video>
+
+    <script>
+        class PictureInPicturePopup {
+            constructor() {
+                this.canvas = document.getElementById('pipCanvas');
+                this.video = document.getElementById('pipVideo');
+                this.ctx = this.canvas.getContext('2d');
+                this.isActive = false;
+                this.animationId = null;
+                this.currentContent = '';
+                this.currentTitle = '';
+                this.backgroundColor = '#ffffff';
+                this.textColor = '#333333';
+                this.size = { width: 400, height: 300 };
+                this.stream = null;
+                this.counter = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                // 设置画布尺寸
+                this.updateCanvasSize('medium');
+                
+                // 绑定事件
+                document.getElementById('startBtn').addEventListener('click', () => this.start());
+                document.getElementById('updateBtn').addEventListener('click', () => this.updateContent());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stop());
+                document.getElementById('popupSize').addEventListener('change', (e) => this.updateCanvasSize(e.target.value));
+                
+                // 绑定颜色选择器
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        this.backgroundColor = option.dataset.color;
+                        this.textColor = option.dataset.text;
+                    });
+                });
+                
+                // 监听画中画状态变化
+                this.video.addEventListener('enterpictureinpicture', () => {
+                    console.log('进入画中画模式');
+                    this.isActive = true;
+                    this.updateStatus(true, '弹窗正在运行中');
+                });
+                
+                this.video.addEventListener('leavepictureinpicture', () => {
+                    console.log('离开画中画模式');
+                    this.isActive = false;
+                    this.updateStatus(false, '弹窗已关闭');
+                    
+                    // 停止动画
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                        this.animationId = null;
+                    }
+                    
+                    // 停止视频流
+                    if (this.stream) {
+                        this.stream.getTracks().forEach(track => track.stop());
+                        this.stream = null;
+                    }
+                });
+                
+                // 更新当前时间
+                this.updateCurrentTime();
+                setInterval(() => this.updateCurrentTime(), 1000);
+                
+                console.log('PiP弹窗管理器已初始化');
+            }
+            
+            updateCanvasSize(size) {
+                switch(size) {
+                    case 'small':
+                        this.size = { width: 300, height: 200 };
+                        break;
+                    case 'medium':
+                        this.size = { width: 400, height: 300 };
+                        break;
+                    case 'large':
+                        this.size = { width: 500, height: 400 };
+                        break;
+                    case 'custom':
+                        this.size = { width: 450, height: 350 };
+                        break;
+                }
+                
+                this.canvas.width = this.size.width;
+                this.canvas.height = this.size.height;
+                
+                console.log(`画布尺寸更新为: ${this.size.width}x${this.size.height}`);
+            }
+            
+            async start() {
+                if (this.isActive) {
+                    console.log('弹窗已经在运行中');
+                    return;
+                }
+                
+                if (!('pictureInPictureEnabled' in document)) {
+                    alert('您的浏览器不支持画中画功能。请使用Chrome 70+、Edge 79+或Safari 13+等现代浏览器。');
+                    return;
+                }
+                
+                try {
+                    // 获取当前设置
+                    this.currentTitle = document.getElementById('popupTitle').value;
+                    this.currentContent = document.getElementById('popupContent').value;
+                    
+                    // 绘制初始内容
+                    this.drawFrame();
+                    
+                    // 将画布转换为视频流
+                    this.stream = this.canvas.captureStream(30);
+                    this.video.srcObject = this.stream;
+                    
+                    // 播放视频
+                    await this.video.play();
+                    
+                    // 请求进入画中画模式
+                    await this.video.requestPictureInPicture();
+                    
+                    // 开始动画循环
+                    this.startAnimation();
+                    
+                } catch (error) {
+                    console.error('启动画中画失败:', error);
+                    this.updateStatus(false, `启动失败: ${error.message}`);
+                }
+            }
+            
+            startAnimation() {
+                const animate = () => {
+                    this.drawFrame();
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                
+                this.animationId = requestAnimationFrame(animate);
+            }
+            
+            drawFrame() {
+                const ctx = this.ctx;
+                const { width, height } = this.size;
+                
+                // 清空画布
+                ctx.clearRect(0, 0, width, height);
+                
+                // 绘制背景
+                ctx.fillStyle = this.backgroundColor;
+                ctx.fillRect(0, 0, width, height);
+                
+                // 绘制边框
+                ctx.strokeStyle = '#4CAF50';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, width, height);
+                
+                // 绘制标题栏
+                const headerHeight = 35;
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(0, 0, width, headerHeight);
+                
+                // 绘制标题
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.currentTitle, width / 2, headerHeight / 2);
+                
+                // 绘制关闭按钮
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.arc(width - 20, headerHeight / 2, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('×', width - 20, headerHeight / 2);
+                
+                // 绘制内容
+                ctx.fillStyle = this.textColor;
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                
+                // 处理内容中的HTML标签
+                let content = this.currentContent;
+                
+                // 更新时间占位符
+                if (content.includes('<span id="currentTime"></span>')) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('zh-CN');
+                    content = content.replace('<span id="currentTime"></span>', timeStr);
+                }
+                
+                // 更新计数器占位符
+                if (content.includes('{{counter}}')) {
+                    this.counter++;
+                    content = content.replace('{{counter}}', this.counter.toString());
+                }
+                
+                // 换行绘制文本
+                const lines = this.wrapText(content, width - 20);
+                const lineHeight = 20;
+                const startY = headerHeight + 20;
+                
+                lines.forEach((line, index) => {
+                    // 处理简单的HTML标签
+                    let text = line;
+                    let style = '14px Arial';
+                    let color = this.textColor;
+                    
+                    if (line.includes('✅')) {
+                        color = '#4CAF50';
+                    } else if (line.includes('⏰')) {
+                        color = '#FF9800';
+                    } else if (line.includes('🔔')) {
+                        color = '#2196F3';
+                    }
+                    
+                    ctx.fillStyle = color;
+                    ctx.font = style;
+                    ctx.fillText(text, 10, startY + (index * lineHeight));
+                });
+                
+                // 绘制底部状态栏
+                const footerHeight = 25;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, height - footerHeight, width, footerHeight);
+                
+                // 绘制状态文字
+                ctx.fillStyle = '#666666';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText('PiP弹窗演示', width - 10, height - footerHeight / 2);
+                
+                // 绘制当前时间
+                ctx.textAlign = 'left';
+                const now = new Date();
+                const timeText = now.toLocaleTimeString('zh-CN', { 
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                ctx.fillText(timeText, 10, height - footerHeight / 2);
+            }
+            
+            wrapText(text, maxWidth) {
+                const words = text.split(' ');
+                const lines = [];
+                let currentLine = '';
+                
+                for (let i = 0; i < words.length; i++) {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + words[i];
+                    const metrics = this.ctx.measureText(testLine);
+                    
+                    if (metrics.width > maxWidth && currentLine !== '') {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                
+                if (currentLine) {
+                    lines.push(currentLine);
+                }
+                
+                return lines;
+            }
+            
+            updateContent() {
+                if (!this.isActive) {
+                    alert('请先启动画中画弹窗');
+                    return;
+                }
+                
+                this.currentTitle = document.getElementById('popupTitle').value;
+                this.currentContent = document.getElementById('popupContent').value;
+                
+                console.log('弹窗内容已更新');
+                this.updateStatus(true, '弹窗内容已更新');
+            }
+            
+            async stop() {
+                if (this.isActive) {
+                    try {
+                        await document.exitPictureInPicture();
+                    } catch (error) {
+                        console.error('退出画中画失败:', error);
+                    }
+                }
+                
+                this.isActive = false;
+                
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                
+                this.updateStatus(false, '弹窗已关闭');
+            }
+            
+            updateStatus(isActive, message) {
+                const statusElement = document.getElementById('pipStatus');
+                const statusText = document.getElementById('statusText');
+                
+                statusText.textContent = message;
+                
+                if (isActive) {
+                    statusElement.classList.add('visible');
+                } else {
+                    statusElement.classList.remove('visible');
+                }
+            }
+            
+            updateCurrentTime() {
+                const timeElements = document.querySelectorAll('#currentTime');
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('zh-CN');
+                
+                timeElements.forEach(element => {
+                    if (element.tagName === 'SPAN') {
+                        element.textContent = timeStr;
+                    }
+                });
+            }
+        }
+        
+        // 示例内容加载函数
+        function loadExample(type) {
+            const titleInput = document.getElementById('popupTitle');
+            const contentInput = document.getElementById('popupContent');
+            
+            switch(type) {
+                case 'clock':
+                    titleInput.value = '实时数字时钟';
+                    contentInput.value = '⏰ 实时时钟演示\n\n当前时间：<span id="currentTime"></span>\n\n这是一个实时更新的数字时钟，显示精确到秒。\n\n✅ 跨窗口显示\n✅ 实时更新时间\n✅ 高精度计时';
+                    break;
+                    
+                case 'counter':
+                    titleInput.value = '实时计数器';
+                    contentInput.value = '🧮 计数器演示\n\n当前计数：{{counter}}\n\n这是一个实时计数器，每秒自动递增。\n\n功能说明：\n✅ 自动计数功能\n✅ 实时更新显示\n✅ 跨窗口同步';
+                    break;
+                    
+                case 'notification':
+                    titleInput.value = '系统通知';
+                    contentInput.value = '🔔 重要通知\n\n主题：系统维护通知\n时间：<span id="currentTime"></span>\n\n内容：\n系统将于今晚24:00进行例行维护，预计持续2小时。\n\n影响范围：\n✅ 所有用户服务\n✅ API接口访问\n\n维护期间服务将暂时不可用，请提前做好安排。';
+                    break;
+            }
+            
+            console.log(`已加载${type}示例`);
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            window.pipPopup = new PictureInPicturePopup();
+            
+            // 显示浏览器支持状态
+            if (!('pictureInPictureEnabled' in document)) {
+                document.getElementById('pipStatus').innerHTML = `
+                    <div style="color: #f44336; font-weight: 600;">
+                        ⚠️ 您的浏览器不支持画中画功能。请使用Chrome 70+、Edge 79+或Safari 13+等现代浏览器。
+                    </div>
+                `;
+                document.getElementById('pipStatus').classList.add('visible');
+                document.getElementById('startBtn').disabled = true;
+            }
+        });
+        
+        // 阻止页面卸载时的默认行为
+        window.addEventListener('beforeunload', (e) => {
+            if (window.pipPopup && window.pipPopup.isActive) {
+                window.pipPopup.stop();
+            }
+        });
+    </script>
+</body>
+</html>

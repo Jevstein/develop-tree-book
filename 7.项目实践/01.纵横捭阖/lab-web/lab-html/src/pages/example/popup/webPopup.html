@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>全局浮动弹窗 - 纯JS实现</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 28px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3);
+            padding: 40px 30px;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            transition: transform 0.2s ease;
+        }
+
+        h1 {
+            color: #4a3b6e;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .sub {
+            color: #6c5b8b;
+            margin-bottom: 32px;
+            font-size: 1rem;
+            border-bottom: 1px solid #e2d5ff;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+
+        .desc {
+            background: #f3f0ff;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 0.95rem;
+            color: #2d3e50;
+            line-height: 1.5;
+            border-left: 5px solid #764ba2;
+        }
+
+        .desc strong {
+            color: #764ba2;
+        }
+
+        button {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 28px -8px rgba(102, 126, 234, 0.5);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .info {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #e0d6ff;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        .badge {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            color: #4a3b6e;
+            font-size: 0.8rem;
+        }
+
+        .badge span {
+            background: #edeaff;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 550px) {
+            .container {
+                padding: 25px 20px;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>✨ 全局浮动弹窗 ✨</h1>
+        <div class="sub">始终可见 · 独立窗口</div>
+        <div class="desc">
+            <strong>⚡ 强大特性</strong><br>
+            • 独立浏览器窗口，<strong style="color:#b83280;">切换任何网页/标签页依然可见</strong><br>
+            • 可随意拖动、调整大小、最小化<br>
+            • 无论你浏览哪个网站，弹窗都会浮在屏幕上<br>
+            • 纯原生 JavaScript 实现，无需任何依赖<br>
+            • 智能管理：只保留一个弹窗实例，避免重叠
+        </div>
+        <button id="openFloatBtn">🚀 打开全局浮动弹窗</button>
+        <button id="updateContentBtn">💬 向弹窗发送消息</button>
+        <div class="badge">
+            <span>📌 切换标签页试试</span>
+            <span>🪄 可拖动位置</span>
+            <span>💬 独立交互</span>
+        </div>
+        <div class="info">
+            💡 弹窗会记住位置/尺寸，关闭后可重新打开
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // 用于保存全局弹窗窗口的引用
+            let floatingWindow = null;
+            // 心跳检测定时器ID (用于检测弹窗是否被用户关闭)
+            let heartbeatTimer = null;
+
+            /**
+             * 生成弹窗内部的HTML内容 (样式精美，功能齐全)
+             * 包含关闭按钮、消息展示、实时时间、以及一个可爱的表情切换
+             * @returns {string} 弹窗完整HTML字符串
+             */
+            function getPopupHTML() {
+                return `
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>全局浮动弹窗</title>
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                        user-select: none; /* 提升拖动时文字选择体验 */
+                    }
+                    body {
+                        background: linear-gradient(145deg, #1e1a2f 0%, #2a2438 100%);
+                        font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+                        height: 100vh;
+                        width: 100vw;
+                        overflow: hidden;
+                        display: flex;
+                        flex-direction: column;
+                        color: #f0eef7;
+                        position: relative;
+                        border-radius: 20px;
+                        /* 让窗口自带轻微圆角效果(浏览器窗口本身也有圆角感) */
+                    }
+                    /* 自定义标题栏 (模拟弹窗头部，可拖动整个浏览器窗口自身) 但窗口原生可拖动，增加装饰栏更方便 */
+                    .popup-header {
+                        background: rgba(0, 0, 0, 0.3);
+                        backdrop-filter: blur(10px);
+                        padding: 12px 18px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        cursor: move;
+                        border-bottom: 1px solid rgba(255,255,255,0.15);
+                        -webkit-app-region: drag;  /* 让标题栏可拖动整个窗口(仅部分浏览器支持但无害) */
+                        app-region: drag;
+                        background: rgba(30, 26, 46, 0.7);
+                    }
+                    .popup-header h3 {
+                        font-size: 1rem;
+                        font-weight: 500;
+                        letter-spacing: 0.5px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .popup-header h3::before {
+                        content: "📌";
+                        font-size: 1rem;
+                    }
+                    .close-btn {
+                        background: rgba(255, 80, 80, 0.8);
+                        border: none;
+                        color: white;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 40px;
+                        font-size: 18px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: 0.2s;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        -webkit-app-region: no-drag;
+                        app-region: no-drag;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                    }
+                    .close-btn:hover {
+                        background: #ff4d4d;
+                        transform: scale(1.05);
+                    }
+                    .content {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 20px 25px;
+                        text-align: center;
+                        gap: 18px;
+                    }
+                    .message-box {
+                        background: rgba(255,255,255,0.1);
+                        border-radius: 28px;
+                        padding: 22px 18px;
+                        width: 100%;
+                        backdrop-filter: blur(4px);
+                        border: 1px solid rgba(255,255,255,0.2);
+                    }
+                    .greeting {
+                        font-size: 1.7rem;
+                        font-weight: bold;
+                        margin-bottom: 12px;
+                        background: linear-gradient(135deg, #FFD166, #A06CF5);
+                        -webkit-background-clip: text;
+                        background-clip: text;
+                        color: transparent;
+                    }
+                    .info-text {
+                        font-size: 0.9rem;
+                        opacity: 0.9;
+                        margin: 8px 0;
+                    }
+                    .time-display {
+                        font-family: monospace;
+                        font-size: 1.3rem;
+                        font-weight: 600;
+                        background: #00000033;
+                        display: inline-block;
+                        padding: 6px 14px;
+                        border-radius: 40px;
+                        letter-spacing: 1px;
+                        margin-top: 8px;
+                    }
+                    .action-buttons {
+                        display: flex;
+                        gap: 16px;
+                        margin-top: 8px;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                    }
+                    .action-btn {
+                        background: rgba(255,255,255,0.2);
+                        border: none;
+                        color: white;
+                        padding: 8px 18px;
+                        border-radius: 40px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        transition: 0.2s;
+                        backdrop-filter: blur(2px);
+                        font-size: 0.8rem;
+                    }
+                    .action-btn:hover {
+                        background: #764ba2cc;
+                        transform: translateY(-2px);
+                    }
+                    .footer-note {
+                        font-size: 0.7rem;
+                        opacity: 0.6;
+                        margin-top: 12px;
+                    }
+                    .emoji-big {
+                        font-size: 2.2rem;
+                        filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+                    }
+                    /* 简单的平滑过渡 */
+                    button {
+                        cursor: pointer;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="popup-header">
+                    <h3>✨ 全局悬浮窗 ✨</h3>
+                    <button class="close-btn" id="closePopupBtn" title="关闭弹窗">✕</button>
+                </div>
+                <div class="content">
+                    <div class="message-box">
+                        <div class="emoji-big" id="emojiToggle">🌊</div>
+                        <div class="greeting" id="greetingMsg">浮动于所有网页之上</div>
+                        <div class="info-text">
+                            即使切换到其他标签页 / 其他网站<br>
+                            这个窗口依然可见，始终置顶于屏幕 ⭐
+                        </div>
+                        <div class="time-display" id="liveTime">--:--:--</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" id="changeEmojiBtn">🎭 切换表情</button>
+                        <button class="action-btn" id="refreshMsgBtn">💬 更新语录</button>
+                        <button class="action-btn" id="minimizeBtn">➖ 最小化窗口</button>
+                    </div>
+                    <div class="footer-note">
+                        💡 提示：可以拖动标题栏移动窗口 | 窗口大小可随意调整
+                    </div>
+                </div>
+                <script>
+                    (function() {
+                        // 实时更新时间
+                        function updateTime() {
+                            const now = new Date();
+                            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+                            const timeElem = document.getElementById('liveTime');
+                            if(timeElem) timeElem.innerText = timeStr;
+                        }
+                        updateTime();
+                        setInterval(updateTime, 1000);
+                        
+                        // 表情列表
+                        const emojis = ['🌊', '🚀', '💎', '🌈', '⭐', '🎈', '🔥', '❄️', '💡', '📌', '🎧', '🍕', '🐱', '🐶', '🌸'];
+                        let emojiIndex = 0;
+                        const emojiElem = document.getElementById('emojiToggle');
+                        const changeEmojiBtn = document.getElementById('changeEmojiBtn');
+                        if(changeEmojiBtn) {
+                            changeEmojiBtn.addEventListener('click', () => {
+                                emojiIndex = (emojiIndex + 1) % emojis.length;
+                                if(emojiElem) emojiElem.innerText = emojis[emojiIndex];
+                            });
+                        }
+                        
+                        // 趣味语录库
+                        const quotes = [
+                            "✨ 全局可见 任何页面不遮挡 ✨",
+                            "🎯 你切换网页，我依然相伴",
+                            "💪 独立窗口，始终在前",
+                            "📌 工作学习好帮手",
+                            "🌟 纯JS实现，轻量强大",
+                            "😎 就像系统级悬浮窗一样酷",
+                            "💖 随意拖动 自由缩放",
+                            "🔮 你的专属浮动窗口"
+                        ];
+                        let quoteIndex = 0;
+                        const refreshMsgBtn = document.getElementById('refreshMsgBtn');
+                        const greetingElem = document.getElementById('greetingMsg');
+                        if(refreshMsgBtn) {
+                            refreshMsgBtn.addEventListener('click', () => {
+                                quoteIndex = (quoteIndex + 1) % quotes.length;
+                                if(greetingElem) greetingElem.innerText = quotes[quoteIndex];
+                            });
+                        }
+                        
+                        // 最小化窗口伪实现: 尽量缩小窗口但保留可见 (浏览器窗口最小化功能受限，可以缩小尺寸)
+                        const minimizeBtn = document.getElementById('minimizeBtn');
+                        if(minimizeBtn) {
+                            minimizeBtn.addEventListener('click', () => {
+                                // 将窗口尺寸缩小到一个小矩形(但是仍然可见)
+                                window.resizeTo(320, 180);
+                                // 可选移动位置到右下角
+                                if(window.screenLeft && window.moveTo) {
+                                    const screenWidth = window.screen.availWidth || window.screen.width;
+                                    const screenHeight = window.screen.availHeight || window.screen.height;
+                                    window.moveTo(screenWidth - 340, screenHeight - 220);
+                                }
+                            });
+                        }
+                        
+                        // 关闭按钮事件
+                        const closeBtn = document.getElementById('closePopupBtn');
+                        if(closeBtn) {
+                            closeBtn.addEventListener('click', () => {
+                                window.close();
+                            });
+                        }
+                        
+                        // 让窗口更友好：当窗口获得焦点时轻微视觉效果（可选）
+                        window.addEventListener('focus', () => {
+                            document.body.style.opacity = '1';
+                        });
+                        
+                        // 重点：当窗口失去焦点时，立即重新获取
+                        window.addEventListener('blur', () => {
+                            setTimeout(() => window.focus(), 0);
+                        });
+
+                        window.addEventListener('message', (event) => {
+                            // if (event.origin !== 'https://your-main-origin.com') return;
+                            console.log('收到数据：', event.data);
+
+                            // 处理主窗口发送的消息，例如更新内容
+                            if(greetingElem) greetingElem.innerText = event.data.msg || "收到主窗口消息！";
+                        });
+                    })();
+                <\/script>
+            </body>
+            </html>
+            `;
+            }
+
+            /**
+             * 清除心跳检测并关闭引用
+             */
+            function stopHeartbeat() {
+                if (heartbeatTimer) {
+                    clearInterval(heartbeatTimer);
+                    heartbeatTimer = null;
+                }
+            }
+
+            /**
+             * 启动对弹窗关闭状态的监听，一旦窗口被用户手动关闭，自动清除引用，避免重复打开失效
+             * @param {Window} win 弹窗窗口对象
+             */
+            function watchPopupClosed(win) {
+                if (!win) return;
+                // 先停止旧的检测
+                stopHeartbeat();
+                // 每隔500ms检测该窗口是否被关闭
+                heartbeatTimer = setInterval(() => {
+                    // 如果floatingWindow引用不匹配当前监控窗口，停止检测
+                    if (floatingWindow !== win) {
+                        // 说明已经被刷新或新窗口覆盖，清除定时器
+                        if (heartbeatTimer) clearInterval(heartbeatTimer);
+                        heartbeatTimer = null;
+                        return;
+                    }
+                    // 如果窗口存在且已关闭，则清理全局引用
+                    if (win.closed) {
+                        floatingWindow = null;
+                        stopHeartbeat();
+                        // 可选在控制台输出信息（静默清理）
+                    }
+                }, 600);
+            }
+
+            /**
+             * 打开全局浮动弹窗 (独立窗口，始终保持在所有浏览器标签前面)
+             * 由于独立窗口的本质，当用户切换到其他网页或应用时，该窗口依然可见。
+             */
+            function openFloatingPopup() {
+                // 1. 校验是否已经有打开且未关闭的弹窗，如果有则将其聚焦到前台并可选闪烁提醒
+                if (floatingWindow && !floatingWindow.closed) {
+                    // 弹窗已存在：将其激活并置于最前，避免重复创建
+                    try {
+                        floatingWindow.focus();
+                        // 可选：通过轻微震动或改变窗口内部背景提示？简单聚焦已经足够
+                        // 如果窗口最小化了，有些浏览器需要手动恢复，但 focus 通常会使窗口恢复并前置
+                    } catch (e) {
+                        console.warn("无法聚焦窗口，可能已被浏览器限制", e);
+                    }
+                    return;
+                }
+
+                // 2. 如果之前的引用窗口已关闭或不存在，彻底清理定时器
+                if (floatingWindow && floatingWindow.closed) {
+                    floatingWindow = null;
+                    stopHeartbeat();
+                }
+
+                // 3. 窗口特征参数：宽400，高500，可调整大小，显示滚动条，无工具栏，可移动，屏幕中央偏右上方一些 (更适合展示)
+                // 获取屏幕可用宽高，让窗口默认出现在屏幕居中偏上的位置
+                const screenWidth = window.screen.availWidth || window.screen.width;
+                const screenHeight = window.screen.availHeight || window.screen.height;
+                const popupWidth = 460;
+                const popupHeight = 520;
+                const left = Math.max(20, (screenWidth - popupWidth) / 2 + (screenWidth > 1200 ? 80 : 0));
+                const top = Math.max(20, (screenHeight - popupHeight) / 3);
+
+                // 窗口特性字符串: 无菜单栏, 无状态栏, 无工具栏, 可调整大小, 滚动条可用，并支持拖拽
+                const features = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no,centerscreen=no`;
+
+                // 打开一个新窗口（空的，后续写入内容），注意 target 使用随机名称避免冲突，但我们将用变量存储引用，每次新建一个独立窗口
+                // 重要：由于需要避开拦截器，直接传入空字符串且同步调用 window.open 在用户点击事件中会正常触发。
+                let newWindow = null;
+                try {
+                    // 使用 _blank 保证每次新开独立窗口，但为了后续复用，我们使用唯一name? 使用随机字符串会每次都新建，但我们只允许一个实例
+                    // 采用固定名称 "globalFloatingPopup" 如果已经存在窗口则会复用，但我们先前已经判断窗口是否存在并且focus。
+                    // 这里使用特定 name，保证同一个窗口反复打开时不会无限生成，但为了避免关闭后再打开出现内容不同步，我们可以主动重写内容。
+                    // 但是根据前面的判断，如果窗口没关闭就直接聚焦了，不会走到创建这一步。所以这里就是全新窗口。
+                    // 使用唯一名称 "FLOAT_WINDOW_VIP" 让同名的已有窗口（被意外残留）可以被重用，但为了确保内容更新，我们后面会重写document
+                    const winName = "GLOBAL_FLOATING_PANEL_" + Date.now(); // 每次都唯一确保不会复用旧缓存, 这样完全新建
+                    newWindow = window.open('', winName, features);
+                    if (!newWindow || newWindow.closed) {
+                        // 可能被浏览器阻止弹窗
+                        alert("⚠️ 弹窗被浏览器拦截！请允许此网站的弹出窗口，以获得全局浮动体验。\n\n您可以手动点击地址栏旁弹窗拦截图标，选择“始终允许”。");
+                        return;
+                    }
+
+                    // 写入完整的html结构
+                    newWindow.document.write(getPopupHTML());
+                    newWindow.document.close();  // 结束写入，保证DOM加载完成
+
+                    // 确保窗口标题美观 (document.title 已经在html里设置了，不过再确保一下)
+                    if (newWindow.document) {
+                        newWindow.document.title = "✨ 全局悬浮窗 ✨";
+                    }
+
+                    // 优化窗口加载完毕后强制前置（确保最前）
+                    newWindow.focus();
+
+                    // 处理窗口意外关闭时清理引用
+                    const checkClosedInterval = setInterval(() => {
+                        if (newWindow.closed) {
+                            if (floatingWindow === newWindow) {
+                                floatingWindow = null;
+                            }
+                            clearInterval(checkClosedInterval);
+                            // 如果这个就是当前保存的窗口，停止心跳
+                            if (heartbeatTimer && floatingWindow === null) {
+                                stopHeartbeat();
+                            }
+                        }
+                    }, 800);
+
+                    // 保存新窗口全局引用
+                    floatingWindow = newWindow;
+                    // 启动新的心跳检测（用于父页面监听关闭并清理引用）
+                    watchPopupClosed(floatingWindow);
+
+                    // 附加：如果窗口加载完成后被用户移动或者调整大小，我们不干涉； 另外可增加窗口失焦前置？不需要过于流氓
+                    // 额外保险：当新窗口试图关闭时通过beforeunload? 不需要，上面监听close即可。
+
+                } catch (err) {
+                    console.error("创建弹窗失败:", err);
+                    alert("无法创建全局弹窗，可能是浏览器安全限制。\n请确保点击按钮时没有被阻止弹窗。");
+                }
+            }
+
+            /**
+             * 绑定按钮事件，并支持页面销毁时清理定时器资源
+             */
+            function bindEvents() {
+                const openBtn = document.getElementById('openFloatBtn');
+                if (openBtn) {
+                    openBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openFloatingPopup();
+                    });
+                }
+
+                const updateBtn = document.getElementById('updateContentBtn');
+                if (updateBtn) {
+                    updateBtn.addEventListener('click', (e) => {
+                        floatingWindow.postMessage({ type: 'UPDATE', msg: '🎉 主窗口发来贺电！' });
+                    });
+                }
+            }
+
+            // 页面关闭之前，清理定时器，避免后台无用轮询
+            window.addEventListener('beforeunload', () => {
+                if (heartbeatTimer) {
+                    clearInterval(heartbeatTimer);
+                    heartbeatTimer = null;
+                }
+                // 如果有弹窗存在，但不强关保留，让用户自己决定，但不清除引用也无大碍
+            });
+
+            // 初始化
+            bindEvents();
+
+            // 额外提醒：如果在一些严格浏览器（如Safari）中，弹窗可能受到限制，提示用户
+            if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
+                console.log("Safari用户请注意：如果弹窗未出现，请检查偏好设置 - 网站 - 弹出窗口，允许本网站弹出窗口");
+            }
+        })();
+    </script>
+</body>
+
+</html>

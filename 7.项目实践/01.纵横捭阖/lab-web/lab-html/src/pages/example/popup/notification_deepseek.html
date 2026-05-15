@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Notification API 完整演示 | 自动关闭 + 永久显示配置</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .demo-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .header {
+            background: #1e2a3e;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 1rem;
+        }
+
+        .status-card {
+            background: #f8fafc;
+            border-radius: 1.25rem;
+            margin: 1.5rem 2rem;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .perm-badge {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .perm-label {
+            font-weight: 600;
+            background: #e9ecef;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .perm-status {
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 14px;
+            border-radius: 40px;
+            background: #e2e3e8;
+            color: #1e293b;
+        }
+
+        .perm-status.granted { background: #d1fae5; color: #065f46; }
+        .perm-status.denied { background: #fee2e2; color: #991b1b; }
+        .perm-status.default { background: #fef9c3; color: #854d0e; }
+
+        .btn-request {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn-request:hover {
+            background: #2563eb;
+            transform: scale(0.98);
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 14px;
+            padding: 0 2rem 1.5rem 2rem;
+        }
+
+        .demo-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 1rem;
+            padding: 12px 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .demo-btn:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -8px rgba(0,0,0,0.15);
+        }
+
+        .btn-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .btn-desc {
+            font-size: 0.75rem;
+            color: #475569;
+        }
+
+        .log-section {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-top: 1px solid #334155;
+            margin-top: 0.5rem;
+            padding: 1.2rem 2rem;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .log-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .clear-log {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .clear-log:hover {
+            background: #475569;
+        }
+
+        .log-list {
+            background: #0a0f1a;
+            border-radius: 1rem;
+            padding: 12px 16px;
+            max-height: 280px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e6;
+            word-break: break-word;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #5b6e8c;
+            margin-right: 12px;
+        }
+
+        .warning-note {
+            background: #fef9e3;
+            border-left: 5px solid #f59e0b;
+            padding: 12px 20px;
+            margin: 0 2rem 1.5rem 2rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #92400e;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 1rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            background: #f9fbfd;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .badge-new {
+            background: #f97316;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 30px;
+            margin-left: 8px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        @media (max-width: 640px) {
+            .demo-container {
+                border-radius: 1rem;
+            }
+            .grid-buttons {
+                padding: 0 1rem 1rem 1rem;
+            }
+            .status-card {
+                margin: 1rem;
+            }
+            .warning-note {
+                margin: 0 1rem 1rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="demo-container">
+    <div class="header">
+        <h1>🔔 Notification API 完全指南 <span style="font-size:0.9rem;">+ 高级配置演示</span></h1>
+        <p>Web 通知 | 权限管理 | 自动关闭 | 永久显示 | 交互事件 | 完整选项</p>
+    </div>
+
+    <!-- 权限状态区域 -->
+    <div class="status-card">
+        <div class="perm-badge">
+            <span class="perm-label">📢 通知权限状态</span>
+            <span id="permStatusText" class="perm-status default">检测中...</span>
+        </div>
+        <button id="requestPermBtn" class="btn-request">🔔 请求通知权限</button>
+    </div>
+
+    <div class="warning-note">
+        💡 <strong>提示：</strong> 浏览器通知需用户授权。首次请点击「请求通知权限」，授权后所有通知生效。<br>
+        🆕 <strong>新增演示：</strong> 「⏱️ 5秒后自动关闭」展示定时关闭通知；「📌 永久显示通知」展示 requireInteraction 直到用户手动关闭。<br>
+        🧪 所有通知事件（显示/点击/关闭/自动关闭）均记录在右侧日志。
+    </div>
+
+    <!-- 功能按钮网格 -->
+    <div class="grid-buttons" id="buttonGrid">
+        <!-- 基础演示 -->
+        <div class="demo-btn" data-action="basic">
+            <div class="btn-title">📢 基础通知</div>
+            <div class="btn-desc">标题 + 正文内容 (默认样式)</div>
+        </div>
+        <div class="demo-btn" data-action="icon">
+            <div class="btn-title">🎨 带图标通知</div>
+            <div class="btn-desc">自定义 SVG 图标 + 富文本正文</div>
+        </div>
+        <div class="demo-btn" data-action="tag">
+            <div class="btn-title">🏷️ Tag 替换演示</div>
+            <div class="btn-desc">相同 tag 会替换上一个通知(自动去重)</div>
+        </div>
+        
+        <!-- 新增：5秒后自动关闭 (核心配置) -->
+        <div class="demo-btn" data-action="autoClose5s">
+            <div class="btn-title">⏱️ 5秒后自动关闭 <span class="badge-new">新增配置</span></div>
+            <div class="btn-desc">通知在显示5秒后由程序自动关闭，无需用户操作</div>
+        </div>
+        
+        <!-- 新增：永久显示 (requireInteraction) -->
+        <div class="demo-btn" data-action="persistent">
+            <div class="btn-title">📌 永久显示通知 <span class="badge-new">新增演示</span></div>
+            <div class="btn-desc">requireInteraction = true，通知保持可见直到用户点击或关闭</div>
+        </div>
+        
+        <div class="demo-btn" data-action="sticky">
+            <div class="btn-title">📌 粘性通知 (requireInteraction)</div>
+            <div class="btn-desc">同永久显示，传统requireInteraction演示</div>
+        </div>
+        <div class="demo-btn" data-action="silent">
+            <div class="btn-title">🔇 静默通知 (silent)</div>
+            <div class="btn-desc">无提示音，安静推送</div>
+        </div>
+        <div class="demo-btn" data-action="delayed">
+            <div class="btn-title">⏰ 延时5秒通知</div>
+            <div class="btn-desc">setTimeout 延时发送 (需提前授权)</div>
+        </div>
+        <div class="demo-btn" data-action="eventful">
+            <div class="btn-title">✨ 带事件通知 (点击/关闭)</div>
+            <div class="btn-desc">点击通知聚焦页面+弹交互日志，关闭事件也记录</div>
+        </div>
+        <div class="demo-btn" data-action="manualClose">
+            <div class="btn-title">🔄 可手动关闭的通知</div>
+            <div class="btn-desc">保存实例 + 下方「关闭最新」按钮控制关闭</div>
+        </div>
+    </div>
+
+    <!-- 额外操作栏: 关闭保存的通知 + 展示tag替换额外动作 -->
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin: 0 2rem 1rem 2rem;">
+        <button id="closeManualNotifBtn" style="background:#ef4444; border:none; color:white; padding:6px 20px; border-radius:40px; font-weight:500; cursor:pointer;">❌ 关闭“手动通知”实例</button>
+        <button id="sendTagReplaceStepBtn" style="background:#8b5cf6; border:none; color:white; padding:6px 20px; border-radius:40px; font-weight:500; cursor:pointer;">🏷️ 逐步演示: 发送带tag替换(重复两次)</button>
+        <span style="font-size:0.75rem; color:#475569; align-self:center;">⭐ 先授权再测试</span>
+    </div>
+
+    <!-- 日志区域 -->
+    <div class="log-section">
+        <div class="log-header">
+            <h3>📋 通知事件日志 (显示/点击/关闭/自动关闭)</h3>
+            <button id="clearLogBtn" class="clear-log">清空日志</button>
+        </div>
+        <div id="logList" class="log-list">
+            <div class="log-entry">✨ 等待操作，通知事件将实时显示在此处...</div>
+        </div>
+    </div>
+    <footer>
+        Notification API 全功能演示 | 自动关闭通过定时器 close() 实现 | 永久显示即 requireInteraction: true | 兼容 Chrome/Edge/Safari/Firefox
+    </footer>
+</div>
+
+<script>
+    // ---------- 全局变量 ----------
+    let currentManualNotification = null;      // 存储可手动关闭的通知实例
+    let autoCloseNotificationRef = null;       // 存储自动关闭通知的实例和定时器
+    let autoCloseTimer = null;
+    let notificationSupport = false;
+
+    // DOM 元素
+    const permStatusSpan = document.getElementById('permStatusText');
+    const requestBtn = document.getElementById('requestPermBtn');
+    const closeManualBtn = document.getElementById('closeManualNotifBtn');
+    const sendTagStepBtn = document.getElementById('sendTagReplaceStepBtn');
+    const clearLogBtn = document.getElementById('clearLogBtn');
+    const logContainer = document.getElementById('logList');
+
+    // ---------- 工具函数 ----------
+    function checkSupport() {
+        if (!("Notification" in window)) {
+            notificationSupport = false;
+            permStatusSpan.innerText = '不支持 Notification API';
+            permStatusSpan.className = 'perm-status denied';
+            addLog('❌ 您的浏览器不支持 Notification API，无法演示', 'error');
+            return false;
+        }
+        notificationSupport = true;
+        updatePermissionUI();
+        return true;
+    }
+
+    function updatePermissionUI() {
+        if (!notificationSupport) return;
+        const state = Notification.permission;
+        if (state === 'granted') {
+            permStatusSpan.innerText = '✅ 已授权 (granted)';
+            permStatusSpan.className = 'perm-status granted';
+        } else if (state === 'denied') {
+            permStatusSpan.innerText = '❌ 已拒绝 (denied)';
+            permStatusSpan.className = 'perm-status denied';
+        } else {
+            permStatusSpan.innerText = '⏳ 未决定 (default) 需要请求权限';
+            permStatusSpan.className = 'perm-status default';
+        }
+    }
+
+    function addLog(message, type = 'info') {
+        const logDiv = document.createElement('div');
+        logDiv.className = 'log-entry';
+        const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+        let icon = '📌';
+        if (type === 'click') icon = '🖱️';
+        else if (type === 'close') icon = '❌';
+        else if (type === 'show') icon = '👁️';
+        else if (type === 'error') icon = '⚠️';
+        else if (type === 'success') icon = '✅';
+        else if (type === 'autoClose') icon = '⏲️';
+        logDiv.innerHTML = `<span class="log-time">[${time}]</span> ${icon} ${message}`;
+        logContainer.appendChild(logDiv);
+        logDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        while (logContainer.children.length > 120) {
+            logContainer.removeChild(logContainer.firstChild);
+        }
+    }
+
+    function clearLogs() {
+        logContainer.innerHTML = '';
+        addLog('日志已清空', 'info');
+    }
+
+    async function requestNotificationPermission() {
+        if (!notificationSupport) {
+            alert('您的浏览器不支持通知功能');
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            addLog('权限已经授予，无需重复请求', 'success');
+            updatePermissionUI();
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            addLog('权限已被拒绝，无法请求，请在浏览器设置中手动开启通知权限', 'error');
+            updatePermissionUI();
+            return;
+        }
+        try {
+            const permission = await Notification.requestPermission();
+            updatePermissionUI();
+            if (permission === 'granted') {
+                addLog('🎉 用户已授予通知权限！现在可以发送通知了', 'success');
+            } else {
+                addLog('❌ 用户拒绝了通知权限，演示受限', 'error');
+            }
+        } catch (err) {
+            Notification.requestPermission((perm) => {
+                updatePermissionUI();
+                if (perm === 'granted') addLog('权限授予成功 (回调方式)', 'success');
+                else addLog('权限获取失败', 'error');
+            });
+        }
+    }
+
+    // 核心发送通知函数：自动检查权限，返回 Notification 对象
+    async function sendNotification(title, options = {}) {
+        if (!notificationSupport) {
+            addLog('浏览器不支持通知', 'error');
+            return null;
+        }
+        if (Notification.permission !== 'granted') {
+            addLog(`⛔ 通知权限未授予 (当前: ${Notification.permission})，请先点击「请求通知权限」按钮`, 'error');
+            return null;
+        }
+        try {
+            const notification = new Notification(title, options);
+            // 默认绑定标准事件，除非明确跳过
+            if (!options._skipDefaultEvents) {
+                if (!notification.onclick) {
+                    notification.onclick = (event) => {
+                        event.preventDefault();
+                        addLog(`🔔 通知被点击 —— 标题: "${title}"`, 'click');
+                        window.focus();
+                        notification.close();
+                    };
+                }
+                if (!notification.onclose) {
+                    notification.onclose = () => {
+                        addLog(`🔚 通知已关闭 —— 标题: "${title}"`, 'close');
+                    };
+                }
+                if (!notification.onshow) {
+                    notification.onshow = () => {
+                        addLog(`📢 通知已显示 —— 标题: "${title}"`, 'show');
+                    };
+                }
+            }
+            return notification;
+        } catch (err) {
+            addLog(`发送通知失败: ${err.message}`, 'error');
+            return null;
+        }
+    }
+
+    // ---------- 各种演示实例 ----------
+    // 基础通知
+    async function demoBasic() {
+        await sendNotification('📬 基础通知示例', {
+            body: '这是最简单的通知消息，只包含标题和正文。',
+        });
+    }
+
+    // 带图标
+    async function demoIcon() {
+        const svgIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E";
+        await sendNotification('🎨 带图标通知', {
+            body: '这是一个带自定义蓝色图标的通知，支持丰富视觉体验。',
+            icon: svgIcon,
+            badge: svgIcon
+        });
+    }
+
+    // Tag 替换演示
+    async function demoTagReplace() {
+        if (Notification.permission !== 'granted') {
+            addLog('请先授权通知权限再测试替换演示', 'error');
+            return;
+        }
+        const tagName = 'same-tag-demo';
+        addLog('🏷️ 开始Tag替换演示: 发送第一条tag通知', 'info');
+        await sendNotification('第一条通知 (tag替换演示)', {
+            body: '我是第一条通知，tag="same-tag-demo"',
+            tag: tagName,
+        });
+        setTimeout(async () => {
+            addLog('🏷️ 发送相同tag的第二条通知 → 将替换上一条', 'info');
+            await sendNotification('第二条通知 (已替换!)', {
+                body: '我和上面的通知使用同一个tag，因此旧通知会被替换/关闭，通知栏只会显示这一条。',
+                tag: tagName,
+            });
+        }, 1800);
+    }
+
+    // 粘性通知 (requireInteraction)
+    async function demoSticky() {
+        await sendNotification('📌 粘性通知(requireInteraction)', {
+            body: '这个通知将保持可见，直到您点击或关闭它。注意部分浏览器可能有限制。',
+            requireInteraction: true,
+            tag: 'sticky_demo',
+        });
+    }
+
+    // ✅ 新增：5秒后自动关闭的演示 (配置定时自动关闭)
+    async function demoAutoClose5s() {
+        if (Notification.permission !== 'granted') {
+            addLog('请先授权通知权限再测试自动关闭', 'error');
+            return;
+        }
+        // 清理上一次自动关闭通知及定时器
+        if (autoCloseNotificationRef) {
+            try {
+                autoCloseNotificationRef.close();
+            } catch(e) {}
+            if (autoCloseTimer) clearTimeout(autoCloseTimer);
+            autoCloseNotificationRef = null;
+            autoCloseTimer = null;
+        }
+        
+        const title = '⏱️ 5秒自动关闭通知';
+        const body = '这个通知将在 5 秒后由程序自动关闭，您也可以手动提前关闭。演示定时关闭特性。';
+        
+        const notif = await sendNotification(title, {
+            body: body,
+            icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23f97316'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13h-1v7l6 3.5.5-1-5.5-3.2z'/%3E%3C/svg%3E",
+            silent: false,
+            tag: 'auto_close_demo'
+        });
+        
+        if (notif) {
+            autoCloseNotificationRef = notif;
+            addLog('⏱️ 已发送“5秒自动关闭”通知，定时器启动', 'info');
+            // 设置5秒后自动关闭
+            autoCloseTimer = setTimeout(() => {
+                if (autoCloseNotificationRef) {
+                    // 关闭通知前检查是否还未关闭 (避免重复关闭)
+                    try {
+                        autoCloseNotificationRef.close();
+                        addLog('⏲️ 通知已通过程序在5秒后自动关闭 (autoClose)', 'autoClose');
+                    } catch(err) {
+                        addLog(`自动关闭时发生异常: ${err.message}`, 'error');
+                    } finally {
+                        autoCloseNotificationRef = null;
+                        autoCloseTimer = null;
+                    }
+                }
+            }, 5000);
+            
+            // 扩展原本的 onclose 事件，清除定时器与引用，防止内存残留
+            const originalClose = notif.onclose;
+            notif.onclose = (e) => {
+                if (originalClose) originalClose(e);
+                if (autoCloseTimer) {
+                    clearTimeout(autoCloseTimer);
+                    autoCloseTimer = null;
+                }
+                autoCloseNotificationRef = null;
+                addLog(`🧹 自动关闭通知实例已清理 (手动或自动关闭)`, 'close');
+            };
+        }
+    }
+    
+    // ✅ 新增：永久显示通知 (requireInteraction = true) 清晰演示
+    async function demoPersistent() {
+        if (Notification.permission !== 'granted') {
+            addLog('请先授权通知权限再测试永久显示', 'error');
+            return;
+        }
+        const title = '📌 永久显示通知 (requireInteraction)';
+        const body = '此通知将一直显示在通知栏，直到您手动点击或关闭。非常适合重要提醒。';
+        await sendNotification(title, {
+            body: body,
+            icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E",
+            requireInteraction: true,      // 核心永久显示配置
+            silent: false,
+            tag: 'persistent_demo_' + Date.now(),  // 避免替换，每次独立显示
+        });
+        addLog('📢 已发送“永久显示”通知，它不会自动消失，必须手动关闭', 'success');
+    }
+
+    // 静默通知
+    async function demoSilent() {
+        await sendNotification('🔇 静默通知测试', {
+            body: '本通知不会触发系统提示音 (silent: true)，适合不打扰场景。',
+            silent: true,
+        });
+    }
+
+    // 延时5秒通知
+    async function demoDelayed() {
+        if (Notification.permission !== 'granted') {
+            addLog('延时通知前请先授权权限', 'error');
+            return;
+        }
+        addLog('⏰ 已设置5秒后发送通知，请稍等...', 'info');
+        setTimeout(async () => {
+            await sendNotification('⏲️ 延时5秒通知', {
+                body: '这是一个由 setTimeout 触发的通知，演示延时推送。',
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23f97316'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13h-1v7l6 3.5.5-1-5.5-3.2z'/%3E%3C/svg%3E",
+            });
+        }, 5000);
+    }
+
+    // 带完整事件
+    async function demoEventful() {
+        const notif = await sendNotification('🎯 带事件监听的通知', {
+            body: '点击我试试 ➕ 查看日志，关闭我也会记录',
+            _skipDefaultEvents: true,
+        });
+        if (notif) {
+            notif.onshow = () => addLog('✨ 事件通知已显示 (onshow 触发)', 'show');
+            notif.onclick = (e) => {
+                e.preventDefault();
+                addLog('🖱️ 你点击了事件通知！将聚焦窗口并关闭通知', 'click');
+                window.focus();
+                notif.close();
+            };
+            notif.onclose = () => {
+                addLog('🧹 事件通知已关闭 (onclose 触发)', 'close');
+            };
+        }
+    }
+
+    // 可手动关闭的通知 (保存实例)
+    async function demoManualClose() {
+        if (currentManualNotification) {
+            try { currentManualNotification.close(); } catch(e) {}
+            currentManualNotification = null;
+            addLog('🔄 已关闭上一个手动通知实例，准备新建', 'info');
+        }
+        const notif = await sendNotification('🖐️ 可手动关闭的通知实例', {
+            body: '你可以点击下方「关闭最新实例」按钮通过代码关闭本通知，也可以手动关闭它。',
+            icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%2310b981'%3E%3Cpath d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'/%3E%3C/svg%3E",
+            tag: 'manual_demo_tag',
+        });
+        if (notif) {
+            currentManualNotification = notif;
+            const originalClose = notif.onclose;
+            notif.onclose = (e) => {
+                if (originalClose) originalClose(e);
+                addLog('🔧 手动通知被关闭，实例引用已清除', 'close');
+                currentManualNotification = null;
+            };
+        }
+    }
+
+    function closeManualNotification() {
+        if (currentManualNotification) {
+            try {
+                currentManualNotification.close();
+                addLog('✅ 已通过代码关闭保存的手动通知实例', 'success');
+                currentManualNotification = null;
+            } catch (err) {
+                addLog(`关闭失败: ${err.message}`, 'error');
+            }
+        } else {
+            addLog('目前没有活跃的“手动通知实例”，请先点击“可手动关闭的通知”按钮生成', 'info');
+        }
+    }
+
+    async function stepTagReplaceDemo() {
+        if (Notification.permission !== 'granted') {
+            addLog('需要通知权限，请先授权', 'error');
+            return;
+        }
+        const stepTag = 'step_by_step_tag';
+        addLog('🏷️ 步骤1/2: 发送初始 tag 通知 (标签: step_by_step_tag)', 'info');
+        await sendNotification('原始内容 [第1条]', {
+            body: '这是第一条使用特定tag的消息。',
+            tag: stepTag,
+        });
+        setTimeout(async () => {
+            addLog('🏷️ 步骤2/2: 发送相同tag的新内容 → 系统将替换旧通知', 'info');
+            await sendNotification('✨ 已替换的内容 [第2条]', {
+                body: '相同tag下，浏览器会用新通知替换之前显示的同tag通知，避免重复堆叠。',
+                tag: stepTag,
+            });
+        }, 1500);
+    }
+
+    // ---------- 事件绑定 ----------
+    function initButtons() {
+        const actionMap = {
+            basic: demoBasic,
+            icon: demoIcon,
+            tag: demoTagReplace,
+            sticky: demoSticky,
+            autoClose5s: demoAutoClose5s,      // 新增
+            persistent: demoPersistent,        // 新增
+            silent: demoSilent,
+            delayed: demoDelayed,
+            eventful: demoEventful,
+            manualClose: demoManualClose,
+        };
+        const btns = document.querySelectorAll('.demo-btn');
+        btns.forEach(btn => {
+            const action = btn.getAttribute('data-action');
+            if (action && actionMap[action]) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    actionMap[action]();
+                });
+            }
+        });
+        sendTagStepBtn.addEventListener('click', stepTagReplaceDemo);
+        closeManualBtn.addEventListener('click', closeManualNotification);
+        requestBtn.addEventListener('click', requestNotificationPermission);
+        clearLogBtn.addEventListener('click', clearLogs);
+    }
+
+    function init() {
+        checkSupport();
+        initButtons();
+        if (notificationSupport && Notification.permission === 'granted') {
+            addLog('🎯 通知权限已启用，所有演示功能就绪，包括“5秒自动关闭”和“永久显示”', 'success');
+        } else if (notificationSupport && Notification.permission === 'default') {
+            addLog('📢 请点击「请求通知权限」开始体验完整通知演示（自动关闭/永久显示等）', 'info');
+        } else if (notificationSupport && Notification.permission === 'denied') {
+            addLog('⚠️ 通知权限已被浏览器阻止，请修改站点权限后刷新页面', 'error');
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

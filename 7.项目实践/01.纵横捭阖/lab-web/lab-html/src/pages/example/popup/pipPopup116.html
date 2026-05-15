@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>全局置顶弹窗 - 画中画API演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 40px 32px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .sub {
+            color: #94a3b8;
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed #334155;
+            display: inline-block;
+            padding-bottom: 6px;
+        }
+
+        .description {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            border-left: 4px solid #a855f7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            margin: 12px 0;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .warning {
+            background: rgba(234, 179, 8, 0.2);
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            color: #fde047;
+            border: 1px solid rgba(234, 179, 8, 0.4);
+        }
+
+        .badge {
+            display: inline-flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.7rem;
+            color: #475569;
+        }
+
+        @media (max-width: 550px) {
+            .card {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .btn-primary {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>📌 全局置顶弹窗</h1>
+        <div class="sub">Document Picture-in-Picture | 永远浮在顶层</div>
+        <div class="description">
+            <strong>✨ 强大特性</strong><br>
+            • 使用 <strong>文档画中画 API</strong> (Chrome/Edge 116+)<br>
+            • 弹窗将<strong>永远处于所有窗口的最上方</strong><br>
+            • 即使切换到其他网页、应用或浏览器标签页，弹窗依然可见<br>
+            • 支持独立交互、关闭按钮、主窗口与弹窗实时通信<br>
+            • 纯原生 JavaScript，无任何依赖
+        </div>
+        <button id="openPipBtn" class="btn-primary">🚀 打开全局置顶画中画弹窗</button>
+        <button id="updateContentBtn" class="btn-primary">💬 向弹窗发送消息</button>
+        <div class="badge">
+            <span>🔝 系统级置顶</span>
+            <span>💬 实时通信</span>
+            <span>🪄 任意拖动/缩放</span>
+        </div>
+        <div id="supportWarning" class="warning" style="display: none;">
+            ⚠️ 当前浏览器不支持 Document Picture-in-Picture API。<br>
+            请使用最新版 Chrome 或 Edge 浏览器以获得全局置顶体验。
+        </div>
+        <footer>
+            💡 提示：画中画窗口关闭后，可重新点击按钮打开。弹窗内可以接收主窗口发送的实时数据。
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            // 检测 API 支持
+            const isSupported = 'documentPictureInPicture' in window;
+            const warningDiv = document.getElementById('supportWarning');
+            const openBtn = document.getElementById('openPipBtn');
+            const updateBtn = document.getElementById('updateContentBtn');
+
+            if (!isSupported) {
+                if (warningDiv) warningDiv.style.display = 'block';
+                if (openBtn) {
+                    openBtn.disabled = true;
+                    openBtn.style.opacity = '0.5';
+                    openBtn.style.cursor = 'not-allowed';
+                    openBtn.title = '浏览器不支持画中画API';
+                }
+                return;
+            }
+
+            // 保存当前打开的画中画窗口实例
+            let pipWindow = null;
+
+            /**
+             * 创建并打开画中画窗口
+             */
+            async function openPictureInPicture() {
+                // 如果已有打开的窗口且未关闭，则直接聚焦并返回
+                if (pipWindow && !pipWindow.closed) {
+                    // 尝试聚焦画中画窗口（某些浏览器支持 focus）
+                    try {
+                        pipWindow.focus();
+                    } catch (e) { /* 忽略 */ }
+                    return;
+                }
+
+                try {
+                    // 请求画中画窗口（固定宽高，但用户可以拖动缩放）
+                    const pip = await window.documentPictureInPicture.requestWindow({
+                        width: 380,
+                        height: 480,
+                        // 可选：指定初始位置 (left, top)，但浏览器可能自动放置
+                    });
+
+                    // 保存引用
+                    pipWindow = pip;
+
+                    // 准备要在画中画窗口中显示的完整 HTML 内容
+                    const popupHtml = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>全局置顶画中画弹窗</title>
+                        <style>
+                            * {
+                                margin: 0;
+                                padding: 0;
+                                box-sizing: border-box;
+                                user-select: none;
+                            }
+                            body {
+                                background: linear-gradient(145deg, #1e1a2f 0%, #2a2438 100%);
+                                font-family: 'Segoe UI', system-ui, 'Poppins', sans-serif;
+                                height: 100vh;
+                                width: 100vw;
+                                overflow: hidden;
+                                display: flex;
+                                flex-direction: column;
+                                color: #f0eef7;
+                            }
+                            /* 自定义标题栏 (模拟拖动区域) */
+                            .title-bar {
+                                background: rgba(0, 0, 0, 0.4);
+                                backdrop-filter: blur(12px);
+                                padding: 14px 18px;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                cursor: move;
+                                -webkit-app-region: drag;
+                                app-region: drag;
+                                border-bottom: 1px solid rgba(255,255,255,0.15);
+                            }
+                            .title-bar h3 {
+                                font-size: 1rem;
+                                font-weight: 500;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            }
+                            .title-bar h3::before {
+                                content: "📌";
+                                font-size: 1rem;
+                            }
+                            .close-pip {
+                                background: rgba(255, 80, 80, 0.85);
+                                border: none;
+                                color: white;
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 30px;
+                                font-size: 18px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                transition: 0.2s;
+                                -webkit-app-region: no-drag;
+                                app-region: no-drag;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                            .close-pip:hover {
+                                background: #ff4d4d;
+                                transform: scale(1.02);
+                            }
+                            .content {
+                                flex: 1;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                padding: 24px 20px;
+                                text-align: center;
+                                gap: 20px;
+                            }
+                            .message-box {
+                                background: rgba(255,255,255,0.1);
+                                border-radius: 32px;
+                                padding: 24px 20px;
+                                width: 100%;
+                                backdrop-filter: blur(4px);
+                                border: 1px solid rgba(255,255,255,0.2);
+                            }
+                            .greeting {
+                                font-size: 1.6rem;
+                                font-weight: bold;
+                                margin-bottom: 12px;
+                                background: linear-gradient(135deg, #FFD166, #A06CF5);
+                                -webkit-background-clip: text;
+                                background-clip: text;
+                                color: transparent;
+                            }
+                            .info-text {
+                                font-size: 0.9rem;
+                                opacity: 0.9;
+                                margin: 12px 0;
+                            }
+                            .time-box {
+                                font-family: monospace;
+                                font-size: 1.2rem;
+                                background: #00000033;
+                                display: inline-block;
+                                padding: 6px 16px;
+                                border-radius: 40px;
+                                margin-top: 8px;
+                            }
+                            .action-buttons {
+                                display: flex;
+                                gap: 16px;
+                                flex-wrap: wrap;
+                                justify-content: center;
+                                margin-top: 8px;
+                            }
+                            .action-btn {
+                                background: rgba(255,255,255,0.2);
+                                border: none;
+                                color: white;
+                                padding: 8px 20px;
+                                border-radius: 40px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                transition: 0.2s;
+                                backdrop-filter: blur(4px);
+                                font-size: 0.8rem;
+                            }
+                            .action-btn:hover {
+                                background: #764ba2cc;
+                                transform: translateY(-2px);
+                            }
+                            .footer-note {
+                                font-size: 0.65rem;
+                                opacity: 0.6;
+                                margin-top: 12px;
+                            }
+                            .emoji-big {
+                                font-size: 2.5rem;
+                                filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+                                margin-bottom: 8px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="title-bar">
+                            <h3>✨ 全局置顶弹窗 ✨</h3>
+                            <button class="close-pip" id="closePipBtn">✕</button>
+                        </div>
+                        <div class="content">
+                            <div class="message-box">
+                                <div class="emoji-big" id="emojiArea">🌟</div>
+                                <div class="greeting" id="greetingMsg">永远在最顶层</div>
+                                <div class="info-text">
+                                    这是一个使用<strong>文档画中画API</strong>创建的窗口<br>
+                                    无论切换到哪个网页/应用，它都会浮在所有窗口之上
+                                </div>
+                                <div class="time-box" id="liveClock">--:--:--</div>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="changeEmojiBtn">🎭 切换表情</button>
+                                <button class="action-btn" id="refreshMsgBtn">💬 更新语录</button>
+                                <button class="action-btn" id="shrinkBtn">📐 缩小窗口</button>
+                            </div>
+                            <div class="footer-note">
+                                💡 提示：可拖动标题栏移动 | 缩放窗口边缘 | 始终置顶
+                            </div>
+                        </div>
+                        <script>
+                            // 实时时钟
+                            function updateClock() {
+                                const now = new Date();
+                                const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+                                const clockElem = document.getElementById('liveClock');
+                                if (clockElem) clockElem.innerText = timeStr;
+                            }
+                            updateClock();
+                            setInterval(updateClock, 1000);
+                            
+                            // 表情库
+                            const emojis = ['🌟', '🚀', '💎', '🌈', '⭐', '🎈', '🔥', '❄️', '💡', '📌', '🎧', '🍕', '🐱', '🐶', '🌸', '💪'];
+                            let emojiIndex = 0;
+                            const emojiSpan = document.getElementById('emojiArea');
+                            const changeEmojiBtn = document.getElementById('changeEmojiBtn');
+                            if (changeEmojiBtn) {
+                                changeEmojiBtn.addEventListener('click', () => {
+                                    emojiIndex = (emojiIndex + 1) % emojis.length;
+                                    if (emojiSpan) emojiSpan.innerText = emojis[emojiIndex];
+                                });
+                            }
+                            
+                            // 趣味语录库
+                            const quotes = [
+                                "🔝 系统级全局置顶",
+                                "🎯 永不沉没的窗口",
+                                "💪 独立于任何标签页",
+                                "📌 工作学习好帮手",
+                                "✨ 画中画API加持",
+                                "😎 就像钉在桌面上",
+                                "💖 随意拖动 自由缩放",
+                                "🔮 你的专属悬浮窗"
+                            ];
+                            let quoteIndex = 0;
+                            const greetingElem = document.getElementById('greetingMsg');
+                            const refreshBtn = document.getElementById('refreshMsgBtn');
+                            if (refreshBtn) {
+                                refreshBtn.addEventListener('click', () => {
+                                    quoteIndex = (quoteIndex + 1) % quotes.length;
+                                    if (greetingElem) greetingElem.innerText = quotes[quoteIndex];
+                                });
+                            }
+                            
+                            // 缩小窗口按钮 (调整至小巧尺寸)
+                            const shrinkBtn = document.getElementById('shrinkBtn');
+                            if (shrinkBtn) {
+                                shrinkBtn.addEventListener('click', () => {
+                                    window.resizeTo(340, 260);
+                                    // 可选：将窗口移动到屏幕右下角
+                                    if (window.screenLeft !== undefined && window.moveTo) {
+                                        const screenWidth = window.screen.availWidth || window.screen.width;
+                                        const screenHeight = window.screen.availHeight || window.screen.height;
+                                        window.moveTo(screenWidth - 360, screenHeight - 300);
+                                    }
+                                });
+                            }
+                            
+                            // 关闭按钮
+                            const closeBtn = document.getElementById('closePipBtn');
+                            if (closeBtn) {
+                                closeBtn.addEventListener('click', () => {
+                                    window.close();
+                                });
+                            }
+                            
+                            // 接收来自主窗口的实时消息 (postMessage)
+                            window.addEventListener('message', (event) => {
+                                // 安全起见可以校验 origin，这里允许同源
+                                if (event.data && event.data.type === 'updateMessage') {
+                                    if (greetingElem) greetingElem.innerText = event.data.text;
+                                } else if (event.data && event.data.type === 'updateEmoji') {
+                                    if (emojiSpan) emojiSpan.innerText = event.data.emoji;
+                                }
+                            });
+                            
+                            // 可选：通知主窗口已准备就绪
+                            if (window.opener) {
+                                window.opener.postMessage({ type: 'pipReady', message: '画中画窗口已加载' }, '*');
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `;
+                    // 将完整的HTML写入画中画窗口
+                    pip.document.write(popupHtml);
+                    // {// 用iframe嵌入网页
+                    //     // 在画中画窗口中创建 iframe
+                    //     const iframe = pipWindow.document.createElement('iframe');
+                    //     iframe.src = 'https://aidh.site';
+                    //     iframe.style.width = '100%';
+                    //     iframe.style.height = '100%';
+                    //     iframe.style.border = 'none';
+                    //     iframe.title = 'Embedded Content';
+                    //     // 添加一些基本样式到画中画窗口的 head
+                    //     const style = pipWindow.document.createElement('style');
+                    //     style.textContent = `
+                    //         body { margin: 0; padding: 0; overflow: hidden; background: #fff; }
+                    //         iframe { display: block; }
+                    //     `;
+                    //     pipWindow.document.head.appendChild(style);
+                    //     // 将 iframe 添加到画中画窗口的 body
+                    //     pipWindow.document.body.appendChild(iframe);
+                    // }
+
+                    pip.document.close();
+
+                    // 监听画中画窗口关闭事件，清理引用
+                    pip.addEventListener('pagehide', () => {
+                        if (pipWindow === pip) {
+                            pipWindow = null;
+                        }
+                    });
+
+                    // // 可选：主窗口向画中画窗口发送一条欢迎消息 (演示通信)
+                    // setTimeout(() => {
+                    //     if (pip && !pip.closed) {
+                    //         pip.postMessage({ type: 'updateMessage', text: '🎉 主窗口发来贺电！' }, '*');
+                    //         setTimeout(() => {
+                    //             if (pip && !pip.closed) {
+                    //                 pip.postMessage({ type: 'updateEmoji', emoji: '✨' }, '*');
+                    //             }
+                    //         }, 1000);
+                    //     }
+                    // }, 500);
+
+                } catch (err) {
+                    console.error('打开画中画窗口失败:', err);
+                    alert('无法打开画中画窗口，可能是权限限制或浏览器版本问题。\n请确保使用的是 Chrome/Edge 116+ 并允许画中画权限。');
+                }
+            }
+
+            // 绑定主按钮点击事件
+            openBtn.addEventListener('click', openPictureInPicture);
+            updateBtn.addEventListener('click', () => {
+                if (pipWindow && !pipWindow.closed) {
+                    pipWindow.postMessage({ type: 'updateMessage', text: '🎉 主窗口发来贺电！' }, '*');
+                    setTimeout(() => {
+                        if (pipWindow && !pipWindow.closed) {
+                            pipWindow.postMessage({ type: 'updateEmoji', emoji: '✨' }, '*');
+                        }
+                    }, 1000);
+                }
+            });
+
+            // 可选：当主窗口关闭时，可以尝试关闭画中画窗口（但不是必须）
+            window.addEventListener('beforeunload', () => {
+                if (pipWindow && !pipWindow.closed) {
+                    // 通常让用户自己决定是否关闭画中画，不主动强制关闭
+                    // 但为了优雅，可以什么都不做。若想关闭，可调用 pipWindow.close()
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

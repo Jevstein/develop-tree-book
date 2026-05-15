@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Notification API 完整演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #2196F3;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #f44336;
+            --dark-color: #2c3e50;
+            --light-color: #f5f5f5;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #1565C0);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .section {
+            background: var(--light-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            color: var(--dark-color);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .notification-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: var(--primary-color);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .secondary-btn {
+            background: #f1f3f4;
+            color: #333;
+        }
+        
+        .secondary-btn:hover {
+            background: #e8eaed;
+        }
+        
+        .success-btn {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .success-btn:hover {
+            background: #45a049;
+        }
+        
+        .warning-btn {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .warning-btn:hover {
+            background: #F57C00;
+        }
+        
+        .danger-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .danger-btn:hover {
+            background: #d32f2f;
+        }
+        
+        .notification-preview {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .notification-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .notification-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--dark-color);
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: #666;
+            margin-left: auto;
+        }
+        
+        .notification-body {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .notification-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .notification-action-btn:hover {
+            background: #e9ecef;
+        }
+        
+        .status {
+            background: #e8f5e8;
+            border: 2px solid var(--success-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .status.visible {
+            display: block;
+        }
+        
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-text {
+            font-weight: 600;
+            color: #2e7d32;
+        }
+        
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            background: white;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .notification-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .notification-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .notification-item-title {
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        .notification-item-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .notification-item-body {
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .notification-tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        footer {
+            background: var(--light-color);
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .notification-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .vibration-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .vibration-pattern {
+            padding: 8px 12px;
+            background: #f1f3f4;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .vibration-pattern:hover {
+            background: #e8eaed;
+        }
+        
+        .vibration-pattern.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .api-feature {
+            margin-bottom: 20px;
+        }
+        
+        .api-feature h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .api-feature code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔔 HTML5 Notification API 完整演示</h1>
+            <p class="subtitle">探索浏览器原生通知系统的各种功能和自定义选项</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="section">
+                <h2 class="section-title">📋 通知配置</h2>
+                
+                <div class="notification-form">
+                    <div class="form-group">
+                        <label>通知标题</label>
+                        <input type="text" id="notificationTitle" value="新消息提醒" placeholder="请输入通知标题">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>通知内容</label>
+                        <textarea id="notificationBody" placeholder="请输入通知内容">您有新的消息，请及时查看。点击通知可以跳转到相应页面。</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>通知图标</label>
+                        <select id="notificationIcon">
+                            <option value="">默认图标</option>
+                            <option value="✅" data-icon="✅">成功图标</option>
+                            <option value="⚠️" data-icon="⚠️">警告图标</option>
+                            <option value="🔔" data-icon="🔔">铃铛图标</option>
+                            <option value="📧" data-icon="📧">邮件图标</option>
+                            <option value="👤" data-icon="👤">用户图标</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>通知图片 (image)</label>
+                        <input type="text" id="notificationImage" placeholder="图片URL (可选)" value="https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=400&h=200&fit=crop">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>徽章 (badge)</label>
+                        <select id="notificationBadge">
+                            <option value="">无徽章</option>
+                            <option value="1" data-badge="1">红色徽章 (1)</option>
+                            <option value="3" data-badge="3">红色徽章 (3)</option>
+                            <option value="9" data-badge="9">红色徽章 (9+)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>标签 (tag)</label>
+                        <select id="notificationTag">
+                            <option value="">无标签 (显示多条)</option>
+                            <option value="message">消息通知 (tag: message)</option>
+                            <option value="alert">警报通知 (tag: alert)</option>
+                            <option value="reminder">提醒通知 (tag: reminder)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>主题颜色</label>
+                        <div class="color-picker">
+                            <div class="color-option selected" style="background: var(--primary-color);" data-color="var(--primary-color)"></div>
+                            <div class="color-option" style="background: var(--success-color);" data-color="var(--success-color)"></div>
+                            <div class="color-option" style="background: var(--warning-color);" data-color="var(--warning-color)"></div>
+                            <div class="color-option" style="background: var(--danger-color);" data-color="var(--danger-color)"></div>
+                            <div class="color-option" style="background: #9C27B0;" data-color="#9C27B0"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>振动模式</label>
+                        <div class="vibration-selector">
+                            <div class="vibration-pattern selected" data-pattern="[200, 100, 200]">短振 (200,100,200)</div>
+                            <div class="vibration-pattern" data-pattern="[300, 100, 300, 100, 300]">长振 (300,100,300,100,300)</div>
+                            <div class="vibration-pattern" data-pattern="[100, 50, 100, 50, 100, 50, 100]">连续振</div>
+                            <div class="vibration-pattern" data-pattern="[]">无振动</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>声音提示</label>
+                        <select id="notificationSound">
+                            <option value="">无声音</option>
+                            <option value="ding">叮咚声</option>
+                            <option value="bell">铃声</option>
+                            <option value="alert">警报声</option>
+                        </select>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="requireInteraction" checked>
+                        <label for="requireInteraction">需要用户交互 (requireInteraction)</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="renotify" checked>
+                        <label for="renotify">重新通知 (renotify)</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="silent">
+                        <label for="silent">静音 (silent)</label>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button class="primary-btn" id="sendNotification">
+                            <span>🔔</span> 发送通知
+                        </button>
+                        <button class="secondary-btn" id="sendTimedNotification">
+                            <span>⏰</span> 5秒后发送
+                        </button>
+                        <button class="danger-btn" id="closeAllNotifications">
+                            <span>🗑️</span> 关闭所有通知
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="status" id="notificationStatus">
+                    <div class="status-content">
+                        <div class="status-dot"></div>
+                        <div class="status-text" id="statusText">就绪</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">👁️ 通知预览</h2>
+                
+                <div class="notification-preview">
+                    <div class="notification-card" id="previewNotification">
+                        <div class="notification-header">
+                            <div class="notification-icon">
+                                <img src="https://via.placeholder.com/40x40/2196F3/ffffff?text=📧" alt="图标" id="previewIcon">
+                            </div>
+                            <div class="notification-title" id="previewTitle">新消息提醒</div>
+                            <div class="notification-time" id="previewTime">刚刚</div>
+                        </div>
+                        
+                        <div id="previewImageContainer"></div>
+                        
+                        <div class="notification-body" id="previewBody">
+                            您有新的消息，请及时查看。点击通知可以跳转到相应页面。
+                        </div>
+                        
+                        <div class="notification-actions" id="previewActions"></div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title" style="margin-top: 30px;">📊 通知历史</h2>
+                
+                <div class="notification-list" id="notificationHistory">
+                    <!-- 通知历史将在这里显示 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content" style="grid-template-columns: 1fr;">
+            <div class="section">
+                <h2 class="section-title">🎯 示例演示</h2>
+                
+                <div class="buttons">
+                    <button class="success-btn" id="testBasicNotification">
+                        <span>📄</span> 基本通知
+                    </button>
+                    <button class="warning-btn" id="testActionNotification">
+                        <span>🔧</span> 带动作按钮
+                    </button>
+                    <button class="primary-btn" id="testImageNotification">
+                        <span>🖼️</span> 带图片通知
+                    </button>
+                    <button class="danger-btn" id="testTagNotification">
+                        <span>🏷️</span> 标签替换
+                    </button>
+                    <button class="success-btn" id="testScheduleNotification">
+                        <span>⏱️</span> 定时通知
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content" style="grid-template-columns: 1fr;">
+            <div class="section">
+                <h2 class="section-title">📖 API 文档参考</h2>
+                
+                <div class="feature-grid">
+                    <div class="api-feature">
+                        <h3>基本属性</h3>
+                        <p><code>title</code>: 通知标题</p>
+                        <p><code>body</code>: 通知内容</p>
+                        <p><code>icon</code>: 图标URL</p>
+                        <p><code>image</code>: 图片URL</p>
+                        <p><code>badge</code>: 徽章图标URL</p>
+                    </div>
+                    
+                    <div class="api-feature">
+                        <h3>行为属性</h3>
+                        <p><code>tag</code>: 通知标签（用于替换）</p>
+                        <p><code>requireInteraction</code>: 需要用户交互</p>
+                        <p><code>renotify</code>: 重新通知时振动</p>
+                        <p><code>silent</code>: 静音模式</p>
+                        <p><code>vibrate</code>: 振动模式数组</p>
+                    </div>
+                    
+                    <div class="api-feature">
+                        <h3>事件处理</h3>
+                        <p><code>onclick</code>: 点击事件</p>
+                        <p><code>onclose</code>: 关闭事件</p>
+                        <p><code>onshow</code>: 显示事件</p>
+                        <p><code>onerror</code>: 错误事件</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2024 HTML5 Notification API 演示 | 兼容 Chrome 50+, Firefox 22+, Safari 9+ 等现代浏览器</p>
+            <p>当前浏览器支持: <span id="supportStatus">检测中...</span></p>
+        </footer>
+    </div>
+
+    <!-- 声音文件 -->
+    <audio id="dingSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="bellSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="alertSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        class NotificationDemo {
+            constructor() {
+                this.currentPermission = null;
+                this.notificationHistory = [];
+                this.currentColor = 'var(--primary-color)';
+                this.vibrationPattern = [200, 100, 200];
+                this.activeNotifications = new Set();
+                
+                this.init();
+            }
+            
+            init() {
+                // 检查浏览器支持
+                this.checkSupport();
+                
+                // 请求通知权限
+                this.requestPermission();
+                
+                // 绑定事件
+                this.bindEvents();
+                
+                // 初始化预览
+                this.updatePreview();
+                
+                // 设置自动保存
+                this.setupAutoSave();
+                
+                console.log('Notification 演示已初始化');
+            }
+            
+            checkSupport() {
+                const supportStatus = document.getElementById('supportStatus');
+                
+                if (!('Notification' in window)) {
+                    supportStatus.innerHTML = '<span style="color: var(--danger-color);">❌ 不支持</span>';
+                    this.showStatus('您的浏览器不支持通知功能', 'error');
+                    return false;
+                }
+                
+                // 检查功能支持
+                const features = {
+                    'actions': 'actions' in Notification.prototype,
+                    'badge': 'badge' in Notification.prototype,
+                    'image': 'image' in Notification.prototype,
+                    'renotify': 'renotify' in Notification.prototype,
+                    'requireInteraction': 'requireInteraction' in Notification.prototype,
+                    'silent': 'silent' in Notification.prototype,
+                    'tag': 'tag' in Notification.prototype,
+                    'vibrate': 'vibrate' in Notification.prototype
+                };
+                
+                let supportedFeatures = Object.keys(features).filter(f => features[f]).length;
+                let totalFeatures = Object.keys(features).length;
+                
+                supportStatus.innerHTML = `<span style="color: var(--success-color);">✅ 支持 (${supportedFeatures}/${totalFeatures} 功能)</span>`;
+                
+                return true;
+            }
+            
+            async requestPermission() {
+                if (!('Notification' in window)) return;
+                
+                try {
+                    this.currentPermission = Notification.permission;
+                    
+                    if (this.currentPermission === 'default') {
+                        const permission = await Notification.requestPermission();
+                        this.currentPermission = permission;
+                        
+                        if (permission === 'granted') {
+                            this.showStatus('通知权限已授予', 'success');
+                        } else if (permission === 'denied') {
+                            this.showStatus('通知权限被拒绝，请手动在浏览器设置中开启', 'error');
+                        }
+                    } else if (this.currentPermission === 'granted') {
+                        this.showStatus('通知权限已授予', 'success');
+                    } else if (this.currentPermission === 'denied') {
+                        this.showStatus('通知权限被拒绝，请手动在浏览器设置中开启', 'error');
+                    }
+                } catch (error) {
+                    console.error('请求通知权限失败:', error);
+                    this.showStatus(`权限请求失败: ${error.message}`, 'error');
+                }
+            }
+            
+            bindEvents() {
+                // 发送通知按钮
+                document.getElementById('sendNotification').addEventListener('click', () => {
+                    this.sendCustomNotification();
+                });
+                
+                // 定时发送按钮
+                document.getElementById('sendTimedNotification').addEventListener('click', () => {
+                    this.sendTimedNotification();
+                });
+                
+                // 关闭所有通知按钮
+                document.getElementById('closeAllNotifications').addEventListener('click', () => {
+                    this.closeAllNotifications();
+                });
+                
+                // 示例演示按钮
+                document.getElementById('testBasicNotification').addEventListener('click', () => {
+                    this.testBasicNotification();
+                });
+                
+                document.getElementById('testActionNotification').addEventListener('click', () => {
+                    this.testActionNotification();
+                });
+                
+                document.getElementById('testImageNotification').addEventListener('click', () => {
+                    this.testImageNotification();
+                });
+                
+                document.getElementById('testTagNotification').addEventListener('click', () => {
+                    this.testTagNotification();
+                });
+                
+                document.getElementById('testScheduleNotification').addEventListener('click', () => {
+                    this.testScheduleNotification();
+                });
+                
+                // 颜色选择器
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        this.currentColor = option.dataset.color;
+                        this.updatePreview();
+                    });
+                });
+                
+                // 振动模式选择器
+                document.querySelectorAll('.vibration-pattern').forEach(pattern => {
+                    pattern.addEventListener('click', () => {
+                        document.querySelectorAll('.vibration-pattern').forEach(p => p.classList.remove('selected'));
+                        pattern.classList.add('selected');
+                        this.vibrationPattern = JSON.parse(pattern.dataset.pattern || '[]');
+                    });
+                });
+                
+                // 表单输入变化时更新预览
+                ['notificationTitle', 'notificationBody', 'notificationIcon', 'notificationImage'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => {
+                        this.updatePreview();
+                    });
+                });
+                
+                document.getElementById('notificationBadge').addEventListener('change', () => {
+                    this.updatePreview();
+                });
+                
+                // 播放声音
+                document.getElementById('notificationSound').addEventListener('change', (e) => {
+                    this.playSound(e.target.value);
+                });
+            }
+            
+            updatePreview() {
+                const title = document.getElementById('notificationTitle').value || '新消息提醒';
+                const body = document.getElementById('notificationBody').value || '通知内容';
+                const iconSelect = document.getElementById('notificationIcon');
+                const selectedIcon = iconSelect.options[iconSelect.selectedIndex];
+                const iconValue = selectedIcon.dataset.icon || '📧';
+                const imageUrl = document.getElementById('notificationImage').value;
+                const badgeSelect = document.getElementById('notificationBadge');
+                const badgeValue = badgeSelect.options[badgeSelect.selectedIndex].dataset.badge;
+                
+                // 提取颜色代码
+                const colorCode = this.currentColor.replace('var(--', '').replace(')', '');
+                let actualColor = getComputedStyle(document.documentElement).getPropertyValue(this.currentColor) || '#2196F3';
+                
+                // 更新预览
+                document.getElementById('previewTitle').textContent = title;
+                document.getElementById('previewBody').textContent = body;
+                document.getElementById('previewIcon').src = `https://via.placeholder.com/40x40/${actualColor.replace('#', '')}/ffffff?text=${encodeURIComponent(iconValue)}`;
+                document.getElementById('previewTime').textContent = '刚刚';
+                
+                // 更新图片预览
+                const imageContainer = document.getElementById('previewImageContainer');
+                if (imageUrl && imageUrl.trim() !== '') {
+                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="预览图片" class="notification-image">`;
+                } else {
+                    imageContainer.innerHTML = '';
+                }
+                
+                // 更新徽章预览
+                const badgeElement = document.querySelector('.badge') || document.createElement('div');
+                badgeElement.className = 'badge';
+                
+                if (badgeValue) {
+                    badgeElement.textContent = badgeValue;
+                    document.getElementById('previewNotification').appendChild(badgeElement);
+                } else if (badgeElement.parentNode) {
+                    badgeElement.remove();
+                }
+                
+                // 更新动作按钮预览
+                const actionsContainer = document.getElementById('previewActions');
+                actionsContainer.innerHTML = `
+                    <button class="notification-action-btn">查看</button>
+                    <button class="notification-action-btn">忽略</button>
+                `;
+            }
+            
+            async sendCustomNotification() {
+                if (this.currentPermission !== 'granted') {
+                    this.showStatus('请先授予通知权限', 'error');
+                    await this.requestPermission();
+                    if (this.currentPermission !== 'granted') return;
+                }
+                
+                try {
+                    const title = document.getElementById('notificationTitle').value || '新消息提醒';
+                    const body = document.getElementById('notificationBody').value || '通知内容';
+                    const iconSelect = document.getElementById('notificationIcon');
+                    const selectedIcon = iconSelect.options[iconSelect.selectedIndex];
+                    const iconValue = selectedIcon.dataset.icon || '📧';
+                    const imageUrl = document.getElementById('notificationImage').value;
+                    const badgeSelect = document.getElementById('notificationBadge');
+                    const badgeValue = badgeSelect.options[badgeSelect.selectedIndex].value;
+                    const tagSelect = document.getElementById('notificationTag');
+                    const tagValue = tagSelect.value;
+                    const requireInteraction = document.getElementById('requireInteraction').checked;
+                    const renotify = document.getElementById('renotify').checked;
+                    const silent = document.getElementById('silent').checked;
+                    const sound = document.getElementById('notificationSound').value;
+                    
+                    // 获取实际颜色
+                    let actualColor = getComputedStyle(document.documentElement).getPropertyValue(this.currentColor) || '#2196F3';
+                    
+                    // 构建通知选项
+                    const options = {
+                        body: body,
+                        icon: `https://via.placeholder.com/192x192/${actualColor.replace('#', '')}/ffffff?text=${encodeURIComponent(iconValue)}`,
+                        tag: tagValue || undefined,
+                        requireInteraction: requireInteraction,
+                        renotify: renotify,
+                        silent: silent,
+                        vibrate: this.vibrationPattern.length > 0 ? this.vibrationPattern : undefined
+                    };
+                    
+                    // 添加徽章
+                    if (badgeValue && 'badge' in Notification.prototype) {
+                        options.badge = `https://via.placeholder.com/72x72/${actualColor.replace('#', '')}/ffffff?text=${badgeValue}`;
+                    }
+                    
+                    // 添加图片
+                    if (imageUrl && imageUrl.trim() !== '' && 'image' in Notification.prototype) {
+                        options.image = imageUrl;
+                    }
+                    
+                    // 添加动作按钮
+                    if ('actions' in Notification.prototype) {
+                        options.actions = [
+                            {
+                                action: 'view',
+                                title: '查看详情',
+                                icon: 'https://via.placeholder.com/24x24/4CAF50/ffffff?text=👁️'
+                            },
+                            {
+                                action: 'dismiss',
+                                title: '忽略',
+                                icon: 'https://via.placeholder.com/24x24/666666/ffffff?text=✕'
+                            }
+                        ];
+                    }
+                    
+                    // 播放声音
+                    if (sound && !silent) {
+                        this.playSound(sound);
+                    }
+                    
+                    // 发送通知
+                    const notification = new Notification(title, options);
+                    
+                    // 添加到活动通知集合
+                    this.activeNotifications.add(notification);
+                    
+                    // 设置事件监听器
+                    this.setupNotificationEvents(notification, title, body);
+                    
+                } catch (error) {
+                    console.error('发送通知失败:', error);
+                    this.showStatus(`发送失败: ${error.message}`, 'error');
+                }
+            }
+            
+            setupNotificationEvents(notification, title, body) {
+                notification.onclick = (event) => {
+                    event.preventDefault();
+                    window.focus();
+                    
+                    this.showStatus('通知被点击，跳转到页面...', 'success');
+                    
+                    // 模拟页面跳转
+                    setTimeout(() => {
+                        alert(`您点击了通知: "${title}"\n跳转到相关页面...`);
+                    }, 100);
+                };
+                
+                notification.onshow = () => {
+                    console.log('通知已显示:', title);
+                    this.showStatus(`通知已发送: "${title}"`, 'success');
+                    this.addToHistory(title, body, 'success');
+                };
+                
+                notification.onclose = () => {
+                    console.log('通知已关闭:', title);
+                    this.showStatus(`通知已关闭: "${title}"`, 'info');
+                    this.activeNotifications.delete(notification);
+                };
+                
+                notification.onerror = (error) => {
+                    console.error('通知错误:', error);
+                    this.showStatus(`通知发送失败: ${error.message}`, 'error');
+                    this.addToHistory(title, body, 'error');
+                    this.activeNotifications.delete(notification);
+                };
+                
+                // 动作按钮点击事件
+                if (notification.actions && notification.actions.length > 0) {
+                    // 注意：某些浏览器不支持 notification.onaction
+                    // 在实际应用中，通常通过 Service Worker 处理动作按钮
+                }
+            }
+            
+            sendTimedNotification() {
+                this.showStatus('通知将在5秒后发送...', 'info');
+                
+                setTimeout(() => {
+                    this.sendCustomNotification();
+                }, 5000);
+            }
+            
+            playSound(soundType) {
+                const soundMap = {
+                    'ding': document.getElementById('dingSound'),
+                    'bell': document.getElementById('bellSound'),
+                    'alert': document.getElementById('alertSound')
+                };
+                
+                const sound = soundMap[soundType];
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play().catch(error => {
+                        console.warn('播放声音失败:', error);
+                    });
+                }
+            }
+            
+            showStatus(message, type = 'info') {
+                const statusElement = document.getElementById('notificationStatus');
+                const statusText = document.getElementById('statusText');
+                
+                statusText.textContent = message;
+                statusElement.className = 'status visible';
+                
+                // 根据类型设置样式
+                if (type === 'success') {
+                    statusElement.style.background = '#e8f5e8';
+                    statusElement.style.borderColor = 'var(--success-color)';
+                    statusText.style.color = '#2e7d32';
+                } else if (type === 'error') {
+                    statusElement.style.background = '#ffebee';
+                    statusElement.style.borderColor = 'var(--danger-color)';
+                    statusText.style.color = '#c62828';
+                } else if (type === 'info') {
+                    statusElement.style.background = '#e3f2fd';
+                    statusElement.style.borderColor = 'var(--primary-color)';
+                    statusText.style.color = '#1565c0';
+                } else if (type === 'warning') {
+                    statusElement.style.background = '#fff3e0';
+                    statusElement.style.borderColor = 'var(--warning-color)';
+                    statusText.style.color = '#ef6c00';
+                }
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    statusElement.classList.remove('visible');
+                }, 3000);
+            }
+            
+            addToHistory(title, body, status) {
+                const historyElement = document.getElementById('notificationHistory');
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('zh-CN', { 
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item';
+                
+                let statusBadge = '';
+                if (status === 'success') {
+                    statusBadge = '<span class="notification-tag" style="background: var(--success-color);">成功</span>';
+                } else if (status === 'error') {
+                    statusBadge = '<span class="notification-tag" style="background: var(--danger-color);">失败</span>';
+                }
+                
+                notificationItem.innerHTML = `
+                    <div class="notification-item-header">
+                        <div class="notification-item-title">${title} ${statusBadge}</div>
+                        <div class="notification-item-time">${timeStr}</div>
+                    </div>
+                    <div class="notification-item-body">${body}</div>
+                `;
+                
+                // 添加到历史列表顶部
+                historyElement.insertBefore(notificationItem, historyElement.firstChild);
+                
+                // 限制历史记录数量
+                const maxHistory = 10;
+                while (historyElement.children.length > maxHistory) {
+                    historyElement.removeChild(historyElement.lastChild);
+                }
+                
+                // 保存到内存
+                this.notificationHistory.unshift({
+                    title,
+                    body,
+                    time: now,
+                    status
+                });
+            }
+            
+            closeAllNotifications() {
+                // 关闭所有活动通知
+                this.activeNotifications.forEach(notification => {
+                    notification.close();
+                });
+                this.activeNotifications.clear();
+                
+                // 清空历史记录
+                document.getElementById('notificationHistory').innerHTML = '';
+                this.notificationHistory = [];
+                
+                this.showStatus('已关闭所有通知并清空历史记录', 'info');
+            }
+            
+            // 示例演示函数
+            testBasicNotification() {
+                const options = {
+                    body: '这是一个基本的浏览器通知示例',
+                    icon: 'https://via.placeholder.com/192x192/4CAF50/ffffff?text=✅',
+                    requireInteraction: true
+                };
+                
+                const notification = new Notification('基本通知演示', options);
+                this.setupNotificationEvents(notification, '基本通知演示', options.body);
+            }
+            
+            testActionNotification() {
+                if (!('actions' in Notification.prototype)) {
+                    this.showStatus('当前浏览器不支持动作按钮', 'warning');
+                    return;
+                }
+                
+                const options = {
+                    body: '请选择一个操作：查看详情、回复或忽略此通知',
+                    icon: 'https://via.placeholder.com/192x192/FF9800/ffffff?text=🔧',
+                    requireInteraction: true,
+                    actions: [
+                        {
+                            action: 'view',
+                            title: '查看详情',
+                            icon: 'https://via.placeholder.com/24x24/4CAF50/ffffff?text=👁️'
+                        },
+                        {
+                            action: 'reply',
+                            title: '回复',
+                            icon: 'https://via.placeholder.com/24x24/2196F3/ffffff?text=↩️'
+                        },
+                        {
+                            action: 'dismiss',
+                            title: '忽略',
+                            icon: 'https://via.placeholder.com/24x24/666666/ffffff?text=✕'
+                        }
+                    ]
+                };
+                
+                const notification = new Notification('带动作按钮的通知', options);
+                this.setupNotificationEvents(notification, '带动作按钮的通知', options.body);
+                
+                // 处理动作按钮点击
+                notification.addEventListener('click', (event) => {
+                    if (event.action) {
+                        this.showStatus(`点击了动作按钮: ${event.action}`, 'info');
+                    }
+                });
+            }
+            
+            testImageNotification() {
+                if (!('image' in Notification.prototype)) {
+                    this.showStatus('当前浏览器不支持图片通知', 'warning');
+                    return;
+                }
+                
+                const options = {
+                    body: '这是一条带有图片的示例通知，图片来自Unsplash',
+                    icon: 'https://via.placeholder.com/192x192/2196F3/ffffff?text=🖼️',
+                    image: 'https://images.unsplash.com/photo-1579546929662-711aa81148cf?w=400&h=200&fit=crop',
+                    requireInteraction: true
+                };
+                
+                const notification = new Notification('带图片的通知', options);
+                this.setupNotificationEvents(notification, '带图片的通知', options.body);
+            }
+            
+            testTagNotification() {
+                const tag = 'test-tag';
+                
+                // 发送3条相同标签的通知
+                for (let i = 1; i <= 3; i++) {
+                    setTimeout(() => {
+                        const options = {
+                            body: `这是第 ${i} 条使用相同标签的通知`,
+                            icon: 'https://via.placeholder.com/192x192/F44336/ffffff?text=🏷️',
+                            tag: tag,
+                            renotify: i > 1
+                        };
+                        
+                        const notification = new Notification(`标签测试通知 (${i}/3)`, options);
+                        this.setupNotificationEvents(notification, `标签测试通知 (${i}/3)`, options.body);
+                        
+                        this.showStatus(`发送了标签通知 ${i}/3`, 'info');
+                    }, i * 1500);
+                }
+                
+                this.showStatus('标签替换测试：将发送3条相同标签的通知（间隔1.5秒）', 'info');
+            }
+            
+            testScheduleNotification() {
+                const now = new Date();
+                const targetTime = new Date(now.getTime() + 10000); // 10秒后
+                
+                this.showStatus(`定时通知将在 ${targetTime.toLocaleTimeString()} 发送`, 'info');
+                
+                setTimeout(() => {
+                    const options = {
+                        body: '定时通知已触发！这是10秒前安排的通知。',
+                        icon: 'https://via.placeholder.com/192x192/9C27B0/ffffff?text=⏱️',
+                        requireInteraction: true
+                    };
+                    
+                    const notification = new Notification('定时通知演示', options);
+                    this.setupNotificationEvents(notification, '定时通知演示', options.body);
+                }, 10000);
+            }
+            
+            setupAutoSave() {
+                // 自动保存表单状态到 localStorage
+                const formFields = [
+                    'notificationTitle',
+                    'notificationBody',
+                    'notificationIcon',
+                    'notificationImage',
+                    'notificationBadge',
+                    'notificationTag',
+                    'requireInteraction',
+                    'renotify',
+                    'silent',
+                    'notificationSound'
+                ];
+                
+                // 加载保存的状态
+                formFields.forEach(field => {
+                    const element = document.getElementById(field);
+                    if (!element) return;
+                    
+                    const savedValue = localStorage.getItem(`notification_${field}`);
+                    if (savedValue !== null) {
+                        if (element.type === 'checkbox') {
+                            element.checked = savedValue === 'true';
+                        } else {
+                            element.value = savedValue;
+                            
+                            // 对于select，需要设置正确的选项
+                            if (element.tagName === 'SELECT') {
+                                for (let i = 0; i < element.options.length; i++) {
+                                    if (element.options[i].value === savedValue) {
+                                        element.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 保存变化
+                    element.addEventListener('change', () => {
+                        const value = element.type === 'checkbox' ? element.checked : element.value;
+                        localStorage.setItem(`notification_${field}`, value);
+                    });
+                });
+                
+                // 保存颜色选择
+                const savedColor = localStorage.getItem('notification_color');
+                if (savedColor) {
+                    this.currentColor = savedColor;
+                    document.querySelectorAll('.color-option').forEach(option => {
+                        if (option.dataset.color === savedColor) {
+                            option.classList.add('selected');
+                        } else {
+                            option.classList.remove('selected');
+                        }
+                    });
+                }
+                
+                // 保存振动模式
+                const savedVibration = localStorage.getItem('notification_vibration');
+                if (savedVibration) {
+                    this.vibrationPattern = JSON.parse(savedVibration);
+                    document.querySelectorAll('.vibration-pattern').forEach(pattern => {
+                        if (pattern.dataset.pattern === savedVibration) {
+                            pattern.classList.add('selected');
+                        } else {
+                            pattern.classList.remove('selected');
+                        }
+                    });
+                }
+                
+                console.log('表单状态已从 localStorage 恢复');
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            window.notificationDemo = new NotificationDemo();
+        });
+        
+        // 页面可见性变化处理
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && window.notificationDemo) {
+                // 页面重新获得焦点时，检查通知权限状态
+                window.notificationDemo.requestPermission();
+            }
+        });
+    </script>
+</body>
+</html>
