@@ -195,12 +195,13 @@
           .item {
             position: relative;
             padding: 5px 8px;
-            font-size: 12px;
+            font-size: 9px;
             background: #ffffff;
             color: #818181;
             border: 1px solid #e5e5e5;
             border-radius: 5px;
             width: 48px;
+            text-align: center;
 
             &.checked {
               background: #5d9cec;

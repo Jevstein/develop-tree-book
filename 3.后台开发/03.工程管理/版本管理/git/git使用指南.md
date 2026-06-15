@@ -172,7 +172,43 @@ $ git checkout ../../script.py
 
 
 
-### 4、常见错误处理
+### 4、常见问题
+
+##### 1）如何回滚？
+
+* 通过执行命令git log，获得如下日志：
+
+  ```bash
+  commit 53e8d747bb84b9022bed9c86a3a81a47a47b77d0 (HEAD -> hotfix-10.1.16, origin/hotfix-10.1.16)
+  Merge: cc5d0578 fd3821f2
+  Author: 金乌斯坦 <303575398@qq.com>
+  Date:   Mon May 25 18:10:23 2026 +0800
+  
+      Merge branch 'dev' of http://xxx/EM/xxx-desktop into hotfix-10.1.16
+  
+  commit cc5d0578b9280200bdd28e9fff9ebbbd76bde260
+  Merge: e9fac2a2 ce359f96
+  Author: 金乌斯坦 <303575398@qq.com>
+  Date:   Mon May 25 13:56:50 2026 +0800
+  
+      Merge branch 'hotfix-10.1.16' of http://xxx/EM/xxx-desktop into hotfix-10.1.16
+  
+  commit e9fac2a2f4924c4acd3749645665263c9aa44e9e
+  Author: 金乌斯坦 <303575398@qq.com>
+  Date:   Mon May 25 13:54:57 2026 +0800
+  
+      feat: no.2185446 新增 eteams-desktop start
+  ```
+
+* 若要回滚到“feat: no.2185446 新增 eteams-desktop start”，即commit = e9fac2a2f4924c4acd3749645665263c9aa44e9e，则需执行命令如下：
+
+  ```bash
+  git revert -m 1 e9fac2a2f4924c4acd3749645665263c9aa44e9e
+  ```
+
+  
+
+### 5、常见错误处理
 
 #### 1）fatal: Authentication failed for ...
 * 解决：

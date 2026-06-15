@@ -1,0 +1,3871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIM — 智能工作协同</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-2: #475569;
+      --text-3: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --warning: #d97706;
+      --warning-soft: #fffbeb;
+      --danger: #dc2626;
+      --ai: #7c3aed;
+      --ai-soft: #f5f3ff;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(15, 23, 42, 0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --sidebar-w: 72px;
+      --list-w: 300px;
+      --card-panel-w: 340px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, textarea { font-family: inherit; }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Icon sidebar ── */
+    .icon-nav {
+      width: var(--sidebar-w);
+      background: #0f172a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #94a3b8;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .nav-btn:hover { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+    .nav-btn.active { background: rgba(37,99,235,0.25); color: #60a5fa; }
+    .nav-btn .icon { font-size: 20px; line-height: 1; }
+    .nav-btn .label { font-size: 10px; }
+
+    .nav-btn .badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      min-width: 16px;
+      height: 16px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .avatar-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* ── List panel ── */
+    .list-panel {
+      width: var(--list-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .list-header {
+      padding: 20px 16px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+
+    .search-box input {
+      border: none;
+      background: none;
+      outline: none;
+      flex: 1;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .search-box input::placeholder { color: var(--text-3); }
+
+    .sub-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+
+    .sub-tab {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-2);
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .sub-tab:hover { background: var(--bg); }
+    .sub-tab.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+
+    .list-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.1s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .list-item:hover { background: var(--surface-2); }
+    .list-item.active { background: var(--primary-soft); }
+
+    .item-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .item-avatar.group { border-radius: 10px; }
+    .item-avatar.ai { background: linear-gradient(135deg, #7c3aed, #a78bfa) !important; }
+    .item-avatar.system { background: #64748b !important; border-radius: 10px; }
+    .item-avatar.item { background: linear-gradient(135deg, #059669, #34d399) !important; border-radius: 10px; }
+
+    .item-content { flex: 1; min-width: 0; }
+    .item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .item-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-time { font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+    .item-preview { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-meta { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .tag.todo { background: #fef3c7; color: #b45309; }
+    .tag.processing { background: var(--primary-soft); color: var(--primary); }
+    .tag.done { background: var(--success-soft); color: var(--success); }
+    .tag.ai-tag { background: var(--ai-soft); color: var(--ai); }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .fab-btn {
+      margin: 12px 16px;
+      padding: 10px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .fab-btn:hover { background: var(--primary-hover); }
+
+    /* ── Main content ── */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+
+    /* Welcome screen */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--text-2);
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .welcome h3 { font-size: 20px; color: var(--text); }
+    .welcome p { font-size: 14px; max-width: 400px; text-align: center; line-height: 1.6; }
+
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .quick-btn {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.15s;
+    }
+
+    .quick-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .quick-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .quick-btn.primary:hover { background: var(--primary-hover); }
+
+    /* ── Chat view ── */
+    .chat-view {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--surface);
+    }
+
+    .chat-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info { flex: 1; min-width: 0; }
+    .chat-header-info h3 { font-size: 15px; font-weight: 700; }
+    .chat-header-info p { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+    .layer-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+
+    .layer-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-2);
+      white-space: nowrap;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .layer-tab:hover { background: var(--surface); border-color: var(--border); }
+    .layer-tab.active { background: var(--surface); border-color: var(--primary); color: var(--primary); font-weight: 600; box-shadow: var(--shadow); }
+    .layer-tab .close-layer { opacity: 0.5; font-size: 14px; padding: 0 2px; }
+    .layer-tab .close-layer:hover { opacity: 1; color: var(--danger); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg-date {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-3);
+      margin: 4px 0;
+    }
+
+    .message {
+      display: flex;
+      gap: 10px;
+      max-width: 75%;
+    }
+
+    .message.self { align-self: flex-end; flex-direction: row-reverse; }
+    .message.system-msg { align-self: center; max-width: 90%; }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+
+    .message.self .msg-bubble {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .message.ai .msg-bubble {
+      background: var(--ai-soft);
+      border-color: #ddd6fe;
+    }
+
+    .msg-sender { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+    .message.self .msg-sender { text-align: right; }
+
+    .system-msg .msg-bubble {
+      background: var(--warning-soft);
+      border-color: #fde68a;
+      color: var(--warning);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* Item card in chat */
+    .item-card-inline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      max-width: 320px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .item-card-inline:hover { border-color: var(--primary); transform: translateY(-1px); }
+
+    .card-inline-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-inline-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--success-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .card-inline-title { font-size: 14px; font-weight: 700; }
+    .card-inline-id { font-size: 11px; color: var(--text-3); }
+
+    .card-inline-body { font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 10px; }
+
+    .card-inline-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .card-inline-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .card-action-btn {
+      flex: 1;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+
+    .card-action-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .card-action-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .card-action-btn.primary:hover { background: var(--primary-hover); }
+
+    /* AI draft card */
+    .draft-card {
+      background: var(--surface);
+      border: 2px dashed var(--ai);
+      border-radius: var(--radius);
+      padding: 16px;
+      max-width: 380px;
+    }
+
+    .draft-card h4 {
+      font-size: 14px;
+      color: var(--ai);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .draft-field {
+      display: flex;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .draft-label { color: var(--text-3); width: 72px; flex-shrink: 0; }
+    .draft-value { color: var(--text); font-weight: 500; }
+
+    .draft-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chat-input-area {
+      padding: 12px 20px 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chat-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .toolbar-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-2);
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+
+    .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .toolbar-btn.ai-btn { border-color: #c4b5fd; color: var(--ai); background: var(--ai-soft); }
+    .toolbar-btn.ai-btn:hover { background: #ede9fe; }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-textarea {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      min-height: 42px;
+      max-height: 120px;
+      line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+
+    .chat-textarea:focus { border-color: var(--primary); }
+
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover { background: var(--primary-hover); }
+    .send-btn:disabled { background: var(--text-3); cursor: not-allowed; }
+
+    /* ── Right card panel ── */
+    .card-panel {
+      width: var(--card-panel-w);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .card-panel-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-panel-header h3 { font-size: 14px; font-weight: 700; }
+
+    .card-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .side-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .side-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+    .side-card.active { border-color: var(--primary); background: var(--primary-soft); }
+
+    .side-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .side-card-title { font-size: 13px; font-weight: 700; line-height: 1.4; }
+    .side-card-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+
+    .side-card-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 10px; }
+
+    .side-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .side-card-meta span { display: flex; align-items: center; gap: 3px; }
+
+    .side-card-nested {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .nested-link {
+      font-size: 11px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .nested-link:hover { text-decoration: underline; }
+
+    .timeline {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .timeline h4 { font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--text-2); }
+
+    .timeline-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .timeline-dot.done { background: var(--success); }
+    .timeline-content { color: var(--text-2); line-height: 1.4; }
+    .timeline-time { color: var(--text-3); font-size: 10px; }
+
+    /* ── Items view table ── */
+    .items-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .items-toolbar {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .items-toolbar h2 { font-size: 18px; font-weight: 700; }
+
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      transition: all 0.15s;
+    }
+
+    .chip:hover { border-color: var(--primary); color: var(--primary); }
+    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .items-table-wrap {
+      flex: 1;
+      overflow: auto;
+      padding: 0 24px 24px;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-top: 16px;
+    }
+
+    .items-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .items-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .items-table tr:hover td { background: var(--surface-2); }
+    .items-table tr:last-child td { border-bottom: none; }
+
+    /* ── Contacts ── */
+    .contacts-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .contacts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .contact-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+
+    .contact-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .contact-name { font-size: 14px; font-weight: 600; }
+    .contact-dept { font-size: 12px; color: var(--text-2); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 480px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+      transform: translateY(20px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.show .modal { transform: translateY(0); }
+
+    .modal-header {
+      padding: 20px 24px 0;
+    }
+
+    .modal-header h3 { font-size: 16px; font-weight: 700; }
+    .modal-header p { font-size: 13px; color: var(--text-2); margin-top: 6px; line-height: 1.5; }
+
+    .modal-body { padding: 20px 24px; }
+
+    .modal-footer {
+      padding: 0 24px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost { border: 1px solid var(--border); color: var(--text-2); }
+    .btn-ghost:hover { border-color: var(--text-2); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-ai { background: var(--ai); color: #fff; }
+    .btn-ai:hover { background: #6d28d9; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      z-index: 2000;
+      transition: transform 0.3s;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .hidden { display: none !important; }
+
+    /* Typing indicator */
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background: var(--ai);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+    .header-action-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      transition: all 0.15s;
+    }
+    .header-action-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* User switcher */
+    .avatar-sm { cursor: pointer; position: relative; }
+    .user-switcher {
+      position: absolute;
+      bottom: 56px;
+      left: 12px;
+      width: 220px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+      padding: 8px;
+      z-index: 500;
+      display: none;
+    }
+    .user-switcher.show { display: block; }
+    .user-switcher-title {
+      font-size: 11px;
+      color: var(--text-3);
+      padding: 6px 10px 4px;
+      font-weight: 600;
+    }
+    .user-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .user-option:hover { background: var(--surface-2); }
+    .user-option.active { background: var(--primary-soft); }
+    .user-option-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .user-option-info { flex: 1; min-width: 0; }
+    .user-option-name { font-size: 13px; font-weight: 600; }
+    .user-option-role { font-size: 11px; color: var(--text-3); }
+    .user-option-check { color: var(--primary); font-size: 14px; }
+
+    .flow-record {
+      align-self: center;
+      max-width: 88%;
+      text-align: center;
+    }
+    .flow-record .msg-bubble {
+      background: var(--primary-soft);
+      border-color: #bfdbfe;
+      color: var(--primary);
+      font-size: 12px;
+      padding: 8px 14px;
+    }
+
+    .msg-hint {
+      align-self: center;
+      font-size: 11px;
+      color: var(--text-3);
+      padding: 2px 0;
+    }
+
+    .group-item-divider {
+      align-self: center;
+      font-size: 11px;
+      color: var(--text-3);
+      background: var(--surface-2);
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin: 8px 0;
+    }
+
+    .current-user-bar {
+      position: fixed;
+      top: 12px;
+      right: 16px;
+      z-index: 300;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px 6px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .current-user-bar .bar-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .current-user-bar strong { font-weight: 600; }
+    .current-user-bar span { color: var(--text-3); }
+
+    /* ── Items hub: categories + ledger + stats ── */
+    .items-hub {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .items-cat-sidebar {
+      width: 200px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 10px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .items-cat-sidebar h3 {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 600;
+      padding: 0 10px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-2);
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+
+    .cat-item:hover { background: var(--surface-2); color: var(--text); }
+    .cat-item.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+    .cat-item .cat-icon { font-size: 16px; width: 22px; text-align: center; }
+    .cat-item .cat-count {
+      margin-left: auto;
+      font-size: 11px;
+      background: var(--bg);
+      padding: 2px 7px;
+      border-radius: 10px;
+      color: var(--text-3);
+    }
+    .cat-item.active .cat-count { background: #dbeafe; color: var(--primary); }
+
+    .cat-sub {
+      padding-left: 34px;
+      font-size: 12px;
+    }
+
+    .items-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .items-mode-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mode-tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      color: var(--text-2);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s;
+    }
+
+    .mode-tab:hover { color: var(--primary); }
+    .mode-tab.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+
+    .items-content {
+      flex: 1;
+      overflow: auto;
+      padding: 20px 24px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card .stat-label { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+    .stat-card .stat-value { font-size: 26px; font-weight: 700; color: var(--text); }
+    .stat-card .stat-sub { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+    .stat-card.highlight { border-color: var(--primary); background: var(--primary-soft); }
+    .stat-card.highlight .stat-value { color: var(--primary); }
+
+    .chart-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-panel h4 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+    .bar-label { width: 80px; color: var(--text-2); text-align: right; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; color: #fff; font-weight: 600; min-width: 28px; }
+    .bar-val { width: 40px; color: var(--text-3); font-size: 11px; }
+
+    .ledger-summary {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ledger-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .ledger-pill strong { color: var(--text); margin-right: 4px; }
+
+    .type-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .type-badge.approval { background: #fef3c7; color: #b45309; }
+    .type-badge.task { background: #dbeafe; color: #1d4ed8; }
+    .type-badge.meeting { background: #ede9fe; color: #6d28d9; }
+    .type-badge.schedule { background: #d1fae5; color: #047857; }
+    .type-badge.business { background: #fce7f3; color: #be185d; }
+
+    .form-card-inline, .summary-card-inline, .app-card-inline {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px; max-width: 360px; box-shadow: var(--shadow);
+    }
+    .form-card-inline { border-left: 3px solid #be185d; }
+    .summary-card-inline { border-left: 3px solid var(--success); background: var(--success-soft); }
+    .app-card-inline { border-left: 3px solid var(--primary); }
+    .form-card-inline h4, .summary-card-inline h4, .app-card-inline h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .form-field-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+    .submit-status { margin-top: 10px; font-size: 11px; }
+    .submit-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin: 2px 4px 2px 0; }
+    .submit-chip.done { background: var(--success-soft); color: var(--success); }
+    .submit-chip.pending { background: var(--warning-soft); color: var(--warning); }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+    .summary-cell { background: var(--surface); border-radius: 6px; padding: 8px; text-align: center; }
+    .summary-cell .val { font-size: 16px; font-weight: 700; color: var(--primary); }
+    .summary-cell .lbl { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+    .scene-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: #fce7f3; color: #be185d; font-weight: 600; }
+    .process-tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+
+    .items-table .no-chat { color: var(--text-3); cursor: default; }
+    .items-table .no-chat:hover td { background: transparent; }
+
+    .report-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 1100px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .report-row { grid-template-columns: 1fr; }
+    }
+
+    .perspective-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .perspective-label { font-size: 12px; color: var(--text-3); margin-right: 4px; }
+
+    .perspective-tab {
+      padding: 5px 14px;
+      border-radius: 16px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      background: var(--surface);
+      transition: all 0.15s;
+    }
+
+    .perspective-tab:hover { border-color: var(--primary); color: var(--primary); }
+    .perspective-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .biz-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .biz-section-title .biz-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .mini-table th, .mini-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .mini-table th { background: var(--surface-2); color: var(--text-2); font-weight: 600; }
+
+    .progress-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .progress-mini {
+      flex: 1;
+      height: 6px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-mini-fill { height: 100%; border-radius: 3px; background: var(--primary); }
+
+    .warn-badge { color: #dc2626; font-size: 11px; font-weight: 600; }
+    .ok-badge { color: #059669; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Icon Nav -->
+    <nav class="icon-nav">
+      <div class="logo">AIM</div>
+      <button class="nav-btn active" data-section="messages" title="工作消息">
+        <span class="icon">💬</span>
+        <span class="label">消息</span>
+        <span class="badge">5</span>
+      </button>
+      <button class="nav-btn" data-section="items" title="工作事项">
+        <span class="icon">📋</span>
+        <span class="label">事项</span>
+      </button>
+      <button class="nav-btn" data-section="contacts" title="组织通讯录">
+        <span class="icon">👥</span>
+        <span class="label">通讯录</span>
+      </button>
+      <div class="nav-spacer"></div>
+      <div class="avatar-sm" id="navAvatar" title="切换身份">张</div>
+      <div class="user-switcher" id="userSwitcher"></div>
+    </nav>
+
+    <div class="current-user-bar" id="currentUserBar">
+      <div class="bar-avatar" id="barAvatar">张</div>
+      <div><strong id="barName">张明</strong> <span id="barRole">研发部</span></div>
+    </div>
+
+    <!-- List Panel (messages) -->
+    <aside class="list-panel" id="listPanel">
+      <div class="list-header">
+        <h2 id="listTitle">工作消息</h2>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="搜索会话、事项..." id="searchInput" />
+        </div>
+      </div>
+      <div class="sub-tabs" id="subTabs"></div>
+      <div class="list-body" id="listBody"></div>
+      <button class="fab-btn" id="fabBtn">＋ 发起新事项</button>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main-area" id="mainArea">
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-icon">✦</div>
+        <h3>欢迎使用 AIM</h3>
+        <p>智能工作协同 — 过程类审批与业务类销售协同，均从对话发起。人与人沟通中 AI 识别事项，生成应用供填报与汇总。</p>
+        <div class="quick-actions">
+          <button class="quick-btn primary" id="quickNewItem">发起新事项</button>
+          <button class="quick-btn" id="quickSales">体验销售团队场景</button>
+          <button class="quick-btn" id="quickBrowse">浏览待办事项</button>
+          <button class="quick-btn" id="quickLedger">查看审批台账</button>
+        </div>
+      </div>
+
+      <!-- Chat View -->
+      <div class="chat-view hidden" id="chatView">
+        <div class="chat-panel">
+          <div class="chat-header" id="chatHeader"></div>
+          <div class="layer-tabs" id="layerTabs"></div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-area" id="chatInputArea">
+            <div class="chat-toolbar" id="chatToolbar"></div>
+            <div class="input-row">
+              <textarea class="chat-textarea" id="chatInput" placeholder="输入消息..." rows="1"></textarea>
+              <button class="send-btn" id="sendBtn">➤</button>
+            </div>
+          </div>
+        </div>
+        <aside class="card-panel" id="cardPanel">
+          <div class="card-panel-header">
+            <h3>关联事项</h3>
+            <span style="font-size:11px;color:var(--text-3)" id="cardCount">0 项</span>
+          </div>
+          <div class="card-panel-body" id="cardPanelBody"></div>
+          <div class="timeline" id="cardTimeline"></div>
+        </aside>
+      </div>
+
+      <!-- Items View -->
+      <div class="items-view hidden" id="itemsView">
+        <div class="items-hub">
+          <aside class="items-cat-sidebar" id="itemsCatSidebar"></aside>
+          <div class="items-main">
+            <div class="items-toolbar">
+              <h2 id="itemsViewTitle">工作事项</h2>
+              <div class="filter-chips" id="itemFilters"></div>
+            </div>
+            <div class="items-mode-tabs" id="itemModeTabs">
+              <button class="mode-tab active" data-item-mode="list">事项清单</button>
+              <button class="mode-tab" data-item-mode="ledger">台账</button>
+              <button class="mode-tab" data-item-mode="stats">统计报表</button>
+            </div>
+            <div class="perspective-bar hidden" id="perspectiveBar">
+              <span class="perspective-label">数据视角</span>
+              <button class="perspective-tab active" data-perspective="item">事项视角</button>
+              <button class="perspective-tab" data-perspective="business">业务视角</button>
+              <span id="bizViewHint" style="font-size:11px;color:var(--text-3);margin-left:8px"></span>
+            </div>
+            <div class="items-content" id="itemsContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacts View -->
+      <div class="contacts-view hidden" id="contactsView">
+        <div class="items-toolbar">
+          <h2>组织通讯录</h2>
+        </div>
+        <div class="contacts-grid" id="contactsGrid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: trigger item from chat -->
+  <div class="modal-overlay" id="triggerModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>检测到可发起的事项</h3>
+        <p>AI 识别到当前对话中可能产生一个工作事项，是否发起？相关聊天记录将带入 AI 对话。</p>
+      </div>
+      <div class="modal-body">
+        <div class="draft-card" style="max-width:100%">
+          <h4>✦ AI 预识别</h4>
+          <div class="draft-field"><span class="draft-label">事项类型</span><span class="draft-value" id="triggerType">采购申请</span></div>
+          <div class="draft-field"><span class="draft-label">关联内容</span><span class="draft-value" id="triggerContent">办公设备采购需求讨论</span></div>
+          <div class="draft-field"><span class="draft-label">建议动作</span><span class="draft-value" id="triggerAction">进入 AI 对话确认后发起</span></div>
+          <div class="draft-field"><span class="draft-label">可见范围</span><span class="draft-value" id="triggerScope">全员可见 / 仅发起人</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="triggerCancel">暂不发起</button>
+        <button class="btn btn-ai" id="triggerConfirm">进入 AI 对话确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── Users ──
+    const USER_LIST = [
+      { id: 'zhang', name: '张明', avatar: '张', color: '#f59e0b', dept: '研发部 · 产品经理' },
+      { id: 'li', name: '李华', avatar: '李', color: '#3b82f6', dept: '研发部 · 高级工程师' },
+      { id: 'wang', name: '王芳', avatar: '王', color: '#ec4899', dept: '财务部 · 财务主管' },
+      { id: 'zhao', name: '赵强', avatar: '赵', color: '#10b981', dept: '研发部 · 技术总监' },
+      { id: 'chen', name: '陈静', avatar: '陈', color: '#8b5cf6', dept: '行政部 · 行政经理' },
+      { id: 'liu', name: '刘峰', avatar: '刘', color: '#e11d48', dept: '销售部 · 销售总监' },
+      { id: 'sun', name: '孙杰', avatar: '孙', color: '#0891b2', dept: '销售部 · 华东区经理' },
+      { id: 'wu', name: '吴敏', avatar: '吴', color: '#ca8a04', dept: '销售部 · 华北区经理' },
+      { id: 'zhou', name: '周磊', avatar: '周', color: '#6366f1', dept: '售前部 · 售前顾问' },
+      { id: 'huang', name: '黄婷', avatar: '黄', color: '#14b8a6', dept: '客户成功 · CS经理' },
+      { id: 'lin', name: '林佳', avatar: '林', color: '#a855f7', dept: '人力资源 · HRBP' },
+    ];
+
+    const USERS = Object.fromEntries([
+      ...USER_LIST.map(u => [u.id, u]),
+      ['ai', { id: 'ai', name: 'AIM 助手', avatar: '✦', color: '#7c3aed', dept: 'AI' }],
+    ]);
+
+    const ITEM_CATEGORIES = {
+      all: { id: 'all', label: '全部事项', icon: '📋' },
+      approval: { id: 'approval', label: '审批', icon: '✅', subTypes: [
+        { id: 'all', label: '全部审批' },
+        { id: 'leave', label: '请假' },
+        { id: 'purchase', label: '采购' },
+        { id: 'expense', label: '报销' },
+        { id: 'trip', label: '出差' },
+        { id: 'budget', label: '预算' },
+        { id: 'other', label: '其他' },
+      ]},
+      task: { id: 'task', label: '任务', icon: '📝' },
+      meeting: { id: 'meeting', label: '会议', icon: '📅' },
+      schedule: { id: 'schedule', label: '日程', icon: '🗓' },
+      business: { id: 'business', label: '业务', icon: '💼', subTypes: [
+        { id: 'all', label: '全部业务' },
+        { id: 'performance', label: '业绩上报' },
+        { id: 'opportunity', label: '商机报备' },
+        { id: 'followup', label: '客户跟进' },
+        { id: 'quote', label: '报价' },
+        { id: 'delivery', label: '项目交付' },
+        { id: 'support', label: '技术支持' },
+      ]},
+    };
+
+    const ITEMS = {
+      item1: {
+        id: 'item1', chatId: 'item_chat_1', code: 'AIM-2026-0042', title: 'Q2 办公设备采购申请',
+        category: 'approval', subType: 'purchase', type: '采购审批', status: 'processing', statusLabel: '财务审核中',
+        amount: 85000, dept: '研发部',
+        desc: '为研发团队采购 10 台显示器和 5 台笔记本，预算 ¥85,000',
+        initiator: 'zhang', handler: 'wang', participants: ['zhang', 'li', 'wang', 'zhao'],
+        sourceConv: 'group_dev', created: '2026-05-28', updated: '2026-05-29 10:30',
+        timeline: [
+          { text: '张明 在研发团队群发起事项', time: '05-28 14:20', done: true },
+          { text: '李华 部门初审通过', time: '05-28 16:45', done: true },
+          { text: '王芳 财务审核中', time: '05-29 10:30', done: false },
+        ],
+        nested: ['item2'],
+      },
+      item2: {
+        id: 'item2', chatId: 'item_chat_2', code: 'AIM-2026-0043', title: '显示器型号确认',
+        category: 'task', subType: 'sub', type: '子任务', status: 'todo', statusLabel: '待李华确认',
+        dept: '研发部', desc: '确认采购显示器的具体型号与供应商报价',
+        initiator: 'wang', handler: 'li', participants: ['li', 'wang', 'zhang'],
+        parent: 'item1', sourceConv: 'item_chat_1', created: '2026-05-29', updated: '2026-05-29 11:00',
+        timeline: [
+          { text: '王芳 从采购事项拆分', time: '05-29 11:00', done: true },
+          { text: '李华 待确认型号', time: '—', done: false },
+        ],
+        nested: [],
+      },
+      item3: {
+        id: 'item3', chatId: 'item_chat_3', code: 'AIM-2026-0038', title: '年度预算调整审批',
+        category: 'approval', subType: 'budget', type: '预算审批', status: 'done', statusLabel: '已完成',
+        amount: 200000, dept: '研发部', desc: '研发部门 Q2 预算追加 ¥200,000',
+        initiator: 'zhang', handler: 'chen', participants: ['zhang', 'chen', 'zhao'],
+        sourceConv: 'group_dev', created: '2026-05-20', updated: '2026-05-25 17:00',
+        timeline: [
+          { text: '张明 发起', time: '05-20 09:00', done: true },
+          { text: '赵强 部门会签', time: '05-22 14:00', done: true },
+          { text: '陈静 审批通过', time: '05-25 17:00', done: true },
+        ],
+        nested: [],
+      },
+      item4: {
+        id: 'item4', chatId: 'item_chat_4', code: 'AIM-2026-0045', title: '测试环境云服务器扩容',
+        category: 'approval', subType: 'other', type: '资源审批', status: 'processing', statusLabel: '赵强审批中',
+        amount: 12000, dept: '研发部', desc: '测试环境 K8s 集群扩容 4 节点，月增成本约 ¥12,000',
+        initiator: 'zhang', handler: 'zhao', participants: ['zhang', 'li', 'zhao'],
+        sourceConv: 'group_dev', created: '2026-05-29', updated: '2026-05-29 15:20',
+        timeline: [
+          { text: '张明 在研发团队群发起', time: '05-29 15:18', done: true },
+          { text: '赵强 技术评审中', time: '05-29 15:20', done: false },
+        ],
+        nested: [],
+      },
+      item5: {
+        id: 'item5', code: 'AIM-2026-0046', title: '年假申请 · 3天',
+        category: 'approval', subType: 'leave', type: '请假审批', status: 'processing', statusLabel: '赵强审批中',
+        dept: '研发部', desc: '2026-06-10 至 06-12，年假 3 天',
+        initiator: 'li', handler: 'zhao', participants: ['li', 'zhao'],
+        created: '2026-05-29', updated: '2026-05-29 09:00', days: 3,
+        timeline: [{ text: '李华 发起请假', time: '05-29 09:00', done: true }],
+        nested: [],
+      },
+      item6: {
+        id: 'item6', code: 'AIM-2026-0047', title: '上海出差差旅报销',
+        category: 'approval', subType: 'expense', type: '报销审批', status: 'todo', statusLabel: '待王芳审核',
+        amount: 2340, dept: '研发部', desc: '交通 ¥1,200 + 住宿 ¥980 + 餐饮 ¥160',
+        initiator: 'zhang', handler: 'wang', participants: ['zhang', 'wang'],
+        created: '2026-05-28', updated: '2026-05-28 18:00',
+        timeline: [{ text: '张明 提交报销单', time: '05-28 18:00', done: true }],
+        nested: [],
+      },
+      item7: {
+        id: 'item7', code: 'AIM-2026-0048', title: '上海客户拜访出差',
+        category: 'approval', subType: 'trip', type: '出差审批', status: 'done', statusLabel: '已完成',
+        dept: '研发部', desc: '06-03 至 06-05，拜访华东客户，预估费用 ¥5,000',
+        initiator: 'zhao', handler: 'chen', participants: ['zhao', 'chen'],
+        created: '2026-05-25', updated: '2026-05-26 10:00',
+        timeline: [{ text: '赵强 出差审批通过', time: '05-26 10:00', done: true }],
+        nested: [],
+      },
+      item8: {
+        id: 'item8', code: 'AIM-2026-0049', title: 'Q2 产品需求评审',
+        category: 'task', subType: 'review', type: '评审任务', status: 'processing', statusLabel: '进行中',
+        dept: '研发部', desc: '完成 Q2 核心功能需求文档评审，截止 5/31',
+        initiator: 'zhang', handler: 'zhang', participants: ['zhang', 'li', 'zhao'],
+        created: '2026-05-27', updated: '2026-05-29 14:00', dueDate: '2026-05-31', progress: 65,
+        timeline: [{ text: '任务创建', time: '05-27 10:00', done: true }],
+        nested: [],
+      },
+      item9: {
+        id: 'item9', code: 'AIM-2026-0050', title: '研发周会 · 5月30日',
+        category: 'meeting', subType: 'weekly', type: '部门会议', status: 'todo', statusLabel: '待召开',
+        dept: '研发部', desc: '周五 10:00-11:00，会议室 A301，议题：Q2 进度同步',
+        initiator: 'zhao', handler: 'zhao', participants: ['zhang', 'li', 'zhao'],
+        created: '2026-05-29', updated: '2026-05-29 16:00',
+        meetingTime: '2026-05-30 10:00', location: 'A301', duration: 60,
+        timeline: [], nested: [],
+      },
+      item10: {
+        id: 'item10', code: 'AIM-2026-0051', title: '季度 OKR 对齐会',
+        category: 'meeting', subType: 'okr', type: '战略会议', status: 'todo', statusLabel: '待召开',
+        dept: '全公司', desc: '6月2日 14:00，线上+线下，全员 OKR 对齐',
+        initiator: 'chen', handler: 'chen', participants: ['zhang', 'li', 'wang', 'zhao', 'chen'],
+        created: '2026-05-28', updated: '2026-05-28 11:00',
+        meetingTime: '2026-06-02 14:00', location: '大会议室', duration: 120,
+        timeline: [], nested: [],
+      },
+      item11: {
+        id: 'item11', code: 'AIM-2026-0052', title: '财务月结提醒',
+        category: 'schedule', subType: 'reminder', type: '工作日程', status: 'todo', statusLabel: '即将到来',
+        dept: '财务部', desc: '5月31日 18:00 前完成本月账务核对',
+        initiator: 'wang', handler: 'wang', participants: ['wang'],
+        created: '2026-05-29', updated: '2026-05-29 08:00',
+        scheduleTime: '2026-05-31 18:00',
+        timeline: [], nested: [],
+      },
+      item12: {
+        id: 'item12', code: 'AIM-2026-0053', title: '张明 · 客户演示准备',
+        category: 'schedule', subType: 'personal', type: '个人日程', status: 'processing', statusLabel: '进行中',
+        dept: '研发部', desc: '5月30日 15:00 客户演示彩排',
+        initiator: 'zhang', handler: 'zhang', participants: ['zhang', 'li'],
+        created: '2026-05-29', updated: '2026-05-29 11:00',
+        scheduleTime: '2026-05-30 15:00',
+        timeline: [], nested: [],
+      },
+      item13: {
+        id: 'item13', code: 'AIM-2026-0054', title: '接口文档编写',
+        category: 'task', subType: 'dev', type: '开发任务', status: 'processing', statusLabel: '李华处理中',
+        dept: '研发部', desc: '完成 v2.3 API 文档更新，关联 AIM 开放平台',
+        initiator: 'zhao', handler: 'li', participants: ['li', 'zhao'],
+        created: '2026-05-26', updated: '2026-05-29 10:00', dueDate: '2026-06-05', progress: 40,
+        timeline: [{ text: '赵强 分配任务', time: '05-26 09:00', done: true }],
+        nested: [],
+      },
+      item14: {
+        id: 'item14', code: 'AIM-2026-0055', title: '病假申请 · 1天',
+        category: 'approval', subType: 'leave', type: '请假审批', status: 'done', statusLabel: '已完成',
+        dept: '行政部', desc: '2026-05-20 病假 1 天',
+        initiator: 'chen', handler: 'zhao', participants: ['chen', 'zhao'],
+        created: '2026-05-19', updated: '2026-05-19 16:00', days: 1,
+        timeline: [{ text: '陈静 请假通过', time: '05-19 16:00', done: true }],
+        nested: [],
+      },
+      item15: {
+        id: 'item15', chatId: 'item_chat_15', code: 'AIM-2026-0060', title: 'Q1 销售业绩上报',
+        category: 'business', subType: 'performance', type: '业绩上报', itemKind: 'business',
+        status: 'processing', statusLabel: '收集中 3/5',
+        dept: '销售部', desc: '各区域反馈 Q1 签约、回款、新客户、商机数据，截止今日 18:00',
+        initiator: 'liu', handler: 'liu', participants: ['liu', 'sun', 'wu', 'zhou', 'huang'],
+        sourceConv: 'group_sales', created: '2026-05-29', updated: '2026-05-29 16:30',
+        formId: 'form_q1_sales',
+        timeline: [
+          { text: '刘峰 在销售团队群触发', time: '05-29 16:00', done: true },
+          { text: 'AIM 生成业绩填报应用', time: '05-29 16:02', done: true },
+          { text: '孙杰、吴敏、周磊 已提交', time: '05-29 16:25', done: true },
+          { text: '黄婷 待提交', time: '—', done: false },
+        ],
+        nested: [],
+      },
+      item16: {
+        id: 'item16', chatId: 'item_chat_16', code: 'AIM-2026-0061', title: '商机报备 · 某城商行数字化',
+        category: 'business', subType: 'opportunity', type: '商机报备', itemKind: 'business',
+        status: 'processing', statusLabel: '售前评估中',
+        dept: '销售部', amount: 2800000,
+        desc: '某城商行办公协同平台采购，预计 Q3 招标，预算约 280 万',
+        initiator: 'sun', handler: 'zhou', participants: ['sun', 'zhou', 'liu'],
+        sourceConv: 'group_sales', created: '2026-05-28', updated: '2026-05-29 11:00',
+        customer: '某城商行', stage: '需求确认', winRate: 35,
+        timeline: [
+          { text: '孙杰 从客户拜访发起商机', time: '05-28 10:00', done: true },
+          { text: '周磊 售前介入评估', time: '05-29 11:00', done: false },
+        ],
+        nested: [],
+      },
+      item17: {
+        id: 'item17', chatId: 'item_chat_17', code: 'AIM-2026-0062', title: '客户跟进 · 腾讯续费沟通',
+        category: 'business', subType: 'followup', type: '客户跟进', itemKind: 'business',
+        status: 'processing', statusLabel: '跟进中',
+        dept: '客户成功', desc: 'AIM 企业版年度续费，客户关注 AI 能力与私有化部署',
+        initiator: 'huang', handler: 'huang', participants: ['huang', 'zhou', 'zhang'],
+        created: '2026-05-27', updated: '2026-05-29 14:00',
+        customer: '腾讯', nextAction: '5/30 产品演示',
+        timeline: [{ text: '黄婷 创建跟进事项', time: '05-27 09:00', done: true }],
+        nested: [],
+      },
+      item18: {
+        id: 'item18', chatId: 'item_chat_18', code: 'AIM-2026-0063', title: '产品报价 · AIM 企业版',
+        category: 'business', subType: 'quote', type: '产品报价', itemKind: 'business',
+        status: 'done', statusLabel: '已发送客户',
+        dept: '销售部', amount: 680000,
+        desc: '200 席位 + AI 模块 + 私有化部署，报价有效期 30 天',
+        initiator: 'wu', handler: 'zhou', participants: ['wu', 'zhou', 'wang'],
+        created: '2026-05-26', updated: '2026-05-27 17:00',
+        customer: '某制造业集团',
+        timeline: [{ text: '报价单已发送', time: '05-27 17:00', done: true }],
+        nested: [],
+      },
+      item19: {
+        id: 'item19', chatId: 'item_chat_19', code: 'AIM-2026-0064', title: '项目实施 · XX 集团交付',
+        category: 'business', subType: 'delivery', type: '项目交付', itemKind: 'business',
+        status: 'processing', statusLabel: '实施中 70%',
+        dept: '客户成功', desc: 'XX 集团 AIM 平台实施，当前 UAT 阶段',
+        initiator: 'huang', handler: 'zhang', participants: ['huang', 'zhang', 'li', 'sun'],
+        created: '2026-05-10', updated: '2026-05-29 09:00', progress: 70,
+        timeline: [{ text: '进入 UAT', time: '05-29 09:00', done: true }],
+        nested: [],
+      },
+      item20: {
+        id: 'item20', code: 'AIM-2026-0065', title: '技术支持 · 客户 A 集成故障',
+        category: 'business', subType: 'support', type: '技术支持', itemKind: 'business',
+        status: 'processing', statusLabel: '李华处理中',
+        dept: '研发部', desc: '客户 A SSO 集成异常，影响 200+ 用户登录',
+        initiator: 'huang', handler: 'li', participants: ['huang', 'li', 'zhang'],
+        created: '2026-05-29', updated: '2026-05-29 15:00',
+        sla: 'P1 · 4h', customer: '客户 A',
+        timeline: [{ text: '工单创建', time: '05-29 14:00', done: true }],
+        nested: [],
+      },
+      item21: {
+        id: 'item21', code: 'AIM-2026-0066', title: '招聘需求 · 高级 Java 工程师',
+        category: 'task', subType: 'hr', type: '招聘任务', itemKind: 'process',
+        status: 'processing', statusLabel: '筛选简历中',
+        dept: '研发部', desc: '研发团队扩编，需 2 名高级 Java，要求 Spring Cloud 经验',
+        initiator: 'zhao', handler: 'lin', participants: ['zhao', 'lin', 'zhang'],
+        created: '2026-05-25', updated: '2026-05-28 10:00',
+        timeline: [{ text: '林佳 已发布 JD', time: '05-26 10:00', done: true }],
+        nested: [],
+      },
+      item22: {
+        id: 'item22', chatId: 'item_chat_22', code: 'AIM-2026-0067', title: '售前方案 · 某省政务云',
+        category: 'business', subType: 'quote', type: '方案编制', itemKind: 'business',
+        status: 'todo', statusLabel: '待周磊提交',
+        dept: '售前部', desc: '政务云协同平台方案，含等保三级与信创适配',
+        initiator: 'liu', handler: 'zhou', participants: ['liu', 'zhou', 'sun'],
+        created: '2026-05-29', updated: '2026-05-29 17:00',
+        timeline: [{ text: '刘峰 从事项群分配', time: '05-29 17:00', done: true }],
+        nested: [],
+      },
+    };
+
+    const FORM_DEFINITIONS = {
+      form_q1_sales: {
+        id: 'form_q1_sales', title: 'Q1 销售业绩填报', itemId: 'item15',
+        fields: ['签约金额(万)', '回款金额(万)', '新客户数', '有效商机数', '备注'],
+        assignees: ['sun', 'wu', 'zhou', 'huang'],
+        submissions: {
+          sun: { '签约金额(万)': 320, '回款金额(万)': 280, '新客户数': 5, '有效商机数': 12, '备注': '华东区 Q1 超预期' },
+          wu: { '签约金额(万)': 210, '回款金额(万)': 195, '新客户数': 3, '有效商机数': 8, '备注': '华北两单大单推迟到 Q2' },
+          zhou: { '签约金额(万)': 0, '回款金额(万)': 0, '新客户数': 0, '有效商机数': 15, '备注': '售前支持，无直接签约' },
+        },
+      },
+    };
+    const BUSINESS_VIEW_META = {
+      leave:    { ledger: '假期余额与请假台账', report: '请假分析报表' },
+      purchase: { ledger: '采购订单与资产台账', report: '采购与资产报表' },
+      expense:  { ledger: '费用报销明细台账', report: '费用分析报表' },
+      trip:     { ledger: '出差行程台账', report: '出差统计报表' },
+      budget:   { ledger: '预算执行台账', report: '预算执行分析' },
+      task:     { ledger: '任务执行台账', report: '任务完成情况报表' },
+      meeting:  { ledger: '会议记录台账', report: '会议统计报表' },
+      schedule: { ledger: '日程安排台账', report: '日程占用分析' },
+      approval: { ledger: '审批业务汇总台账', report: '审批业务分析报表' },
+      business: { ledger: '销售业务汇总台账', report: '销售经营分析报表' },
+      performance: { ledger: '业绩上报明细台账', report: '销售业绩分析报表' },
+      opportunity: { ledger: '商机管道台账', report: '商机转化分析' },
+      followup: { ledger: '客户跟进台账', report: '客户活跃度分析' },
+      quote: { ledger: '报价单台账', report: '报价转化报表' },
+      delivery: { ledger: '项目交付台账', report: '交付进度报表' },
+      support: { ledger: '技术支持工单台账', report: 'SLA 分析报表' },
+      all:      { ledger: '综合业务台账', report: '经营分析总览' },
+    };
+
+    const BUSINESS_DATA = {
+      leaveBalances: [
+        { userId: 'zhang', dept: '研发部', annual: 10, used: 3, remain: 7, sickUsed: 0, personalUsed: 1 },
+        { userId: 'li',    dept: '研发部', annual: 12, used: 3, remain: 9, sickUsed: 0, personalUsed: 0 },
+        { userId: 'wang',  dept: '财务部', annual: 10, used: 5, remain: 5, sickUsed: 1, personalUsed: 0 },
+        { userId: 'zhao',  dept: '研发部', annual: 15, used: 8, remain: 7, sickUsed: 0, personalUsed: 2 },
+        { userId: 'chen',  dept: '行政部', annual: 10, used: 4, remain: 6, sickUsed: 1, personalUsed: 0 },
+      ],
+      leaveRecords: [
+        { userId: 'li',  type: '年假', start: '2026-06-10', end: '2026-06-12', days: 3, status: '审批中', itemCode: 'AIM-2026-0046' },
+        { userId: 'chen', type: '病假', start: '2026-05-20', end: '2026-05-20', days: 1, status: '已完成', itemCode: 'AIM-2026-0055' },
+        { userId: 'zhang', type: '事假', start: '2026-04-15', end: '2026-04-15', days: 1, status: '已完成', itemCode: '—' },
+        { userId: 'zhao', type: '年假', start: '2026-03-01', end: '2026-03-05', days: 5, status: '已完成', itemCode: '—' },
+      ],
+      assets: [
+        { code: 'AST-0042-01', name: '戴尔 P2723D 显示器', category: '显示设备', qty: 10, unitPrice: 3200, total: 32000, dept: '研发部', purchaseCode: 'AIM-2026-0042', inbound: '待入库', status: '采购中' },
+        { code: 'AST-0042-02', name: 'ThinkPad X1 Carbon', category: '计算机', qty: 5, unitPrice: 9800, total: 49000, dept: '研发部', purchaseCode: 'AIM-2026-0042', inbound: '待入库', status: '采购中' },
+        { code: 'AST-0031-01', name: 'MacBook Pro 14', category: '计算机', qty: 3, unitPrice: 14900, total: 44700, dept: '研发部', purchaseCode: 'AIM-2025-0031', inbound: '2025-11-20', status: '在用' },
+        { code: 'AST-0031-02', name: '人体工学椅', category: '办公家具', qty: 8, unitPrice: 1200, total: 9600, dept: '研发部', purchaseCode: 'AIM-2025-0031', inbound: '2025-11-22', status: '在用' },
+      ],
+      purchaseOrders: [
+        { code: 'PO-2026-0042', itemCode: 'AIM-2026-0042', vendor: '戴尔/联想', amount: 85000, items: '显示器×10 + 笔记本×5', dept: '研发部', status: '财务审核中', date: '2026-05-28' },
+        { code: 'PO-2025-0031', itemCode: 'AIM-2025-0031', vendor: '苹果/宜家', amount: 54300, items: 'MacBook×3 + 办公椅×8', dept: '研发部', status: '已完成', date: '2025-11-15' },
+      ],
+      expenses: [
+        { userId: 'zhang', dept: '研发部', type: '差旅费', transport: 1200, hotel: 980, meal: 160, total: 2340, invoices: 5, date: '2026-05-28', status: '待审核', itemCode: 'AIM-2026-0047' },
+        { userId: 'li', dept: '研发部', type: '交通费', transport: 320, hotel: 0, meal: 0, total: 320, invoices: 2, date: '2026-05-20', status: '已报销', itemCode: '—' },
+        { userId: 'wang', dept: '财务部', type: '办公用品', transport: 0, hotel: 0, meal: 0, total: 580, invoices: 3, date: '2026-05-15', status: '已报销', itemCode: '—' },
+      ],
+      trips: [
+        { userId: 'zhao', dept: '研发部', dest: '上海', start: '2026-06-03', end: '2026-06-05', days: 3, budget: 5000, actual: 0, purpose: '客户拜访', status: '已完成', itemCode: 'AIM-2026-0048' },
+        { userId: 'zhang', dept: '研发部', dest: '深圳', start: '2026-04-10', end: '2026-04-12', days: 3, budget: 4500, actual: 4200, purpose: '技术交流', status: '已完成', itemCode: '—' },
+      ],
+      budgetExec: [
+        { dept: '研发部', budget: 1200000, used: 680000, rate: 57, items: 3 },
+        { dept: '财务部', budget: 300000, used: 185000, rate: 62, items: 1 },
+        { dept: '行政部', budget: 500000, used: 320000, rate: 64, items: 1 },
+      ],
+      taskExec: [
+        { title: 'Q2 产品需求评审', owner: 'zhang', dept: '研发部', planEnd: '2026-05-31', progress: 65, overdue: false, status: '进行中', itemCode: 'AIM-2026-0049' },
+        { title: '接口文档编写', owner: 'li', dept: '研发部', planEnd: '2026-06-05', progress: 40, overdue: false, status: '进行中', itemCode: 'AIM-2026-0054' },
+        { title: '显示器型号确认', owner: 'li', dept: '研发部', planEnd: '2026-05-29', progress: 20, overdue: true, status: '待处理', itemCode: 'AIM-2026-0043' },
+        { title: '安全漏洞修复', owner: 'li', dept: '研发部', planEnd: '2026-05-25', progress: 100, overdue: false, status: '已完成', itemCode: '—' },
+      ],
+      meetingRecords: [
+        { title: '研发周会', organizer: 'zhao', date: '2026-05-30 10:00', duration: 60, attendees: 4, actual: 3, location: 'A301', minutes: '未提交', itemCode: 'AIM-2026-0050' },
+        { title: '季度 OKR 对齐会', organizer: 'chen', date: '2026-06-02 14:00', duration: 120, attendees: 5, actual: 0, location: '大会议室', minutes: '—', itemCode: 'AIM-2026-0051' },
+        { title: '产品评审会', organizer: 'zhang', date: '2026-05-22 15:00', duration: 90, attendees: 3, actual: 3, location: '线上', minutes: '已提交', itemCode: '—' },
+      ],
+      scheduleBlocks: [
+        { title: '财务月结提醒', owner: 'wang', date: '2026-05-31 18:00', type: '工作', hours: 2, itemCode: 'AIM-2026-0052' },
+        { title: '客户演示准备', owner: 'zhang', date: '2026-05-30 15:00', type: '工作', hours: 3, itemCode: 'AIM-2026-0053' },
+        { title: '研发周会', owner: 'zhao', date: '2026-05-30 10:00', type: '会议', hours: 1, itemCode: 'AIM-2026-0050' },
+      ],
+      opportunities: [
+        { code: 'OPP-0061', customer: '某城商行', amount: 2800000, stage: '需求确认', owner: 'sun', winRate: 35, itemCode: 'AIM-2026-0061', updated: '2026-05-29' },
+        { code: 'OPP-0058', customer: '某制造业集团', amount: 680000, stage: '方案报价', owner: 'wu', winRate: 60, itemCode: 'AIM-2026-0063', updated: '2026-05-27' },
+        { code: 'OPP-0067', customer: '某省政务云', amount: 4500000, stage: '方案编制', owner: 'liu', winRate: 25, itemCode: 'AIM-2026-0067', updated: '2026-05-29' },
+        { code: 'OPP-0055', customer: '腾讯', amount: 1200000, stage: '续费谈判', owner: 'huang', winRate: 85, itemCode: 'AIM-2026-0062', updated: '2026-05-29' },
+      ],
+      customers: [
+        { name: '腾讯', owner: 'huang', level: 'S', lastContact: '2026-05-29', status: '续费跟进', itemCode: 'AIM-2026-0062' },
+        { name: '某城商行', owner: 'sun', level: 'A', lastContact: '2026-05-28', status: '商机培育', itemCode: 'AIM-2026-0061' },
+        { name: 'XX 集团', owner: 'huang', level: 'A', lastContact: '2026-05-29', status: '实施交付', itemCode: 'AIM-2026-0064' },
+        { name: '客户 A', owner: 'huang', level: 'B', lastContact: '2026-05-29', status: '技术支持', itemCode: 'AIM-2026-0065' },
+      ],
+      quotes: [
+        { code: 'QT-0063', customer: '某制造业集团', product: 'AIM 企业版', amount: 680000, seats: 200, validUntil: '2026-06-26', status: '已发送', owner: 'wu' },
+        { code: 'QT-0067', customer: '某省政务云', product: 'AIM 政务版', amount: 4500000, seats: 5000, validUntil: '—', status: '编制中', owner: 'zhou' },
+      ],
+      q1Performance: [
+        { userId: 'sun', region: '华东', signed: 320, received: 280, newClients: 5, opps: 12 },
+        { userId: 'wu', region: '华北', signed: 210, received: 195, newClients: 3, opps: 8 },
+        { userId: 'zhou', region: '售前', signed: 0, received: 0, newClients: 0, opps: 15 },
+        { userId: 'huang', region: 'CS', signed: 180, received: 165, newClients: 2, opps: 6 },
+      ],
+      supportTickets: [
+        { code: 'TK-0065', customer: '客户 A', level: 'P1', title: 'SSO 集成故障', owner: 'li', status: '处理中', created: '2026-05-29 14:00', itemCode: 'AIM-2026-0065' },
+        { code: 'TK-0059', customer: 'XX 集团', level: 'P3', title: '报表导出慢', owner: 'li', status: '已解决', created: '2026-05-27', itemCode: '—' },
+      ],
+    };
+
+    const CONVERSATIONS = {
+      dm_li: {
+        id: 'dm_li', type: 'dm', name: '李华', userId: 'li',
+        preview: '好的，我下午把报价发你', time: '11:20', unread: 1,
+        messages: [
+          { from: 'li', text: '张明，上次说的显示器采购，供应商那边给了新报价', time: '11:15' },
+          { from: 'zhang', text: '好的，发我看看。另外可能需要走正式的采购流程', time: '11:18' },
+          { from: 'li', text: '好的，我下午把报价发你', time: '11:20' },
+        ],
+        items: [],
+        canTriggerItem: true,
+      },
+      group_dev: {
+        id: 'group_dev', type: 'group', name: '研发团队群',
+        preview: '赵强: 云扩容方案我看过了', time: '15:22', unread: 3,
+        members: ['zhang', 'li', 'wang', 'zhao'],
+        messages: [
+          { type: 'date', text: '5月28日' },
+          { from: 'zhao', text: '大家注意，本周五之前提交 Q2 总结', time: '09:30' },
+          { from: 'zhang', text: '收到。另外我们组显示器太旧了，想统一换一批', time: '09:45' },
+          { from: 'li', text: '我联系了戴尔和联想，两家都给了报价单', time: '10:02' },
+          { from: 'wang', text: '采购的话要走正式流程哦，预算明细也要提前准备', time: '10:15' },
+          { from: 'zhang', text: '明白，我先整理需求，等下发起事项', time: '10:18' },
+          { from: 'li', text: '报价单我发群文件了，可以参考', time: '10:25' },
+          { from: 'zhang', text: '好，我这就去和 AI 确认单据', time: '10:28' },
+          { type: 'hint', text: '张明 完成了 AI 对话确认（6 轮）' },
+          { type: 'card', itemId: 'item1', time: '05-28 14:21', by: 'zhang' },
+          { from: 'wang', text: '采购事项收到了，我先排期做财务审核', time: '05-28 16:50' },
+          { type: 'date', text: '5月29日' },
+          { from: 'wang', text: '@张明 采购申请还缺供应商资质和比价单', time: '10:45' },
+          { from: 'zhang', text: '好的，我让李华今天补齐', time: '10:48' },
+          { from: 'li', text: '资质文件下午给到', time: '10:52' },
+          { type: 'divider', text: '── 讨论新需求 ──' },
+          { from: 'zhao', text: '测试环境最近经常 OOM，是不是该扩容了？', time: '14:30' },
+          { from: 'li', text: '是的，CI 排队也很严重，建议加 4 个节点', time: '14:35' },
+          { from: 'zhang', text: '云厂商给了方案，月增大概 1.2 万', time: '14:40' },
+          { from: 'zhao', text: '方案合理，你可以走个资源申请', time: '14:42' },
+          { from: 'zhang', text: '行，我再去和 AI 把要素确认一下', time: '14:45' },
+          { type: 'hint', text: '张明 完成了 AI 对话确认（5 轮）' },
+          { type: 'card', itemId: 'item4', time: '05-29 15:18', by: 'zhang' },
+          { from: 'zhao', text: '云扩容方案我看过了，今天下班前给你反馈', time: '15:22' },
+        ],
+        items: ['item1', 'item4', 'item3'],
+        canTriggerItem: true,
+      },
+      item_chat_1: {
+        id: 'item_chat_1', type: 'item', name: '事项: Q2 办公设备采购',
+        itemId: 'item1', preview: '王芳: 已拆分显示器型号确认子事项', time: '11:05', unread: 2,
+        canTriggerSubItem: true,
+        messages: [
+          { type: 'flow', text: '事项群聊已创建 · 张明、李华、王芳、赵强 已加入', time: '05-28 14:21' },
+          { type: 'card', itemId: 'item1', time: '05-28 14:21' },
+          { from: 'zhang', text: '事项已发起，请各位按流程处理，采购明细见卡片', time: '05-28 14:22' },
+          { from: 'li', text: '收到，我先做部门初审', time: '05-28 14:30' },
+          { type: 'flow', text: '流转 → 李华（部门初审）', time: '05-28 14:30' },
+          { from: 'li', text: '初审完毕：需求合理，预算在部门额度内 ✓', time: '05-28 16:45' },
+          { type: 'flow', text: '李华 通过初审 → 流转至 王芳（财务审核）', time: '05-28 16:45' },
+          { from: 'wang', text: '收到，我先核对供应商资质和比价材料', time: '05-28 17:00' },
+          { type: 'date', text: '5月29日' },
+          { from: 'wang', text: '缺少供应商营业执照和三方比价单，@张明 请补充', time: '10:30' },
+          { from: 'zhang', text: '好的，今天下班前给到', time: '10:35' },
+          { type: 'flow', text: '王芳 退回补充材料 → 等待 张明 提交', time: '10:30' },
+          { type: 'divider', text: '── 拆分处理子事项 ──' },
+          { from: 'wang', text: '资质审核和型号确认可以并行，显示器型号让李华先定', time: '10:55' },
+          { from: 'li', text: '没问题，戴尔和联想两个方案我再对比一下', time: '10:58' },
+          { from: 'wang', text: '那我发起一个子事项，把型号确认单独拉出来', time: '11:00' },
+          { type: 'hint', text: '王芳 完成了 AI 对话确认（4 轮）· 发起子事项' },
+          { type: 'flow', text: '子事项已创建 · 李华、王芳 已加入子事项群聊', time: '05-29 11:00' },
+          { type: 'card', itemId: 'item2', time: '05-29 11:00', isSub: true },
+          { from: 'wang', text: '子事项「显示器型号确认」已发起，@李华 请今天确认', time: '11:05' },
+        ],
+        items: ['item1', 'item2'],
+      },
+      item_chat_2: {
+        id: 'item_chat_2', type: 'item', name: '事项: 显示器型号确认',
+        itemId: 'item2', preview: '王芳: 请李华今天确认型号', time: '11:05', unread: 1,
+        messages: [
+          { type: 'flow', text: '子事项已从「Q2 办公设备采购」拆分 · 李华、王芳 已加入', time: '05-29 11:00' },
+          { type: 'card', itemId: 'item2', time: '05-29 11:00' },
+          { from: 'wang', text: '主事项卡在资质审核，显示器型号需要李华先敲定', time: '05-29 11:02' },
+          { type: 'flow', text: '流转 → 李华（型号确认）', time: '05-29 11:02' },
+          { from: 'wang', text: '@李华 戴尔 P2723D 和联想 L27q 二选一，今天能定吗？', time: '11:05' },
+        ],
+        items: ['item2'],
+      },
+      item_chat_3: {
+        id: 'item_chat_3', type: 'item', name: '事项: 年度预算调整审批',
+        itemId: 'item3', preview: '陈静: 审批已通过', time: '05-25', unread: 0,
+        messages: [
+          { type: 'flow', text: '事项群聊已创建 · 张明、陈静、赵强 已加入', time: '05-20 09:00' },
+          { type: 'card', itemId: 'item3', time: '05-20 09:01' },
+          { from: 'zhang', text: 'Q2 研发预算需追加 20 万，主要用于人力和云资源', time: '05-20 09:02' },
+          { type: 'flow', text: '流转 → 赵强（部门会签）', time: '05-20 09:02' },
+          { from: 'zhao', text: '部门侧同意，编制内可以调剂', time: '05-22 14:00' },
+          { type: 'flow', text: '赵强 会签通过 → 流转至 陈静（行政审批）', time: '05-22 14:00' },
+          { from: 'chen', text: '材料齐全，审批通过 ✓', time: '05-25 17:00' },
+          { type: 'flow', text: '事项已完成 · 全部流程结束', time: '05-25 17:00' },
+        ],
+        items: ['item3'],
+      },
+      item_chat_4: {
+        id: 'item_chat_4', type: 'item', name: '事项: 测试环境云服务器扩容',
+        itemId: 'item4', preview: '赵强: 技术评审中', time: '15:20', unread: 1,
+        messages: [
+          { type: 'flow', text: '事项群聊已创建 · 张明、李华、赵强 已加入', time: '05-29 15:18' },
+          { type: 'card', itemId: 'item4', time: '05-29 15:18' },
+          { from: 'zhang', text: '测试环境扩容需求，云厂商方案和报价已附在卡片里', time: '05-29 15:19' },
+          { type: 'flow', text: '流转 → 赵强（技术评审）', time: '05-29 15:19' },
+          { from: 'zhao', text: '方案看了，节点规格没问题，我再评估下成本', time: '05-29 15:20' },
+        ],
+        items: ['item4'],
+      },
+      dm_wang: {
+        id: 'dm_wang', type: 'dm', name: '王芳', userId: 'wang',
+        preview: '审批流程已经到你这边了', time: '昨天', unread: 0,
+        messages: [
+          { from: 'wang', text: '采购申请我这边看到了，流程走得挺快', time: '昨天 15:00' },
+          { from: 'zhang', text: '辛苦了，有需要随时说', time: '昨天 15:10' },
+        ],
+        items: [],
+        canTriggerItem: false,
+      },
+      group_sales: {
+        id: 'group_sales', type: 'group', name: '销售团队群',
+        preview: '刘峰: Q1业绩上报事项已发起', time: '16:05', unread: 4,
+        members: ['liu', 'sun', 'wu', 'zhou', 'huang'],
+        messages: [
+          { type: 'date', text: '5月28日' },
+          { from: 'sun', text: '今天拜访了某城商行 CIO，对 AIM 协同平台兴趣很大，预算大概 280 万左右', time: '10:30' },
+          { from: 'liu', text: '不错，走商机报备，@周磊 售前跟进评估', time: '10:35' },
+          { from: 'zhou', text: '收到，明天出初步方案', time: '10:38' },
+          { type: 'hint', text: '孙杰 完成了 AI 对话确认（4 轮）' },
+          { type: 'card', itemId: 'item16', time: '05-28 11:00' },
+          { from: 'wu', text: '制造业集团报价已发出，68 万，200 席位 + AI 模块', time: '14:20' },
+          { type: 'card', itemId: 'item18', time: '05-27 17:00' },
+          { type: 'date', text: '5月29日' },
+          { from: 'huang', text: '腾讯续费沟通中，他们重点问 AI 和私有化，@张明 能否安排产品演示？', time: '09:15' },
+          { from: 'zhang', text: '可以，周五下午我来演示 AIM AI 能力', time: '09:22' },
+          { type: 'card', itemId: 'item17', time: '05-29 09:30' },
+          { from: 'liu', text: '@所有人 大家反馈一下目前一季度的销售业绩情况，今天下班前给我', time: '16:00' },
+          { from: 'sun', text: '好的刘总，我整理一下华东数据', time: '16:02' },
+          { type: 'hint', text: '✦ AIM 识别到「Q1 销售业绩收集」意图 · 仅刘峰可见' },
+          { from: 'ai', text: '检测到您在安排 Q1 业绩反馈。建议发起「业绩上报」事项：自动生成填报应用，收齐后汇总成业绩报表。是否创建？', time: '16:02' },
+          { from: 'liu', text: '好，发起吧，让各区域和销售支持同事填', time: '16:03' },
+          { type: 'hint', text: '刘峰 完成了 AI 对话确认（3 轮）' },
+          { type: 'flow', text: '业绩上报事项已创建 · 销售团队群可见卡片', time: '16:05' },
+          { type: 'card', itemId: 'item15', time: '16:05' },
+          { from: 'liu', text: '事项已发起，各位点击卡片进入填报，AIM 会自动汇总', time: '16:06' },
+        ],
+        items: ['item15', 'item16', 'item17', 'item18'],
+        canTriggerItem: true,
+        triggerPreset: 'performance',
+      },
+      item_chat_15: {
+        id: 'item_chat_15', type: 'item', name: '事项: Q1 销售业绩上报',
+        itemId: 'item15', preview: 'AIM: 已汇总 3/4 份数据', time: '16:28', unread: 1,
+        messages: [
+          { type: 'flow', text: '事项群聊已创建 · 刘峰、孙杰、吴敏、周磊、黄婷 已加入', time: '16:05' },
+          { type: 'card', itemId: 'item15', time: '16:05' },
+          { from: 'liu', text: '请在今天 18:00 前完成 Q1 业绩填报', time: '16:06' },
+          { type: 'form', formId: 'form_q1_sales', time: '16:06' },
+          { from: 'sun', text: '华东区已提交 ✓', time: '16:15' },
+          { from: 'wu', text: '华北区已提交 ✓', time: '16:20' },
+          { from: 'zhou', text: '售前侧商机数据已填', time: '16:22' },
+          { type: 'hint', text: 'AIM 已收到 3 份填报 · 黄婷 待提交' },
+          { type: 'partial_summary', formId: 'form_q1_sales', time: '16:28' },
+        ],
+        items: ['item15'],
+      },
+      item_chat_16: {
+        id: 'item_chat_16', type: 'item', name: '事项: 某城商行数字化商机',
+        itemId: 'item16', preview: '周磊: 初版方案已完成', time: '11:30', unread: 0,
+        messages: [
+          { type: 'flow', text: '商机事项群聊已创建', time: '05-28 11:00' },
+          { type: 'card', itemId: 'item16', time: '05-28 11:00' },
+          { type: 'app', appType: 'opportunity', itemId: 'item16', time: '05-28 11:01' },
+          { from: 'sun', text: '客户关键人：CIO 张总。Q3 招标，预算 280 万', time: '05-28 11:05' },
+          { from: 'zhou', text: '初版方案已完成，含 AIM 协同 + AI + 信创', time: '05-29 11:30' },
+        ],
+        items: ['item16'],
+      },
+      item_chat_17: {
+        id: 'item_chat_17', type: 'item', name: '事项: 腾讯续费跟进',
+        itemId: 'item17', preview: '张明: 周五演示就绪', time: '14:30', unread: 1,
+        messages: [
+          { type: 'card', itemId: 'item17', time: '05-27 09:00' },
+          { from: 'huang', text: '客户关注 AI 发起事项和私有化', time: '05-27 09:05' },
+          { from: 'zhang', text: '周五演示 AIM 销售场景', time: '05-29 14:30' },
+        ],
+        items: ['item17'],
+      },
+      item_chat_18: {
+        id: 'item_chat_18', type: 'item', name: '事项: AIM 企业版报价',
+        itemId: 'item18', preview: '报价已发送', time: '05-27', unread: 0,
+        messages: [
+          { type: 'card', itemId: 'item18', time: '05-26 14:00' },
+          { type: 'app', appType: 'quote', itemId: 'item18', time: '05-26 14:01' },
+          { from: 'wu', text: '报价已发送客户采购部', time: '05-27 17:00' },
+        ],
+        items: ['item18'],
+      },
+      item_chat_19: {
+        id: 'item_chat_19', type: 'item', name: '事项: XX 集团项目实施',
+        itemId: 'item19', preview: 'UAT 进行中 70%', time: '09:00', unread: 0,
+        messages: [
+          { type: 'card', itemId: 'item19', time: '05-10 09:00' },
+          { from: 'huang', text: 'UAT 进行中，验收 70% 功能点', time: '05-29 09:00' },
+          { from: 'zhang', text: '剩余 2 个定制接口本周五交付', time: '05-29 09:15' },
+        ],
+        items: ['item19'],
+      },
+      item_chat_22: {
+        id: 'item_chat_22', type: 'item', name: '事项: 某省政务云方案',
+        itemId: 'item22', preview: '刘峰: 请出方案初稿', time: '17:00', unread: 1,
+        messages: [
+          { type: 'card', itemId: 'item22', time: '05-29 17:00' },
+          { from: 'liu', text: '@周磊 450 万预算，本周出方案初稿', time: '05-29 17:00' },
+        ],
+        items: ['item22'],
+      },
+      dm_sun: {
+        id: 'dm_sun', type: 'dm', name: '孙杰', userId: 'sun',
+        preview: '城商行约下周二评标', time: '15:00', unread: 0,
+        messages: [
+          { from: 'sun', text: '城商行约下周二评标，需要售前支持', time: '15:00' },
+        ],
+        items: [],
+        canTriggerItem: true,
+        triggerPreset: 'opportunity',
+      },
+      system: {
+        id: 'system', type: 'system', name: '系统通知',
+        preview: '您有 2 条待办事项即将超时', time: '08:00', unread: 2,
+        messages: [
+          { type: 'system', text: '【提醒】事项 AIM-2026-0042 等待您补充材料，剩余 2 天', time: '08:00' },
+          { type: 'system', text: '【通知】李华 在「研发团队群」中 @了您', time: '10:46' },
+        ],
+        items: [],
+      },
+      ai_new: {
+        id: 'ai_new', type: 'ai', name: 'AI 事项助手',
+        preview: '请描述您要发起的事项...', time: '现在', unread: 0,
+        messages: [],
+        items: [],
+        isNew: true,
+      },
+      ai_demo_performance: {
+        id: 'ai_demo_performance', type: 'ai', name: 'AI 对话 · Q1业绩上报（已归档）',
+        preview: '已生成填报应用', time: '05-29', unread: 0, archived: true,
+        messages: [
+          { type: 'hint', text: '已从「销售团队群」导入 3 条相关聊天记录' },
+          { from: 'ai', text: '理解您要收集 Q1 销售业绩。建议：签约、回款、新客户、商机数。填报人？', time: '16:02' },
+          { from: 'liu', text: '孙杰、吴敏、周磊、黄婷', time: '16:02' },
+          { from: 'ai', text: '18:00 截止，汇总后自动生成报表。确认？', time: '16:03' },
+          { from: 'liu', text: '确认', time: '16:03' },
+        ],
+        items: [],
+      },
+      ai_demo_procurement: {
+        id: 'ai_demo_procurement', type: 'ai', name: 'AI 对话 · 采购申请（已归档）',
+        preview: '单据已确认', time: '05-28', unread: 0, archived: true,
+        messages: [
+          { type: 'hint', text: '已从「研发团队群」导入 6 条相关聊天记录' },
+          { from: 'ai', text: '你好！我已阅读群聊记录，了解到你想发起办公设备采购。请确认采购清单和预算范围？', time: '14:10' },
+          { from: 'zhang', text: '10 台 27 寸显示器 + 5 台笔记本，预算 8-9 万', time: '14:11' },
+          { from: 'ai', text: '好的。请问有倾向的供应商吗？是否需要三方比价？', time: '14:12' },
+          { from: 'zhang', text: '戴尔和联想，李华已有报价，需要比价', time: '14:13' },
+          { from: 'ai', text: '审批流程建议：李华（部门初审）→ 王芳（财务审核）→ 赵强（备案）。是否同意？', time: '14:15' },
+          { from: 'zhang', text: '同意，王芳之前也提醒过要走流程', time: '14:16' },
+          { from: 'ai', text: '信息已完整。请确认单据草稿，确认后将创建事项群聊。', time: '14:18' },
+        ],
+        items: [],
+      },
+      ai_demo_cloud: {
+        id: 'ai_demo_cloud', type: 'ai', name: 'AI 对话 · 云资源扩容（已归档）',
+        preview: '单据已确认', time: '05-29', unread: 0, archived: true,
+        messages: [
+          { type: 'hint', text: '已从「研发团队群」导入 4 条相关聊天记录' },
+          { from: 'ai', text: '了解到测试环境需要 K8s 扩容。请问扩容节点数量和规格？', time: '14:46' },
+          { from: 'zhang', text: '4 个节点，8C16G，和现有节点同规格', time: '14:47' },
+          { from: 'ai', text: '月增成本约 ¥12,000，审批人设为赵强（技术评审）可以吗？', time: '14:48' },
+          { from: 'zhang', text: '可以，赵强刚在群里也同意了', time: '14:49' },
+          { from: 'ai', text: '草稿已生成，确认后发起流转。', time: '14:50' },
+        ],
+        items: [],
+      },
+      ai_demo_subitem: {
+        id: 'ai_demo_subitem', type: 'ai', name: 'AI 对话 · 子事项：显示器型号确认（已归档）',
+        preview: '子事项已确认', time: '05-29', unread: 0, archived: true,
+        messages: [
+          { type: 'hint', text: '已从「事项: Q2 办公设备采购」导入 5 条相关聊天记录' },
+          { from: 'ai', text: '了解到需要从主事项拆分「显示器型号确认」子事项。请确认负责人和交付时间？', time: '10:58' },
+          { from: 'wang', text: '李华负责确认，今天下班前给结果', time: '10:59' },
+          { from: 'ai', text: '子事项审批流程：李华确认 → 王芳备案。是否同意？', time: '11:00' },
+          { from: 'wang', text: '同意', time: '11:00' },
+          { from: 'ai', text: '子事项草稿已生成，确认后将创建子事项群聊并关联到主事项。', time: '11:00' },
+        ],
+        items: [],
+      },
+    };
+
+  const MESSAGE_TABS = [
+    { id: 'all', label: '全部' },
+    { id: 'dm', label: '单聊' },
+    { id: 'group', label: '群聊' },
+    { id: 'item', label: '事项' },
+    { id: 'system', label: '系统' },
+  ];
+
+  const ITEM_TABS = [
+    { id: 'todo', label: '待办事项' },
+    { id: 'initiated', label: '我发起的' },
+    { id: 'joined', label: '我参与的' },
+    { id: 'done', label: '已完成' },
+  ];
+
+  const CONTACTS = USER_LIST.filter(u => u.id !== 'zhang');
+
+  // ── State ──
+  let state = {
+    currentUserId: 'zhang',
+    section: 'messages',
+    messageTab: 'all',
+    itemTab: 'todo',
+    itemCategory: 'all',
+    itemSubType: 'all',
+    itemViewMode: 'list',
+    itemPerspective: 'item',
+    activeConv: null,
+    layers: [],
+    activeLayer: null,
+    aiFlow: null,
+    showCardPanel: true,
+    userSwitcherOpen: false,
+    selectedSideItem: null,
+    pendingTrigger: null,
+  };
+
+  const TRIGGER_PRESETS = {
+    performance: { type: '业绩上报', content: 'Q1 销售业绩收集与自动汇总', action: '生成填报应用并创建事项群聊', scope: '销售团队可见', itemId: 'item15' },
+    opportunity: { type: '商机报备', content: '客户商机登记与售前协同', action: '进入 AI 对话完善商机要素', scope: '相关销售与售前可见' },
+    purchase: { type: '采购申请', content: '办公设备采购需求讨论', action: '进入 AI 对话确认后发起', scope: '群成员可见' },
+  };
+
+  // ── DOM refs ──
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  // ── Helpers ──
+  function getCurrentUser() {
+    return USERS[state.currentUserId];
+  }
+
+  function isSelf(userId) {
+    return userId === state.currentUserId;
+  }
+
+  function showToast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function getUser(id) {
+    return USERS[id] || { name: id, avatar: '?', color: '#64748b' };
+  }
+
+  function statusClass(s) {
+    return { todo: 'todo', processing: 'processing', done: 'done' }[s] || 'processing';
+  }
+
+  function getItemChatId(itemId) {
+    return ITEMS[itemId]?.chatId || null;
+  }
+
+  function filterConversations() {
+    const tab = state.messageTab;
+    return Object.values(CONVERSATIONS).filter(c => {
+      if (c.archived) return false;
+      if (c.id === 'ai_new' && c.messages.length === 0 && tab !== 'all') return false;
+      if (tab === 'all') return c.type !== 'ai' || c.messages.length > 0;
+      if (tab === 'dm') return c.type === 'dm';
+      if (tab === 'group') return c.type === 'group';
+      if (tab === 'item') return c.type === 'item';
+      if (tab === 'system') return c.type === 'system';
+      return true;
+    });
+  }
+
+  function filterItems() {
+    const uid = state.currentUserId;
+    const tab = state.itemTab;
+    const cat = state.itemCategory;
+    const sub = state.itemSubType;
+
+    return Object.values(ITEMS).filter(item => {
+      if (cat !== 'all' && item.category !== cat) return false;
+      if (cat === 'approval' && sub !== 'all' && item.subType !== sub) return false;
+      if (cat === 'business' && sub !== 'all' && item.subType !== sub) return false;
+
+      if (tab === 'todo') {
+        return (item.status === 'todo' || item.status === 'processing') &&
+          (item.handler === uid || (item.initiator === uid && item.status === 'processing'));
+      }
+      if (tab === 'initiated') return item.initiator === uid;
+      if (tab === 'joined') return item.participants.includes(uid) && item.initiator !== uid;
+      if (tab === 'done') return item.status === 'done' && item.participants.includes(uid);
+      return item.participants.includes(uid);
+    });
+  }
+
+  function countByCategory(catId) {
+    const uid = state.currentUserId;
+    return Object.values(ITEMS).filter(i =>
+      i.participants.includes(uid) && (catId === 'all' || i.category === catId)
+    ).length;
+  }
+
+  function getCategoryLabel(item) {
+    const cat = ITEM_CATEGORIES[item.category];
+    return cat ? cat.label : item.category;
+  }
+
+  function formatAmount(n) {
+    if (!n) return '—';
+    return '¥' + n.toLocaleString('zh-CN');
+  }
+
+  function renderTypeBadge(item) {
+    return `<span class="type-badge ${item.category}">${item.type}</span>`;
+  }
+
+  function renderUserSwitcher() {
+    const user = getCurrentUser();
+    $('#navAvatar').textContent = user.avatar;
+    $('#navAvatar').style.background = `linear-gradient(135deg, ${user.color}, ${user.color}cc)`;
+    $('#barAvatar').textContent = user.avatar;
+    $('#barAvatar').style.background = user.color;
+    $('#barName').textContent = user.name;
+    $('#barRole').textContent = user.dept?.split(' · ')[0] || '';
+
+    $('#userSwitcher').innerHTML = `
+      <div class="user-switcher-title">切换用户身份（演示）</div>
+      ${USER_LIST.map(u => `
+        <div class="user-option ${u.id === state.currentUserId ? 'active' : ''}" data-switch-user="${u.id}">
+          <div class="user-option-avatar" style="background:${u.color}">${u.avatar}</div>
+          <div class="user-option-info">
+            <div class="user-option-name">${u.name}</div>
+            <div class="user-option-role">${u.dept}</div>
+          </div>
+          ${u.id === state.currentUserId ? '<span class="user-option-check">✓</span>' : ''}
+        </div>
+      `).join('')}
+    `;
+    $('#userSwitcher').classList.toggle('show', state.userSwitcherOpen);
+  }
+
+  function switchUser(userId) {
+    state.currentUserId = userId;
+    state.userSwitcherOpen = false;
+    state.activeConv = null;
+    state.layers = [];
+    state.activeLayer = null;
+    showToast(`已切换为 ${getUser(userId).name} 的视角`);
+    renderAll();
+  }
+
+  // ── Render Nav ──
+  function renderNav() {
+    $$('.nav-btn[data-section]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.section === state.section);
+    });
+    $('#listPanel').classList.toggle('hidden', state.section !== 'messages');
+    $('#fabBtn').classList.toggle('hidden', state.section !== 'messages');
+    renderUserSwitcher();
+  }
+
+  // ── Render List Panel ──
+  function renderListPanel() {
+    if (state.section !== 'messages') return;
+
+    $('#listTitle').textContent = '工作消息';
+
+    const tabs = $('#subTabs');
+    tabs.innerHTML = MESSAGE_TABS.map(t =>
+      `<button class="sub-tab ${t.id === state.messageTab ? 'active' : ''}" data-tab="${t.id}">${t.label}</button>`
+    ).join('');
+
+    const convs = filterConversations();
+    const body = $('#listBody');
+    body.innerHTML = convs.map(c => {
+      const isAI = c.type === 'ai';
+      const isGroup = c.type === 'group';
+      const isItem = c.type === 'item';
+      const isSystem = c.type === 'system';
+      let avatarClass = isAI ? 'ai' : isGroup ? 'group' : isItem ? 'item' : isSystem ? 'system' : '';
+      let avatarContent = isAI ? '✦' : isGroup ? '团' : isItem ? '事' : isSystem ? '🔔' : getUser(c.userId).avatar;
+      let avatarColor = isAI || isGroup || isItem || isSystem ? '' : `background:${getUser(c.userId).color}`;
+
+      return `<div class="list-item ${state.activeConv === c.id ? 'active' : ''}" data-conv="${c.id}">
+        <div class="item-avatar ${avatarClass}" style="${avatarColor}">${avatarContent}</div>
+        <div class="item-content">
+          <div class="item-top">
+            <span class="item-name">${c.name}</span>
+            <span class="item-time">${c.time}</span>
+          </div>
+          <div class="item-preview">${c.preview}</div>
+          ${isItem && c.itemId ? `<div class="item-meta"><span class="tag ${statusClass(ITEMS[c.itemId]?.status)}">${ITEMS[c.itemId]?.statusLabel || '进行中'}</span></div>` : ''}
+          ${isGroup && c.items?.length ? `<div class="item-meta"><span class="tag processing">${c.items.length} 个事项</span></div>` : ''}
+        </div>
+        ${c.unread ? '<div class="unread-dot"></div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function getBizKey() {
+    const cat = state.itemCategory;
+    const sub = state.itemSubType;
+    if (cat === 'approval' && sub !== 'all') return sub;
+    if (cat === 'approval') return 'approval';
+    if (cat === 'business' && sub !== 'all') return sub;
+    if (cat === 'business') return 'business';
+    if (cat === 'task') return 'task';
+    if (cat === 'meeting') return 'meeting';
+    if (cat === 'schedule') return 'schedule';
+    return 'all';
+  }
+
+  function getFormDef(formId) {
+    return FORM_DEFINITIONS[formId];
+  }
+
+  function getFormSubmittedUsers(formId) {
+    const form = getFormDef(formId);
+    return form ? Object.keys(form.submissions) : [];
+  }
+
+  function computeFormSummary(formId) {
+    const form = getFormDef(formId);
+    if (!form) return null;
+    const subs = Object.values(form.submissions);
+    if (!subs.length) return null;
+    const sum = (key) => subs.reduce((s, r) => s + (Number(r[key]) || 0), 0);
+    return {
+      signed: sum('签约金额(万)'),
+      received: sum('回款金额(万)'),
+      newClients: sum('新客户数'),
+      opps: sum('有效商机数'),
+      count: subs.length,
+      total: form.assignees.length,
+    };
+  }
+
+  function showTriggerModal(presetKey, convId) {
+    const preset = TRIGGER_PRESETS[presetKey] || TRIGGER_PRESETS.purchase;
+    state.pendingTrigger = { presetKey, convId, ...preset };
+    $('#triggerType').textContent = preset.type;
+    $('#triggerContent').textContent = preset.content;
+    $('#triggerAction').textContent = preset.action;
+    $('#triggerScope').textContent = preset.scope;
+    $('#triggerModal').classList.add('show');
+  }
+
+  function submitForm(formId) {
+    const form = getFormDef(formId);
+    const uid = state.currentUserId;
+    if (!form || form.submissions[uid]) {
+      showToast(form?.submissions[uid] ? '您已提交过' : '表单不存在');
+      return;
+    }
+    if (!form.assignees.includes(uid)) {
+      showToast('您不在本次填报范围内');
+      return;
+    }
+    const defaults = uid === 'huang'
+      ? { '签约金额(万)': 180, '回款金额(万)': 165, '新客户数': 2, '有效商机数': 6, '备注': '客户成功续费贡献' }
+      : { '签约金额(万)': 100, '回款金额(万)': 90, '新客户数': 1, '有效商机数': 4, '备注': '已填报' };
+    form.submissions[uid] = defaults;
+    const item = ITEMS[form.itemId];
+    const chat = CONVERSATIONS[item?.chatId];
+    if (chat) {
+      chat.messages.push({ from: uid, text: `${getUser(uid).name} 已完成业绩填报 ✓`, time: '刚刚' });
+      const submitted = getFormSubmittedUsers(formId).length;
+      const total = form.assignees.length;
+      item.statusLabel = `收集中 ${submitted}/${total}`;
+      if (submitted >= total) {
+        chat.messages.push({ type: 'summary', formId, time: '刚刚' });
+        item.status = 'done';
+        item.statusLabel = '已全部汇总';
+        showToast('全员填报完成！AIM 已生成 Q1 业绩汇总');
+      } else {
+        chat.messages.push({ type: 'partial_summary', formId, time: '刚刚' });
+        showToast('填报已提交');
+      }
+    }
+    renderAll();
+  }
+
+  function getBizMeta() {
+    return BUSINESS_VIEW_META[getBizKey()] || BUSINESS_VIEW_META.all;
+  }
+
+  function renderBizTable(cols, rows) {
+    return `<table class="items-table"><thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.length ? rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')
+        : `<tr><td colspan="${cols.length}" style="text-align:center;padding:32px;color:var(--text-3)">暂无数据</td></tr>`}
+      </tbody></table>`;
+  }
+
+  function renderProgressBar(pct, color) {
+    return `<div class="progress-cell"><div class="progress-mini"><div class="progress-mini-fill" style="width:${pct}%;background:${color || 'var(--primary)'}"></div></div><span style="font-size:11px">${pct}%</span></div>`;
+  }
+
+  function renderBusinessLedger(items, cat) {
+    const key = getBizKey();
+    const meta = getBizMeta();
+    let body = '';
+
+    if (key === 'leave') {
+      body = `
+        <div class="biz-section-title">员工假期余额 <span class="biz-tag">人力业务</span></div>
+        ${renderBizTable(
+          ['员工', '部门', '年假额度', '已用', '剩余', '病假已用', '事假已用', '状态'],
+          BUSINESS_DATA.leaveBalances.map(b => [
+            getUser(b.userId).name, b.dept, b.annual + '天', b.used + '天',
+            `<strong>${b.remain}天</strong>`,
+            b.sickUsed + '天', b.personalUsed + '天',
+            b.remain <= 3 ? '<span class="warn-badge">余额偏低</span>' : '<span class="ok-badge">正常</span>',
+          ])
+        )}
+        <div class="biz-section-title" style="margin-top:24px">请假流水记录</div>
+        ${renderBizTable(
+          ['员工', '假期类型', '开始', '结束', '天数', '关联单据', '状态'],
+          BUSINESS_DATA.leaveRecords.map(r => [
+            getUser(r.userId).name, r.type, r.start, r.end, r.days + '天', r.itemCode, r.status,
+          ])
+        )}`;
+    } else if (key === 'purchase') {
+      body = `
+        <div class="biz-section-title">采购订单台账 <span class="biz-tag">采购业务</span></div>
+        ${renderBizTable(
+          ['采购单号', '关联事项', '供应商', '采购内容', '金额', '部门', '日期', '状态'],
+          BUSINESS_DATA.purchaseOrders.map(p => [
+            p.code, p.itemCode, p.vendor, p.items, formatAmount(p.amount), p.dept, p.date, p.status,
+          ])
+        )}
+        <div class="biz-section-title" style="margin-top:24px">固定资产台账 <span class="biz-tag">资产管理</span></div>
+        ${renderBizTable(
+          ['资产编号', '资产名称', '类别', '数量', '单价', '总值', '归属部门', '采购单', '入库日', '状态'],
+          BUSINESS_DATA.assets.map(a => [
+            a.code, a.name, a.category, a.qty, formatAmount(a.unitPrice), formatAmount(a.total),
+            a.dept, a.purchaseCode, a.inbound, a.status,
+          ])
+        )}`;
+    } else if (key === 'expense') {
+      body = `
+        <div class="biz-section-title">费用报销明细台账 <span class="biz-tag">财务业务</span></div>
+        ${renderBizTable(
+          ['报销人', '部门', '费用类型', '交通', '住宿', '餐饮', '合计', '发票数', '日期', '状态'],
+          BUSINESS_DATA.expenses.map(e => [
+            getUser(e.userId).name, e.dept, e.type,
+            formatAmount(e.transport), formatAmount(e.hotel), formatAmount(e.meal),
+            formatAmount(e.total), e.invoices, e.date, e.status,
+          ])
+        )}`;
+    } else if (key === 'trip') {
+      body = `
+        <div class="biz-section-title">出差行程台账 <span class="biz-tag">差旅业务</span></div>
+        ${renderBizTable(
+          ['出差人', '部门', '目的地', '出发', '返回', '天数', '预算', '实际费用', '事由', '状态'],
+          BUSINESS_DATA.trips.map(t => [
+            getUser(t.userId).name, t.dept, t.dest, t.start, t.end, t.days + '天',
+            formatAmount(t.budget), t.actual ? formatAmount(t.actual) : '—', t.purpose, t.status,
+          ])
+        )}`;
+    } else if (key === 'budget') {
+      body = `
+        <div class="biz-section-title">预算执行台账 <span class="biz-tag">预算管理</span></div>
+        ${renderBizTable(
+          ['部门', '年度预算', '已使用', '执行率', '关联事项数', '健康度'],
+          BUSINESS_DATA.budgetExec.map(b => [
+            b.dept, formatAmount(b.budget), formatAmount(b.used),
+            renderProgressBar(b.rate, b.rate > 80 ? '#f59e0b' : '#3b82f6'),
+            b.items,
+            b.rate > 80 ? '<span class="warn-badge">接近上限</span>' : '<span class="ok-badge">正常</span>',
+          ])
+        )}`;
+    } else if (key === 'task') {
+      body = `
+        <div class="biz-section-title">任务执行台账 <span class="biz-tag">任务管理</span></div>
+        ${renderBizTable(
+          ['任务名称', '负责人', '部门', '计划完成', '进度', '是否逾期', '关联事项', '状态'],
+          BUSINESS_DATA.taskExec.map(t => [
+            t.title, getUser(t.owner).name, t.dept, t.planEnd,
+            renderProgressBar(t.progress, t.overdue ? '#ef4444' : '#3b82f6'),
+            t.overdue ? '<span class="warn-badge">已逾期</span>' : '—',
+            t.itemCode, t.status,
+          ])
+        )}`;
+    } else if (key === 'meeting') {
+      body = `
+        <div class="biz-section-title">会议记录台账 <span class="biz-tag">会议管理</span></div>
+        ${renderBizTable(
+          ['会议主题', '组织者', '时间', '时长', '应到/实到', '地点', '纪要', '关联事项'],
+          BUSINESS_DATA.meetingRecords.map(m => [
+            m.title, getUser(m.organizer).name, m.date, m.duration + 'min',
+            `${m.attendees}/${m.actual || '—'}`, m.location, m.minutes, m.itemCode,
+          ])
+        )}`;
+    } else if (key === 'schedule') {
+      body = `
+        <div class="biz-section-title">日程安排台账 <span class="biz-tag">日程管理</span></div>
+        ${renderBizTable(
+          ['日程', '所属人', '时间', '类型', '预估时长', '关联事项'],
+          BUSINESS_DATA.scheduleBlocks.map(s => [
+            s.title, getUser(s.owner).name, s.date, s.type, s.hours + 'h', s.itemCode,
+          ])
+        )}`;
+    } else if (key === 'performance') {
+      body = `
+        <div class="biz-section-title">Q1 业绩上报明细 <span class="biz-tag">销售业务</span></div>
+        ${renderBizTable(
+          ['区域/人员', '签约(万)', '回款(万)', '新客户', '商机数', '备注'],
+          Object.entries(FORM_DEFINITIONS.form_q1_sales.submissions).map(([uid, r]) => [
+            getUser(uid).name, r['签约金额(万)'], r['回款金额(万)'], r['新客户数'], r['有效商机数'], r['备注'] || '—',
+          ])
+        )}
+        <p style="font-size:12px;color:var(--text-3);margin-top:8px">待提交：${FORM_DEFINITIONS.form_q1_sales.assignees.filter(id=>!FORM_DEFINITIONS.form_q1_sales.submissions[id]).map(id=>getUser(id).name).join('、') || '无'}</p>`;
+    } else if (key === 'opportunity') {
+      body = `<div class="biz-section-title">商机管道台账</div>${renderBizTable(['商机','客户','金额','阶段','赢率','负责人'], BUSINESS_DATA.opportunities.map(o=>[o.code,o.customer,formatAmount(o.amount),o.stage,o.winRate+'%',getUser(o.owner).name]))}`;
+    } else if (key === 'followup') {
+      body = `<div class="biz-section-title">客户跟进台账</div>${renderBizTable(['客户','等级','负责人','最近联系','状态'], BUSINESS_DATA.customers.map(c=>[c.name,c.level,getUser(c.owner).name,c.lastContact,c.status]))}`;
+    } else if (key === 'quote') {
+      body = `<div class="biz-section-title">报价单台账</div>${renderBizTable(['报价','客户','产品','金额','状态'], BUSINESS_DATA.quotes.map(q=>[q.code,q.customer,q.product,formatAmount(q.amount),q.status]))}`;
+    } else if (key === 'support') {
+      body = `<div class="biz-section-title">技术支持工单</div>${renderBizTable(['工单','客户','级别','标题','处理人','状态'], BUSINESS_DATA.supportTickets.map(t=>[t.code,t.customer,t.level,t.title,getUser(t.owner).name,t.status]))}`;
+    } else if (key === 'business') {
+      body = `<div class="biz-section-title">销售业务汇总</div><div class="report-row">
+        <div class="chart-panel"><h4>商机管道</h4>${renderBizTable(['客户','金额'], BUSINESS_DATA.opportunities.map(o=>[o.customer,formatAmount(o.amount)]))}</div>
+        <div class="chart-panel"><h4>客户状态</h4>${renderBizTable(['客户','状态'], BUSINESS_DATA.customers.map(c=>[c.name,c.status]))}</div></div>`;
+    } else if (key === 'approval') {
+      body = `
+        <div class="biz-section-title">审批业务汇总 <span class="biz-tag">审批域</span></div>
+        <div class="report-row">
+          <div class="chart-panel"><h4>请假流水</h4>
+            ${renderBizTable(['员工','类型','天数','状态'], BUSINESS_DATA.leaveRecords.map(r=>[getUser(r.userId).name,r.type,r.days+'天',r.status]))}
+          </div>
+          <div class="chart-panel"><h4>在途采购</h4>
+            ${renderBizTable(['采购单','金额','状态'], BUSINESS_DATA.purchaseOrders.filter(p=>p.status!=='已完成').map(p=>[p.code,formatAmount(p.amount),p.status]))}
+          </div>
+        </div>
+        <div class="report-row" style="margin-top:16px">
+          <div class="chart-panel"><h4>待审报销</h4>
+            ${renderBizTable(['报销人','金额'], BUSINESS_DATA.expenses.filter(e=>e.status!=='已报销').map(e=>[getUser(e.userId).name,formatAmount(e.total)]))}
+          </div>
+          <div class="chart-panel"><h4>近期出差</h4>
+            ${renderBizTable(['出差人','目的地','天数'], BUSINESS_DATA.trips.map(t=>[getUser(t.userId).name,t.dest,t.days+'天']))}
+          </div>
+        </div>`;
+    } else {
+      body = `
+        <div class="biz-section-title">综合业务台账 <span class="biz-tag">全业务</span></div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">汇总各业务域核心台账，点击左侧分类查看专项台账。</p>
+        <div class="report-row">
+          <div class="chart-panel"><h4>假期余额（剩余 ≤5天）</h4>
+            ${renderBizTable(['员工','剩余年假'], BUSINESS_DATA.leaveBalances.filter(b=>b.remain<=5).map(b=>[getUser(b.userId).name, b.remain+'天']))}
+          </div>
+          <div class="chart-panel"><h4>在途采购资产</h4>
+            ${renderBizTable(['资产','状态'], BUSINESS_DATA.assets.filter(a=>a.status==='采购中').map(a=>[a.name, a.status]))}
+          </div>
+        </div>
+        <div class="report-row" style="margin-top:16px">
+          <div class="chart-panel"><h4>逾期任务</h4>
+            ${renderBizTable(['任务','负责人'], BUSINESS_DATA.taskExec.filter(t=>t.overdue).map(t=>[t.title, getUser(t.owner).name]))}
+          </div>
+          <div class="chart-panel"><h4>待报销费用</h4>
+            ${renderBizTable(['报销人','金额'], BUSINESS_DATA.expenses.filter(e=>e.status!=='已报销').map(e=>[getUser(e.userId).name, formatAmount(e.total)]))}
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="ledger-summary">
+        <div class="ledger-pill"><strong>业务视角</strong></div>
+        <div class="ledger-pill">${meta.ledger}</div>
+      </div>
+      ${body}
+      <p style="font-size:11px;color:var(--text-3);margin-top:12px">业务台账从业务对象维度汇总，与事项流转台账互为补充</p>`;
+  }
+
+  function renderBusinessStats(items, cat) {
+    const key = getBizKey();
+    const meta = getBizMeta();
+    let stats = '';
+    let charts = '';
+
+    if (key === 'leave') {
+      const byType = { '年假': 2, '病假': 1, '事假': 1 };
+      const byDept = {};
+      BUSINESS_DATA.leaveRecords.forEach(r => {
+        const dept = BUSINESS_DATA.leaveBalances.find(b => b.userId === r.userId)?.dept || '—';
+        byDept[dept] = (byDept[dept] || 0) + r.days;
+      });
+      const totalDays = BUSINESS_DATA.leaveRecords.reduce((s, r) => s + r.days, 0);
+      const lowBalance = BUSINESS_DATA.leaveBalances.filter(b => b.remain <= 5).length;
+      stats = `
+        <div class="stat-card highlight"><div class="stat-label">本月请假总天数</div><div class="stat-value">${totalDays}</div><div class="stat-sub">${BUSINESS_DATA.leaveRecords.length} 笔申请</div></div>
+        <div class="stat-card"><div class="stat-label">余额预警人数</div><div class="stat-value" style="color:#dc2626">${lowBalance}</div><div class="stat-sub">年假剩余 ≤5 天</div></div>`;
+      charts = `<div class="report-row">
+        <div class="chart-panel"><h4>假期类型分布</h4><div class="bar-chart">
+          ${Object.entries(byType).map(([k, v]) => `<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/3*100}%;background:#f59e0b">${v}次</div></div></div>`).join('')}
+        </div></div>
+        <div class="chart-panel"><h4>部门休假天数</h4><div class="bar-chart">
+          ${Object.entries(byDept).map(([k, v]) => `<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/8*100}%;background:#3b82f6">${v}天</div></div></div>`).join('')}
+        </div></div>
+      </div>
+      <div class="chart-panel"><h4>员工年假余额</h4><div class="bar-chart">
+        ${BUSINESS_DATA.leaveBalances.map(b => `<div class="bar-row"><span class="bar-label">${getUser(b.userId).name}</span><div class="bar-track"><div class="bar-fill" style="width:${b.remain/b.annual*100}%;background:${b.remain<=3?'#ef4444':'#10b981'}">${b.remain}/${b.annual}天</div></div></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'purchase') {
+      const totalAsset = BUSINESS_DATA.assets.reduce((s, a) => s + a.total, 0);
+      const inUse = BUSINESS_DATA.assets.filter(a => a.status === '在用').length;
+      const pending = BUSINESS_DATA.assets.filter(a => a.status === '采购中').length;
+      const byCat = {};
+      BUSINESS_DATA.assets.forEach(a => { byCat[a.category] = (byCat[a.category] || 0) + a.total; });
+      const maxCat = Math.max(...Object.values(byCat));
+      stats = `
+        <div class="stat-card highlight"><div class="stat-label">资产总值</div><div class="stat-value" style="font-size:22px">${formatAmount(totalAsset)}</div><div class="stat-sub">${BUSINESS_DATA.assets.length} 项资产</div></div>
+        <div class="stat-card"><div class="stat-label">在用 / 采购中</div><div class="stat-value">${inUse} / ${pending}</div></div>`;
+      charts = `<div class="report-row">
+        <div class="chart-panel"><h4>资产类别金额分布</h4><div class="bar-chart">
+          ${Object.entries(byCat).map(([k, v]) => `<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/maxCat*100}%;background:#f59e0b">${formatAmount(v)}</div></div></div>`).join('')}
+        </div></div>
+        <div class="chart-panel"><h4>采购订单状态</h4><div class="bar-chart">
+          ${BUSINESS_DATA.purchaseOrders.map(p => `<div class="bar-row"><span class="bar-label" style="width:90px;font-size:11px">${p.code}</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:#3b82f6">${formatAmount(p.amount)}</div></div><span class="bar-val">${p.status}</span></div>`).join('')}
+        </div></div>
+      </div>`;
+    } else if (key === 'expense') {
+      const total = BUSINESS_DATA.expenses.reduce((s, e) => s + e.total, 0);
+      const byType = {};
+      BUSINESS_DATA.expenses.forEach(e => { byType[e.type] = (byType[e.type] || 0) + e.total; });
+      stats = `<div class="stat-card highlight"><div class="stat-label">报销总额</div><div class="stat-value" style="font-size:22px">${formatAmount(total)}</div></div>`;
+      charts = `<div class="chart-panel"><h4>费用类型占比</h4><div class="bar-chart">
+        ${Object.entries(byType).map(([k, v]) => `<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/total*100}%;background:#ec4899">${formatAmount(v)}</div></div></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'trip') {
+      const totalBudget = BUSINESS_DATA.trips.reduce((s, t) => s + t.budget, 0);
+      stats = `<div class="stat-card highlight"><div class="stat-label">出差预算合计</div><div class="stat-value" style="font-size:22px">${formatAmount(totalBudget)}</div><div class="stat-sub">${BUSINESS_DATA.trips.length} 次出差</div></div>`;
+      charts = `<div class="chart-panel"><h4>出差目的地分布</h4><div class="bar-chart">
+        ${BUSINESS_DATA.trips.map(t => `<div class="bar-row"><span class="bar-label">${t.dest}</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#10b981">${t.days}天</div></div><span class="bar-val">${getUser(t.userId).name}</span></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'budget') {
+      charts = `<div class="chart-panel"><h4>各部门预算执行率</h4><div class="bar-chart">
+        ${BUSINESS_DATA.budgetExec.map(b => `<div class="bar-row"><span class="bar-label">${b.dept}</span><div class="bar-track"><div class="bar-fill" style="width:${b.rate}%;background:${b.rate>80?'#f59e0b':'#3b82f6'}">${b.rate}%</div></div><span class="bar-val">${formatAmount(b.used)}</span></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'task') {
+      const tasks = BUSINESS_DATA.taskExec;
+      const done = tasks.filter(t => t.progress === 100).length;
+      const overdue = tasks.filter(t => t.overdue).length;
+      const avg = Math.round(tasks.reduce((s, t) => s + t.progress, 0) / tasks.length);
+      stats = `
+        <div class="stat-card highlight"><div class="stat-label">任务完成率</div><div class="stat-value">${Math.round(done/tasks.length*100)}%</div><div class="stat-sub">${done}/${tasks.length} 已完成</div></div>
+        <div class="stat-card"><div class="stat-label">平均进度</div><div class="stat-value">${avg}%</div></div>
+        <div class="stat-card"><div class="stat-label">逾期任务</div><div class="stat-value" style="color:#dc2626">${overdue}</div></div>`;
+      charts = `<div class="report-row">
+        <div class="chart-panel"><h4>按人任务完成情况</h4><div class="bar-chart">
+          ${['zhang','li'].map(uid => {
+            const ut = tasks.filter(t => t.owner === uid);
+            const avgP = Math.round(ut.reduce((s,t)=>s+t.progress,0)/ut.length);
+            return `<div class="bar-row"><span class="bar-label">${getUser(uid).name}</span><div class="bar-track"><div class="bar-fill" style="width:${avgP}%;background:#3b82f6">${avgP}%</div></div><span class="bar-val">${ut.length}项</span></div>`;
+          }).join('')}
+        </div></div>
+        <div class="chart-panel"><h4>任务进度明细</h4><div class="bar-chart">
+          ${tasks.map(t => `<div class="bar-row"><span class="bar-label" style="width:100px;font-size:11px">${t.title.slice(0,8)}…</span><div class="bar-track"><div class="bar-fill" style="width:${t.progress}%;background:${t.overdue?'#ef4444':'#3b82f6'}">${t.progress}%</div></div></div>`).join('')}
+        </div></div>
+      </div>`;
+    } else if (key === 'meeting') {
+      const totalMin = BUSINESS_DATA.meetingRecords.reduce((s, m) => s + m.duration, 0);
+      stats = `<div class="stat-card highlight"><div class="stat-label">会议总时长</div><div class="stat-value">${Math.round(totalMin/60)}h</div><div class="stat-sub">${BUSINESS_DATA.meetingRecords.length} 场会议</div></div>`;
+      charts = `<div class="chart-panel"><h4>会议时长分布</h4><div class="bar-chart">
+        ${BUSINESS_DATA.meetingRecords.map(m => `<div class="bar-row"><span class="bar-label" style="width:100px;font-size:11px">${m.title.slice(0,8)}…</span><div class="bar-track"><div class="bar-fill" style="width:${m.duration/120*100}%;background:#8b5cf6">${m.duration}min</div></div></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'schedule') {
+      const totalH = BUSINESS_DATA.scheduleBlocks.reduce((s, b) => s + b.hours, 0);
+      stats = `<div class="stat-card highlight"><div class="stat-label">本周日程占用</div><div class="stat-value">${totalH}h</div></div>`;
+      charts = `<div class="chart-panel"><h4>日程类型时间分配</h4><div class="bar-chart">
+        ${['工作','会议'].map(type => {
+          const h = BUSINESS_DATA.scheduleBlocks.filter(s=>s.type===type).reduce((s,b)=>s+b.hours,0);
+          return `<div class="bar-row"><span class="bar-label">${type}</span><div class="bar-track"><div class="bar-fill" style="width:${h/totalH*100}%;background:#10b981">${h}h</div></div></div>`;
+        }).join('')}
+      </div></div>`;
+    } else if (key === 'performance') {
+      const s = computeFormSummary('form_q1_sales');
+      stats = `<div class="stat-card highlight"><div class="stat-label">Q1 签约合计</div><div class="stat-value">${s?.signed || 0}万</div><div class="stat-sub">已收 ${s?.count || 0}/${s?.total || 0} 份</div></div>
+        <div class="stat-card"><div class="stat-label">回款合计</div><div class="stat-value">${s?.received || 0}万</div></div>`;
+      charts = `<div class="report-row"><div class="chart-panel"><h4>各区域签约贡献</h4><div class="bar-chart">
+        ${BUSINESS_DATA.q1Performance.map(p => `<div class="bar-row"><span class="bar-label">${p.region}</span><div class="bar-track"><div class="bar-fill" style="width:${p.signed/320*100}%;background:#be185d">${p.signed}万</div></div></div>`).join('')}
+      </div></div><div class="chart-panel"><h4>商机数分布</h4><div class="bar-chart">
+        ${BUSINESS_DATA.q1Performance.map(p => `<div class="bar-row"><span class="bar-label">${getUser(p.userId).name}</span><div class="bar-track"><div class="bar-fill" style="width:${p.opps/15*100}%;background:#6366f1">${p.opps}</div></div></div>`).join('')}
+      </div></div></div>`;
+    } else if (key === 'opportunity') {
+      const total = BUSINESS_DATA.opportunities.reduce((s,o)=>s+o.amount,0);
+      stats = `<div class="stat-card highlight"><div class="stat-label">管道总金额</div><div class="stat-value" style="font-size:20px">${formatAmount(total)}</div></div>`;
+      charts = `<div class="chart-panel"><h4>商机阶段分布</h4><div class="bar-chart">
+        ${['需求确认','方案报价','方案编制','续费谈判'].map(st => { const c=BUSINESS_DATA.opportunities.filter(o=>o.stage===st).length; return `<div class="bar-row"><span class="bar-label">${st}</span><div class="bar-track"><div class="bar-fill" style="width:${c/4*100||10}%;background:#0891b2">${c}个</div></div></div>`; }).join('')}
+      </div></div>`;
+    } else if (key === 'business') {
+      const pipe = BUSINESS_DATA.opportunities.reduce((s,o)=>s+o.amount,0);
+      stats = `<div class="stat-card highlight"><div class="stat-label">销售管道</div><div class="stat-value" style="font-size:18px">${formatAmount(pipe)}</div></div>
+        <div class="stat-card"><div class="stat-label">活跃客户</div><div class="stat-value">${BUSINESS_DATA.customers.length}</div></div>`;
+      charts = `<div class="chart-panel"><h4>商机赢率</h4><div class="bar-chart">
+        ${BUSINESS_DATA.opportunities.map(o=>`<div class="bar-row"><span class="bar-label" style="width:90px;font-size:11px">${o.customer.slice(0,6)}</span><div class="bar-track"><div class="bar-fill" style="width:${o.winRate}%;background:#be185d">${o.winRate}%</div></div></div>`).join('')}
+      </div></div>`;
+    } else if (key === 'approval') {
+      const pending = BUSINESS_DATA.leaveRecords.filter(r=>r.status==='审批中').length
+        + BUSINESS_DATA.expenses.filter(e=>e.status!=='已报销').length
+        + BUSINESS_DATA.purchaseOrders.filter(p=>p.status!=='已完成').length;
+      stats = `
+        <div class="stat-card highlight"><div class="stat-label">在途审批</div><div class="stat-value">${pending}</div><div class="stat-sub">请假+报销+采购</div></div>
+        <div class="stat-card"><div class="stat-label">本月请假</div><div class="stat-value">${BUSINESS_DATA.leaveRecords.reduce((s,r)=>s+r.days,0)}天</div></div>
+        <div class="stat-card"><div class="stat-label">资产总值</div><div class="stat-value" style="font-size:18px">${formatAmount(BUSINESS_DATA.assets.reduce((s,a)=>s+a.total,0))}</div></div>`;
+      charts = `<div class="report-row">
+        <div class="chart-panel"><h4>审批类型业务量</h4><div class="bar-chart">
+          ${[['请假',BUSINESS_DATA.leaveRecords.length],['采购',BUSINESS_DATA.purchaseOrders.length],['报销',BUSINESS_DATA.expenses.length],['出差',BUSINESS_DATA.trips.length]].map(([k,v])=>`<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v/4*100}%;background:#f59e0b">${v}笔</div></div></div>`).join('')}
+        </div></div>
+        <div class="chart-panel"><h4>预算执行概览</h4><div class="bar-chart">
+          ${BUSINESS_DATA.budgetExec.map(b=>`<div class="bar-row"><span class="bar-label">${b.dept}</span><div class="bar-track"><div class="bar-fill" style="width:${b.rate}%;background:#3b82f6">${b.rate}%</div></div></div>`).join('')}
+        </div></div>
+      </div>`;
+    } else {
+      stats = `
+        <div class="stat-card"><div class="stat-label">资产总值</div><div class="stat-value" style="font-size:20px">${formatAmount(BUSINESS_DATA.assets.reduce((s,a)=>s+a.total,0))}</div></div>
+        <div class="stat-card"><div class="stat-label">任务完成率</div><div class="stat-value">${Math.round(BUSINESS_DATA.taskExec.filter(t=>t.progress===100).length/BUSINESS_DATA.taskExec.length*100)}%</div></div>
+        <div class="stat-card"><div class="stat-label">待审报销</div><div class="stat-value">${BUSINESS_DATA.expenses.filter(e=>e.status!=='已报销').length}</div></div>`;
+      charts = `<p style="font-size:13px;color:var(--text-2);margin-bottom:12px">选择左侧具体业务分类，查看专项业务报表。</p>`;
+    }
+
+    return `
+      <div class="ledger-summary">
+        <div class="ledger-pill"><strong>业务视角</strong></div>
+        <div class="ledger-pill">${meta.report}</div>
+      </div>
+      <div class="stat-grid">${stats}</div>
+      ${charts}
+      <p style="font-size:11px;color:var(--text-3);margin-top:12px">业务报表从业务结果维度分析，支撑管理决策</p>`;
+  }
+
+  // ── Render Items View ──
+  function renderItemsView() {
+    const cat = ITEM_CATEGORIES[state.itemCategory] || ITEM_CATEGORIES.all;
+    const bizMeta = getBizMeta();
+    const showPerspective = state.itemViewMode === 'ledger' || state.itemViewMode === 'stats';
+
+    // Category sidebar
+    $('#itemsCatSidebar').innerHTML = `
+      <h3>事项分类</h3>
+      ${Object.values(ITEM_CATEGORIES).map(c => `
+        <div class="cat-item ${state.itemCategory === c.id ? 'active' : ''}" data-item-cat="${c.id}">
+          <span class="cat-icon">${c.icon}</span>
+          <span>${c.label}</span>
+          <span class="cat-count">${countByCategory(c.id)}</span>
+        </div>
+        ${c.subTypes && state.itemCategory === c.id ? c.subTypes.map(st => `
+          <div class="cat-item cat-sub ${state.itemSubType === st.id ? 'active' : ''}" data-item-sub="${st.id}">${st.label}</div>
+        `).join('') : ''}
+      `).join('')}
+    `;
+
+    const modeLabel = { list: '', ledger: ' · 台账', stats: ' · 统计报表' }[state.itemViewMode];
+    const perspLabel = showPerspective && state.itemPerspective === 'business'
+      ? `（${bizMeta[state.itemViewMode === 'ledger' ? 'ledger' : 'report']}）` : '';
+    $('#itemsViewTitle').textContent = cat.label + modeLabel + perspLabel;
+
+    // Perspective bar
+    $('#perspectiveBar').classList.toggle('hidden', !showPerspective);
+    if (showPerspective) {
+      $$('.perspective-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.perspective === state.itemPerspective);
+      });
+      $('#bizViewHint').textContent = state.itemPerspective === 'business'
+        ? '按业务对象汇总，非事项流转记录'
+        : '按 AIM 事项流转记录汇总';
+    }
+
+    // Status filters (list mode only)
+    const filters = $('#itemFilters');
+    if (state.itemViewMode === 'list') {
+      filters.innerHTML = ITEM_TABS.map(t =>
+        `<button class="chip ${t.id === state.itemTab ? 'active' : ''}" data-item-tab="${t.id}">${t.label}</button>`
+      ).join('');
+      filters.classList.remove('hidden');
+    } else {
+      filters.innerHTML = '';
+      filters.classList.add('hidden');
+    }
+
+    // Mode tabs
+    $$('.mode-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.itemMode === state.itemViewMode);
+    });
+
+    const content = $('#itemsContent');
+    const items = filterItems();
+
+    if (state.itemViewMode === 'list') {
+      content.innerHTML = renderItemsList(items);
+    } else if (state.itemViewMode === 'ledger') {
+      content.innerHTML = state.itemPerspective === 'business'
+        ? renderBusinessLedger(items, cat)
+        : renderItemsLedger(items, cat);
+    } else {
+      content.innerHTML = state.itemPerspective === 'business'
+        ? renderBusinessStats(items, cat)
+        : renderItemsStats(items, cat);
+    }
+  }
+
+  function renderItemsList(items) {
+    const extraCol = state.itemCategory === 'approval' ? '<th>金额/天数</th>'
+      : state.itemCategory === 'business' ? '<th>客户/金额</th>'
+      : state.itemCategory === 'task' ? '<th>进度</th>'
+      : state.itemCategory === 'meeting' || state.itemCategory === 'schedule' ? '<th>时间/地点</th>'
+      : '<th>分类</th>';
+
+    return `<table class="items-table">
+      <thead><tr>
+        <th>编号</th><th>标题</th><th>类型</th>${extraCol}<th>处理人</th><th>状态</th><th>更新时间</th>
+      </tr></thead>
+      <tbody>
+        ${items.length ? items.map(item => {
+          const extra = state.itemCategory === 'approval'
+            ? `<td>${item.amount ? formatAmount(item.amount) : (item.days ? item.days + '天' : '—')}</td>`
+            : state.itemCategory === 'business'
+            ? `<td style="font-size:12px">${item.customer || '—'}${item.amount ? '<br>' + formatAmount(item.amount) : ''}</td>`
+            : state.itemCategory === 'task'
+            ? `<td>${item.progress != null ? item.progress + '%' : '—'}</td>`
+            : state.itemCategory === 'meeting'
+            ? `<td style="font-size:12px;color:var(--text-2)">${item.meetingTime || '—'}<br>${item.location || ''}</td>`
+            : state.itemCategory === 'schedule'
+            ? `<td style="font-size:12px;color:var(--text-2)">${item.scheduleTime || '—'}</td>`
+            : `<td>${renderTypeBadge(item)}</td>`;
+          const rowClass = item.chatId ? 'item-row' : 'no-chat';
+          const clickAttr = item.chatId ? `data-item="${item.id}"` : '';
+          return `<tr class="${rowClass}" ${clickAttr}>
+            <td style="color:var(--primary);font-weight:600">${item.code}</td>
+            <td>${item.title}</td>
+            <td>${renderTypeBadge(item)}</td>
+            ${extra}
+            <td>${getUser(item.handler).name}</td>
+            <td><span class="tag ${statusClass(item.status)}">${item.statusLabel}</span></td>
+            <td style="color:var(--text-3)">${item.updated}</td>
+          </tr>`;
+        }).join('') : `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">当前筛选下暂无事项</td></tr>`}
+      </tbody>
+    </table>`;
+  }
+
+  function renderItemsLedger(items, cat) {
+    const totalAmount = items.filter(i => i.amount).reduce((s, i) => s + i.amount, 0);
+    const processing = items.filter(i => i.status === 'processing').length;
+    const done = items.filter(i => i.status === 'done').length;
+
+    const ledgerCols = {
+      approval: ['编号', '审批类型', '发起人', '金额', '部门', '状态', '创建日期'],
+      task: ['编号', '任务名称', '负责人', '进度', '截止日期', '部门', '状态'],
+      meeting: ['编号', '会议主题', '组织者', '时间', '地点', '时长', '状态'],
+      schedule: ['编号', '日程标题', '所属人', '时间', '类型', '部门', '状态'],
+      all: ['编号', '分类', '标题', '发起人', '处理人', '状态', '更新日期'],
+    };
+    const cols = ledgerCols[cat.id] || ledgerCols.all;
+
+    const rows = items.map(item => {
+      if (cat.id === 'approval') {
+        return [item.code, item.type, getUser(item.initiator).name, formatAmount(item.amount) || (item.days ? item.days+'天' : '—'), item.dept || '—', item.statusLabel, item.created];
+      }
+      if (cat.id === 'task') {
+        return [item.code, item.title, getUser(item.handler).name, (item.progress ?? '—') + (item.progress != null ? '%' : ''), item.dueDate || '—', item.dept || '—', item.statusLabel];
+      }
+      if (cat.id === 'meeting') {
+        return [item.code, item.title, getUser(item.initiator).name, item.meetingTime || '—', item.location || '—', item.duration ? item.duration+'min' : '—', item.statusLabel];
+      }
+      if (cat.id === 'schedule') {
+        return [item.code, item.title, getUser(item.initiator).name, item.scheduleTime || '—', item.type, item.dept || '—', item.statusLabel];
+      }
+      return [item.code, getCategoryLabel(item), item.title, getUser(item.initiator).name, getUser(item.handler).name, item.statusLabel, item.updated];
+    });
+
+    return `
+      <div class="ledger-summary">
+        <div class="ledger-pill"><strong>${items.length}</strong> 条记录</div>
+        <div class="ledger-pill"><strong>${processing}</strong> 进行中</div>
+        <div class="ledger-pill"><strong>${done}</strong> 已完成</div>
+        ${cat.id === 'approval' ? `<div class="ledger-pill"><strong>${formatAmount(totalAmount)}</strong> 涉及金额合计</div>` : ''}
+      </div>
+      <table class="items-table">
+        <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${rows.length ? rows.map((row, i) => {
+            const item = items[i];
+            const cls = item.chatId ? 'item-row' : 'no-chat';
+            const attr = item.chatId ? `data-item="${item.id}"` : '';
+            return `<tr class="${cls}" ${attr}>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+          }).join('') : `<tr><td colspan="${cols.length}" style="text-align:center;padding:40px;color:var(--text-3)">暂无台账数据</td></tr>`}
+        </tbody>
+      </table>
+      <p style="font-size:11px;color:var(--text-3);margin-top:12px">台账数据来源于 AIM 事项流转记录，支持导出（演示）</p>`;
+  }
+
+  function renderItemsStats(items, cat) {
+    const byStatus = { todo: 0, processing: 0, done: 0 };
+    items.forEach(i => { byStatus[i.status] = (byStatus[i.status] || 0) + 1; });
+
+    const catId = cat.id;
+    let specificStats = '';
+    let charts = '';
+
+    if (catId === 'approval' || catId === 'all') {
+      const approvalItems = catId === 'all' ? items.filter(i => i.category === 'approval') : items;
+      const bySub = {};
+      approvalItems.forEach(i => { bySub[i.subType] = (bySub[i.subType] || 0) + 1; });
+      const subLabels = { leave: '请假', purchase: '采购', expense: '报销', trip: '出差', budget: '预算', other: '其他' };
+      const maxSub = Math.max(...Object.values(bySub), 1);
+      if (catId === 'approval') {
+        const totalAmt = approvalItems.filter(i => i.amount).reduce((s, i) => s + i.amount, 0);
+        specificStats = `<div class="stat-card highlight"><div class="stat-label">审批总金额</div><div class="stat-value">${formatAmount(totalAmt)}</div><div class="stat-sub">${approvalItems.length} 笔审批</div></div>`;
+      }
+      charts += `<div class="chart-panel"><h4>审批类型分布</h4><div class="bar-chart">
+        ${Object.entries(bySub).map(([k, v]) => `
+          <div class="bar-row">
+            <span class="bar-label">${subLabels[k] || k}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${v/maxSub*100}%;background:#f59e0b">${v}</div></div>
+            <span class="bar-val">${v}件</span>
+          </div>`).join('')}
+      </div></div>`;
+      if (catId === 'all') {
+        const totalAmt = approvalItems.filter(i => i.amount).reduce((s, i) => s + i.amount, 0);
+        specificStats = `<div class="stat-card highlight"><div class="stat-label">审批总金额</div><div class="stat-value">${formatAmount(totalAmt)}</div><div class="stat-sub">${approvalItems.length} 笔审批</div></div>`;
+      }
+    }
+
+    if (catId === 'task' || catId === 'all') {
+      const taskItems = catId === 'all' ? items.filter(i => i.category === 'task') : items;
+      const avgProgress = taskItems.filter(i => i.progress != null).reduce((s, i, _, a) => s + i.progress / a.length, 0) || 0;
+      if (catId === 'task') {
+        specificStats = `<div class="stat-card highlight"><div class="stat-label">平均完成度</div><div class="stat-value">${Math.round(avgProgress)}%</div><div class="stat-sub">${taskItems.length} 个任务</div></div>`;
+      }
+      charts += `<div class="chart-panel"><h4>任务进度分布</h4><div class="bar-chart">
+        ${taskItems.filter(i => i.progress != null).map(i => `
+          <div class="bar-row">
+            <span class="bar-label" style="width:100px;font-size:11px">${i.title.slice(0,8)}…</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${i.progress}%;background:#3b82f6">${i.progress}%</div></div>
+          </div>`).join('') || '<p style="color:var(--text-3);font-size:13px">暂无进度数据</p>'}
+      </div></div>`;
+    }
+
+    if (catId === 'meeting') {
+      specificStats = `<div class="stat-card highlight"><div class="stat-label">本月会议</div><div class="stat-value">${items.length}</div><div class="stat-sub">待召开 ${byStatus.todo || 0} 场</div></div>`;
+      charts = `<div class="chart-panel"><h4>会议类型</h4><div class="bar-chart">
+        ${['weekly', 'okr'].map(t => {
+          const c = items.filter(i => i.subType === t).length;
+          return `<div class="bar-row"><span class="bar-label">${t === 'weekly' ? '周会' : 'OKR'}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${c/items.length*100||0}%;background:#8b5cf6">${c}</div></div></div>`;
+        }).join('')}
+      </div></div>`;
+    }
+
+    if (catId === 'schedule') {
+      specificStats = `<div class="stat-card highlight"><div class="stat-label">近期日程</div><div class="stat-value">${items.length}</div><div class="stat-sub">本周 ${items.length} 项</div></div>`;
+    }
+
+    if (catId === 'all') {
+      const byCat = {};
+      items.forEach(i => { byCat[i.category] = (byCat[i.category] || 0) + 1; });
+      const maxCat = Math.max(...Object.values(byCat), 1);
+      const catColors = { approval: '#f59e0b', task: '#3b82f6', meeting: '#8b5cf6', schedule: '#10b981' };
+      charts = `<div class="report-row"><div class="chart-panel"><h4>事项分类占比</h4><div class="bar-chart">
+        ${Object.entries(byCat).map(([k, v]) => `
+          <div class="bar-row">
+            <span class="bar-label">${ITEM_CATEGORIES[k]?.label || k}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${v/maxCat*100}%;background:${catColors[k]}">${v}</div></div>
+            <span class="bar-val">${Math.round(v/items.length*100)}%</span>
+          </div>`).join('')}
+      </div></div>${charts}</div>`;
+    }
+
+    return `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">总计</div><div class="stat-value">${items.length}</div><div class="stat-sub">当前筛选范围</div></div>
+        <div class="stat-card"><div class="stat-label">待处理</div><div class="stat-value">${byStatus.todo || 0}</div></div>
+        <div class="stat-card"><div class="stat-label">进行中</div><div class="stat-value">${byStatus.processing || 0}</div></div>
+        <div class="stat-card"><div class="stat-label">已完成</div><div class="stat-value">${byStatus.done || 0}</div></div>
+        ${specificStats}
+      </div>
+      ${charts}
+      <p style="font-size:11px;color:var(--text-3)">统计报表基于 AIM 事项数据实时汇总（演示数据）</p>`;
+  }
+
+  // ── Render Contacts ──
+  function renderContacts() {
+    $('#contactsGrid').innerHTML = CONTACTS.map((c) => `
+      <div class="contact-card" data-user="${c.id}">
+        <div class="contact-avatar" style="background:${c.color}">${c.avatar}</div>
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-dept">${c.dept}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Render Main Views ──
+  function renderMain() {
+    const inChat = state.section === 'messages' && state.activeConv;
+    $('#welcomeScreen').classList.toggle('hidden', inChat || state.section !== 'messages');
+    $('#chatView').classList.toggle('hidden', !inChat);
+    $('#itemsView').classList.toggle('hidden', state.section !== 'items');
+    $('#contactsView').classList.toggle('hidden', state.section !== 'contacts');
+
+    if (state.section === 'items') renderItemsView();
+    if (state.section === 'contacts') renderContacts();
+    if (inChat) renderChat();
+  }
+
+  // ── Render Chat ──
+  function renderChat() {
+    const conv = CONVERSATIONS[state.activeConv];
+    if (!conv) return;
+
+    // Header
+    const activeId = state.activeLayer || state.activeConv;
+    const activeConv = CONVERSATIONS[activeId] || conv;
+    const acType = activeConv.type;
+    const typeLabel = { dm: '单聊', group: '群聊', item: '事项群聊', ai: 'AI 私密对话', system: '系统消息' }[acType] || '';
+    $('#chatHeader').innerHTML = `
+      <div class="chat-header-info">
+        <h3>${activeConv.name}</h3>
+        <p>${typeLabel}${acType === 'ai' ? ' · 仅自己可见' : ''}${acType === 'group' ? ` · ${activeConv.members?.length || 0} 人 · ${activeConv.items?.length || 0} 个事项` : ''}${acType === 'item' ? ' · 可发起子事项' : ''}${activeConv.archived ? ' · 已归档' : ''}</p>
+      </div>
+      <div class="header-actions">
+        ${activeConv.canTriggerItem ? '<button class="header-action-btn" id="btnTriggerItem">发起事项</button>' : ''}
+        ${acType === 'item' ? '<button class="header-action-btn" id="btnTriggerSubItem" style="border-color:#059669;color:#059669">发起子事项</button>' : ''}
+        ${(activeConv.type === 'group' && activeConv.items?.length) || acType === 'item' ? '<button class="header-action-btn" id="btnViewAIDemo">查看 AI 对话记录</button>' : ''}
+        ${activeConv.type !== 'ai' && activeConv.type !== 'system' ? '<button class="header-action-btn ai-btn" id="btnOpenAI" style="border-color:#c4b5fd;color:#7c3aed">与 AI 对话</button>' : ''}
+        <button class="header-action-btn" id="btnToggleCards">${state.showCardPanel ? '收起卡片' : '展开卡片'}</button>
+      </div>
+    `;
+
+    // Layer tabs
+    const layers = state.layers;
+    if (layers.length > 0) {
+      $('#layerTabs').innerHTML = layers.map((l, i) => {
+        const lc = CONVERSATIONS[l] || { name: l };
+        return `<button class="layer-tab ${l === state.activeLayer ? 'active' : ''}" data-layer="${l}">
+          ${i > 0 ? '→ ' : ''}${lc.name}
+          ${i > 0 ? '<span class="close-layer" data-close-layer="' + l + '">×</span>' : ''}
+        </button>`;
+      }).join('');
+      $('#layerTabs').classList.remove('hidden');
+    } else {
+      $('#layerTabs').classList.add('hidden');
+      $('#layerTabs').innerHTML = '';
+    }
+
+    // Messages
+    renderMessages(activeConv);
+
+    // Toolbar
+    const toolbar = $('#chatToolbar');
+    if (acType === 'ai') {
+      toolbar.innerHTML = '<span style="font-size:12px;color:var(--ai)">✦ AI 将帮您梳理事项要素，确认后生成单据</span>';
+    } else if (acType === 'item') {
+      toolbar.innerHTML = `
+        <button class="toolbar-btn">📎 附件</button>
+        <button class="toolbar-btn">@ 提及</button>
+        <button class="toolbar-btn ai-btn" id="toolbarAI">✦ 与 AI 对话处理本事项</button>
+        <button class="toolbar-btn" id="toolbarSubItem" style="border-color:#6ee7b7;color:#059669">＋ 发起子事项</button>
+      `;
+    } else if (acType !== 'system') {
+      toolbar.innerHTML = `
+        <button class="toolbar-btn">📎 附件</button>
+        <button class="toolbar-btn">@ 提及</button>
+        <button class="toolbar-btn ai-btn" id="toolbarAI">✦ 与 AI 对话处理事项</button>
+      `;
+    } else {
+      toolbar.innerHTML = '';
+    }
+
+    // Card panel
+    $('#cardPanel').classList.toggle('hidden', !state.showCardPanel || acType === 'ai');
+    renderCardPanel(activeConv);
+
+    // Input placeholder
+    const cur = getCurrentUser();
+    $('#chatInput').placeholder = acType === 'ai'
+      ? (activeConv.archived ? '已归档的 AI 对话，仅供查看' : '描述您要发起的事项，AI 将引导您完善...')
+      : `以 ${cur.name} 身份输入消息...`;
+    $('#chatInput').disabled = !!activeConv.archived;
+    $('#sendBtn').disabled = !!activeConv.archived;
+  }
+
+  function renderMessages(conv) {
+    const container = $('#chatMessages');
+    let html = '';
+
+    if (conv.isNew && conv.messages.length === 0) {
+      html = `
+        <div class="msg-date">今天</div>
+        <div class="message ai">
+          <div class="msg-avatar" style="background:#7c3aed">✦</div>
+          <div>
+            <div class="msg-sender">AIM 助手</div>
+            <div class="msg-bubble">你好 ${getCurrentUser().name}！请告诉我您想发起什么工作事项，我会通过多轮对话帮您梳理所需信息，确认后自动生成单据并创建事项群聊。</div>
+          </div>
+        </div>`;
+    }
+
+    conv.messages.forEach(msg => {
+      if (msg.type === 'date') {
+        html += `<div class="msg-date">${msg.text}</div>`;
+      } else if (msg.type === 'hint') {
+        html += `<div class="msg-hint">${msg.text}</div>`;
+      } else if (msg.type === 'divider') {
+        html += `<div class="group-item-divider">${msg.text}</div>`;
+      } else if (msg.type === 'flow') {
+        html += `<div class="message flow-record"><div class="msg-bubble">⟳ ${msg.text}</div></div>`;
+      } else if (msg.type === 'system') {
+        html += `<div class="message system-msg"><div class="msg-bubble">${msg.text}</div></div>`;
+      } else if (msg.type === 'card') {
+        const item = ITEMS[msg.itemId];
+        if (item) html += renderInlineCard(item, msg.time, msg.isSub);
+      } else if (msg.type === 'form') {
+        html += renderFormCard(msg.formId);
+      } else if (msg.type === 'summary') {
+        html += renderSummaryCard(msg.formId, false);
+      } else if (msg.type === 'partial_summary') {
+        html += renderSummaryCard(msg.formId, true);
+      } else if (msg.type === 'app') {
+        html += renderAppCard(msg.appType, msg.itemId);
+      } else if (msg.type === 'draft') {
+        html += renderDraftCard(msg.draft);
+      } else if (msg.from) {
+        const user = getUser(msg.from);
+        const self = isSelf(msg.from);
+        const isAI = msg.from === 'ai';
+        html += `
+          <div class="message ${self ? 'self' : ''} ${isAI ? 'ai' : ''}">
+            ${!self ? `<div class="msg-avatar" style="background:${user.color}">${user.avatar}</div>` : ''}
+            <div>
+              ${!self ? `<div class="msg-sender">${user.name}${msg.time ? ' · ' + msg.time : ''}</div>` : ''}
+              <div class="msg-bubble">${msg.text}</div>
+            </div>
+          </div>`;
+      }
+    });
+
+    // AI flow draft
+    if (state.aiFlow && state.aiFlow.convId === conv.id && state.aiFlow.draft) {
+      html += renderDraftCard(state.aiFlow.draft);
+    }
+
+    container.innerHTML = html;
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function renderInlineCard(item, time, isSub) {
+    const kindTag = item.itemKind === 'business'
+      ? '<span class="scene-tag">业务事项</span>'
+      : '<span class="process-tag">流程事项</span>';
+    const subLabel = isSub || item.parent ? '<span class="tag ai-tag" style="margin-left:4px">子事项</span>' : '';
+    return `
+      <div class="message">
+        <div class="msg-avatar item" style="background:linear-gradient(135deg,${item.itemKind==='business'?'#be185d,#ec4899':'#059669,#34d399'});border-radius:10px">事</div>
+        <div>
+          <div class="msg-sender">事项卡片${item.parent ? '（子事项）' : ''} · ${time || ''} ${kindTag}</div>
+          <div class="item-card-inline" data-open-item-chat="${item.id}">
+            <div class="card-inline-header">
+              <div class="card-inline-icon">${item.parent ? '↳' : '📋'}</div>
+              <div>
+                <div class="card-inline-title">${item.title}${subLabel}</div>
+                <div class="card-inline-id">${item.code}${item.parent ? ' · 隶属 ' + (ITEMS[item.parent]?.code || '') : ''}</div>
+              </div>
+            </div>
+            <div class="card-inline-body">${item.desc}</div>
+            <div class="card-inline-footer">
+              <span class="tag ${statusClass(item.status)}">${item.statusLabel}</span>
+              <span>处理人: ${getUser(item.handler).name}</span>
+            </div>
+            <div class="card-inline-actions">
+              <button class="card-action-btn" data-open-item-chat="${item.id}">进入事项群聊</button>
+              ${item.formId ? `<button class="card-action-btn primary" data-fill-form="${item.formId}">填写/查看</button>` : `<button class="card-action-btn primary" data-open-item-ai="${item.id}">AI 协助处理</button>`}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderFormCard(formId) {
+    const form = getFormDef(formId);
+    if (!form) return '';
+    const uid = state.currentUserId;
+    const submitted = getFormSubmittedUsers(formId);
+    const canFill = form.assignees.includes(uid) && !form.submissions[uid];
+    return `
+      <div class="message">
+        <div class="msg-avatar" style="background:#be185d;border-radius:10px">填</div>
+        <div>
+          <div class="msg-sender">数据填报应用 · ${form.title}</div>
+          <div class="form-card-inline">
+            <h4>📊 ${form.title}</h4>
+            ${form.fields.map(f => `<div class="form-field-row"><span>${f}</span><span style="color:var(--text-3)">必填</span></div>`).join('')}
+            <div class="submit-status">
+              ${form.assignees.map(id => `<span class="submit-chip ${form.submissions[id] ? 'done' : 'pending'}">${getUser(id).name}${form.submissions[id] ? ' ✓' : ' 待填'}</span>`).join('')}
+            </div>
+            ${canFill ? `<div class="card-inline-actions" style="margin-top:10px"><button class="card-action-btn primary" data-submit-form="${formId}">提交我的填报</button></div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderSummaryCard(formId, partial) {
+    const form = getFormDef(formId);
+    const summary = computeFormSummary(formId);
+    if (!form || !summary) return '';
+    const title = partial ? `阶段性汇总 (${summary.count}/${summary.total} 已提交)` : 'Q1 业绩汇总报告';
+    return `
+      <div class="message flow-record" style="max-width:92%">
+        <div class="summary-card-inline" style="max-width:100%">
+          <h4>📈 AIM 自动生成 · ${title}</h4>
+          <div class="summary-grid">
+            <div class="summary-cell"><div class="val">${summary.signed}</div><div class="lbl">签约(万)</div></div>
+            <div class="summary-cell"><div class="val">${summary.received}</div><div class="lbl">回款(万)</div></div>
+            <div class="summary-cell"><div class="val">${summary.newClients}</div><div class="lbl">新客户</div></div>
+            <div class="summary-cell"><div class="val">${summary.opps}</div><div class="lbl">商机数</div></div>
+          </div>
+          <div class="mini-table-wrap"><table class="mini-table"><thead><tr><th>填报人</th><th>签约</th><th>回款</th><th>新客户</th><th>商机</th></tr></thead>
+          <tbody>${Object.entries(form.submissions).map(([uid, r]) => `<tr><td>${getUser(uid).name}</td><td>${r['签约金额(万)']}</td><td>${r['回款金额(万)']}</td><td>${r['新客户数']}</td><td>${r['有效商机数']}</td></tr>`).join('')}</tbody></table></div>
+          ${partial ? '<p style="font-size:11px;color:var(--warning);margin-top:8px">待全员提交后将更新最终报表</p>' : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderAppCard(appType, itemId) {
+    const item = ITEMS[itemId];
+    if (!item) return '';
+    if (appType === 'opportunity') {
+      return `<div class="message"><div class="msg-avatar" style="background:#0891b2;border-radius:10px">商</div><div>
+        <div class="msg-sender">商机应用</div>
+        <div class="app-card-inline"><h4>🎯 商机详情</h4>
+          <div class="form-field-row"><span>客户</span><span>${item.customer || '—'}</span></div>
+          <div class="form-field-row"><span>预计金额</span><span>${formatAmount(item.amount)}</span></div>
+          <div class="form-field-row"><span>阶段</span><span>${item.stage || '—'}</span></div>
+          <div class="form-field-row"><span>赢率</span><span>${item.winRate || '—'}%</span></div>
+          <div class="form-field-row"><span>负责人</span><span>${getUser(item.initiator).name}</span></div>
+        </div></div></div>`;
+    }
+    if (appType === 'quote') {
+      const q = BUSINESS_DATA.quotes.find(x => x.itemCode === item.code);
+      return `<div class="message"><div class="msg-avatar" style="background:#6366f1;border-radius:10px">报</div><div>
+        <div class="msg-sender">报价应用</div>
+        <div class="app-card-inline"><h4>💰 报价单</h4>
+          <div class="form-field-row"><span>客户</span><span>${item.customer || q?.customer || '—'}</span></div>
+          <div class="form-field-row"><span>产品</span><span>${q?.product || 'AIM 企业版'}</span></div>
+          <div class="form-field-row"><span>席位</span><span>${q?.seats || '—'}</span></div>
+          <div class="form-field-row"><span>报价金额</span><span>${formatAmount(item.amount)}</span></div>
+          <div class="form-field-row"><span>有效期</span><span>${q?.validUntil || '30天'}</span></div>
+        </div></div></div>`;
+    }
+    return '';
+  }
+
+  function renderDraftCard(draft) {
+    return `
+      <div class="message ai">
+        <div class="msg-avatar" style="background:#7c3aed">✦</div>
+        <div>
+          <div class="msg-sender">AIM 助手 · 单据草稿</div>
+          <div class="draft-card">
+            <h4>✦ 请确认事项信息</h4>
+            ${Object.entries(draft).map(([k, v]) =>
+              `<div class="draft-field"><span class="draft-label">${k}</span><span class="draft-value">${v}</span></div>`
+            ).join('')}
+            <div class="draft-actions">
+              <button class="card-action-btn" id="draftEdit">修改</button>
+              <button class="card-action-btn primary" id="draftConfirm">确认并发起流转</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderCardPanel(conv) {
+    const itemIds = conv.items || [];
+    const cards = itemIds.map(id => ITEMS[id]).filter(Boolean);
+    const activeItemId = state.selectedSideItem || conv.itemId || cards[0]?.id;
+
+    $('#cardCount').textContent = `${cards.length} 项`;
+
+    if (cards.length === 0) {
+      $('#cardPanelBody').innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-3);font-size:13px">
+        暂无关联事项<br><br>
+        <span style="font-size:12px">在对话中发起事项后，卡片将显示在这里</span>
+      </div>`;
+      $('#cardTimeline').innerHTML = '';
+      return;
+    }
+
+    $('#cardPanelBody').innerHTML = cards.map(item => {
+      const nested = (item.nested || []).map(id => ITEMS[id]).filter(Boolean);
+      const isActive = item.id === activeItemId;
+      return `
+        <div class="side-card ${isActive ? 'active' : ''}" data-side-item="${item.id}">
+          <div class="side-card-header">
+            <div class="side-card-title">${item.title}</div>
+            <span class="side-card-status tag ${statusClass(item.status)}">${item.statusLabel}</span>
+          </div>
+          <div class="side-card-desc">${item.desc}</div>
+          <div class="side-card-meta">
+            <span>📋 ${item.code}</span>
+            <span>👤 ${getUser(item.handler).name}</span>
+            <span>发起: ${getUser(item.initiator).name}</span>
+          </div>
+          ${nested.length ? `<div class="side-card-nested">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:4px">子事项</div>
+            ${nested.map(n => `<div class="nested-link" data-open-item-chat="${n.id}">↳ ${n.title}</div>`).join('')}
+          </div>` : ''}
+        </div>`;
+    }).join('');
+
+    const focusItem = ITEMS[activeItemId] || cards[0];
+    if (focusItem?.timeline) {
+      $('#cardTimeline').innerHTML = `
+        <h4>流转记录 · ${focusItem.code}</h4>
+        ${focusItem.timeline.map(t => `
+          <div class="timeline-item">
+            <div class="timeline-dot ${t.done ? 'done' : ''}"></div>
+            <div>
+              <div class="timeline-content">${t.text}</div>
+              <div class="timeline-time">${t.time}</div>
+            </div>
+          </div>
+        `).join('')}`;
+    }
+  }
+
+  // ── Actions ──
+  function openConversation(convId) {
+    state.section = 'messages';
+    state.activeConv = convId;
+    state.layers = [convId];
+    state.activeLayer = convId;
+    state.aiFlow = null;
+    const conv = CONVERSATIONS[convId];
+    if (conv) {
+      conv.unread = 0;
+      if (conv.itemId) state.selectedSideItem = conv.itemId;
+    }
+    renderAll();
+  }
+
+  function openItemChat(itemId, { asLayer = false } = {}) {
+    const chatId = getItemChatId(itemId);
+    if (!chatId || !CONVERSATIONS[chatId]) {
+      showToast('未找到该事项的对话');
+      return;
+    }
+    state.selectedSideItem = itemId;
+    if (asLayer && state.activeConv) {
+      pushLayer(chatId);
+    } else {
+      openConversation(chatId);
+    }
+  }
+
+  function pushLayer(convId) {
+    if (!state.layers.includes(convId)) state.layers.push(convId);
+    state.activeLayer = convId;
+    renderAll();
+  }
+
+  function popLayer(convId) {
+    const idx = state.layers.indexOf(convId);
+    if (idx > 0) {
+      state.layers = state.layers.slice(0, idx);
+      state.activeLayer = state.layers[state.layers.length - 1];
+      renderAll();
+    }
+  }
+
+  function startNewItemAI(contextConvId, { isSubItem = false } = {}) {
+    const aiConv = CONVERSATIONS.ai_new;
+    aiConv.isNew = false;
+    aiConv.messages = [];
+    aiConv.archived = false;
+    const ctx = contextConvId ? CONVERSATIONS[contextConvId] : null;
+
+    if (ctx) {
+      const importCount = ctx.messages?.filter(m => m.from || m.type === 'card').length || 0;
+      aiConv.messages.push({ type: 'hint', text: `已从「${ctx.name}」导入 ${Math.min(importCount, 8)} 条相关聊天记录` });
+
+      if (isSubItem && ctx.type === 'item' && ctx.itemId) {
+        const parentItem = ITEMS[ctx.itemId];
+        aiConv.name = `AI 对话 · 子事项（从「${parentItem?.title || ctx.name}」）`;
+        state.aiFlow = {
+          convId: 'ai_new', step: 0, contextConvId,
+          mode: 'sub', parentItemId: ctx.itemId, parentChatId: contextConvId,
+        };
+      } else {
+        aiConv.name = `AI 对话 · 从「${ctx.name}」发起`;
+        state.aiFlow = { convId: 'ai_new', step: 0, contextConvId, mode: 'main' };
+      }
+    } else {
+      aiConv.name = 'AI 事项助手';
+      state.aiFlow = { convId: 'ai_new', step: 0, mode: 'main' };
+    }
+
+    if (contextConvId && state.activeConv) {
+      pushLayer('ai_new');
+    } else {
+      openConversation('ai_new');
+    }
+  }
+
+  function viewAIDemoHistory() {
+    const conv = CONVERSATIONS[state.activeLayer || state.activeConv];
+    if (conv?.id === 'group_sales' || conv?.itemId === 'item15') {
+      pushLayer('ai_demo_performance');
+    } else if (conv?.type === 'item') {
+      pushLayer('ai_demo_subitem');
+    } else {
+      pushLayer('ai_demo_procurement');
+    }
+  }
+
+  function handleAISend(text) {
+    const conv = CONVERSATIONS[state.activeLayer || 'ai_new'];
+    if (!conv || conv.type !== 'ai') return;
+
+    conv.messages.push({ from: state.currentUserId, text, time: '刚刚' });
+    conv.preview = text;
+
+    const flow = state.aiFlow || { step: 0, convId: conv.id };
+    flow.step++;
+
+    setTimeout(() => {
+      const replies = [
+        '好的，我已了解您的需求。请问涉及的预算金额和相关部门是？',
+        '明白了。是否有指定供应商？审批流程需要经过哪些人？',
+        '还需要补充什么材料吗？比如报价单、资质文件等？',
+        '最后确认一下时间节点，希望什么时候完成？',
+      ];
+      if (flow.step <= replies.length) {
+        conv.messages.push({ from: 'ai', text: replies[flow.step - 1], time: '刚刚' });
+      }
+      if (flow.step >= 4) {
+        const cur = getCurrentUser();
+        const isSub = flow.mode === 'sub';
+        const parentItem = isSub ? ITEMS[flow.parentItemId] : null;
+        flow.draft = isSub ? {
+          '事项类型': '子事项',
+          '标题': '显示器型号确认（草稿）',
+          '发起人': cur.name,
+          '隶属主事项': parentItem?.title || '—',
+          '处理人': '李华',
+          '说明': '从主事项拆分，并行处理',
+        } : {
+          '事项类型': '采购申请',
+          '标题': '新采购申请（草稿）',
+          '发起人': cur.name,
+          '预算金额': '待填写',
+          '审批流程': '部门负责 → 财务审核',
+          '首步处理人': '李华（部门初审）',
+        };
+        const tip = isSub
+          ? '子事项信息已完整，确认后将创建子事项群聊并关联到主事项。'
+          : '多轮沟通完成，请确认以下单据草稿。确认后将自动创建事项群聊并拉入相关人员。';
+        conv.messages.push({ from: 'ai', text: tip, time: '刚刚' });
+      }
+      state.aiFlow = flow;
+      renderAll();
+    }, 700);
+  }
+
+  function confirmDraft() {
+    const flow = state.aiFlow;
+    state.aiFlow = null;
+    if (CONVERSATIONS.ai_new) {
+      CONVERSATIONS.ai_new.messages = [];
+      CONVERSATIONS.ai_new.isNew = true;
+    }
+
+    if (flow?.mode === 'sub' && flow.parentItemId) {
+      const parentChat = CONVERSATIONS[flow.parentChatId];
+      const parentItem = ITEMS[flow.parentItemId];
+      const subId = 'item2';
+      if (parentChat && !parentChat.messages.some(m => m.type === 'card' && m.itemId === subId)) {
+        parentChat.messages.push(
+          { type: 'flow', text: '子事项已创建 · 李华、王芳 已加入子事项群聊', time: '刚刚' },
+          { type: 'card', itemId: subId, time: '刚刚', isSub: true },
+        );
+        if (!parentChat.items.includes(subId)) parentChat.items.push(subId);
+        if (!parentItem.nested.includes(subId)) parentItem.nested.push(subId);
+      }
+      showToast('子事项已创建！已关联到主事项并创建子事项群聊');
+      openItemChat(subId, { asLayer: true });
+      return;
+    }
+
+    showToast('事项已创建！相关人员已加入事项群聊（演示）');
+    openItemChat('item1');
+  }
+
+  function sendMessage() {
+    const input = $('#chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const convId = state.activeLayer || state.activeConv;
+    const conv = CONVERSATIONS[convId];
+    if (!conv) return;
+
+    if (conv.type === 'ai' && !conv.archived) {
+      input.value = '';
+      handleAISend(text);
+      return;
+    }
+
+    if (conv.archived) {
+      showToast('这是已归档的 AI 对话记录，仅供查看');
+      return;
+    }
+
+    conv.messages.push({ from: state.currentUserId, text, time: '刚刚' });
+    const cur = getCurrentUser();
+    conv.preview = `${cur.name}: ${text}`;
+    input.value = '';
+    renderAll();
+
+    if (conv.type === 'dm' && conv.canTriggerItem) {
+      setTimeout(() => { showTriggerModal(conv.triggerPreset || 'purchase', convId); }, 1200);
+    }
+    if (conv.id === 'group_sales' && /业绩|反馈.*Q1|季度.*销售|销售.*情况/.test(text)) {
+      setTimeout(() => { showTriggerModal('performance', convId); }, 1000);
+    }
+  }
+
+  function openItemAI(itemId) {
+    const item = ITEMS[itemId];
+    const aiId = 'ai_item_' + itemId;
+    const cur = getCurrentUser();
+    if (!CONVERSATIONS[aiId]) {
+      CONVERSATIONS[aiId] = {
+        id: aiId, type: 'ai', name: `AI 协助 · ${item.title}`,
+        preview: '我可以帮您处理这个事项', time: '现在', unread: 0,
+        messages: [
+          { from: 'ai', text: `${cur.name}，您好！我正在协助您处理「${item.title}」。当前状态：${item.statusLabel}，待处理人：${getUser(item.handler).name}。请问需要什么帮助？` },
+        ],
+        items: [itemId],
+        parentItem: itemId,
+      };
+    }
+    pushLayer(aiId);
+  }
+
+  function renderAll() {
+    renderNav();
+    renderListPanel();
+    renderMain();
+  }
+
+  // ── Event Listeners ──
+  $$('.nav-btn[data-section]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.section = btn.dataset.section;
+      if (state.section !== 'messages') {
+        state.activeConv = null;
+        state.layers = [];
+        state.activeLayer = null;
+      }
+      renderAll();
+    });
+  });
+
+  $('#navAvatar').addEventListener('click', (e) => {
+    e.stopPropagation();
+    state.userSwitcherOpen = !state.userSwitcherOpen;
+    renderUserSwitcher();
+  });
+
+  $('#currentUserBar').addEventListener('click', () => {
+    state.userSwitcherOpen = !state.userSwitcherOpen;
+    renderUserSwitcher();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#userSwitcher') && !e.target.closest('#navAvatar') && !e.target.closest('#currentUserBar')) {
+      state.userSwitcherOpen = false;
+    }
+
+    if (e.target.closest('[data-switch-user]')) {
+      switchUser(e.target.closest('[data-switch-user]').dataset.switchUser);
+      return;
+    }
+
+    if (e.target.dataset.tab) {
+      state.messageTab = e.target.dataset.tab;
+      renderAll();
+      return;
+    }
+
+    if (e.target.dataset.itemTab) {
+      state.itemTab = e.target.dataset.itemTab;
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest('[data-item-cat]')) {
+      state.itemCategory = e.target.closest('[data-item-cat]').dataset.itemCat;
+      state.itemSubType = 'all';
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest('[data-item-sub]')) {
+      state.itemSubType = e.target.closest('[data-item-sub]').dataset.itemSub;
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest('[data-item-mode]')) {
+      state.itemViewMode = e.target.closest('[data-item-mode]').dataset.itemMode;
+      if (state.itemViewMode === 'list') state.itemPerspective = 'item';
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest('[data-perspective]')) {
+      state.itemPerspective = e.target.closest('[data-perspective]').dataset.perspective;
+      renderAll();
+      return;
+    }
+
+    if (e.target.closest('[data-conv]')) {
+      openConversation(e.target.closest('[data-conv]').dataset.conv);
+      return;
+    }
+
+    if (e.target.closest('tr.item-row')) {
+      const itemId = e.target.closest('tr.item-row').dataset.item;
+      openItemChat(itemId);
+      return;
+    }
+
+    if (e.target.closest('tr.no-chat')) {
+      showToast('该事项暂无关联群聊（演示数据）');
+      return;
+    }
+
+    if (e.target.dataset.layer) {
+      state.activeLayer = e.target.dataset.layer;
+      renderAll();
+      return;
+    }
+    if (e.target.dataset.closeLayer) {
+      e.stopPropagation();
+      popLayer(e.target.dataset.closeLayer);
+      return;
+    }
+
+    if (e.target.dataset.openItemChat || e.target.closest('[data-open-item-chat]')) {
+      const el = e.target.dataset.openItemChat
+        ? e.target
+        : e.target.closest('[data-open-item-chat]');
+      openItemChat(el.dataset.openItemChat, { asLayer: !!state.activeConv });
+      return;
+    }
+
+    if (e.target.dataset.openItemAi) {
+      openItemAI(e.target.dataset.openItemAi);
+      return;
+    }
+
+    if (e.target.closest('[data-side-item]') && !e.target.closest('[data-open-item-chat]')) {
+      const itemId = e.target.closest('[data-side-item]').dataset.sideItem;
+      state.selectedSideItem = itemId;
+      renderCardPanel(CONVERSATIONS[state.activeLayer || state.activeConv]);
+      return;
+    }
+
+    if (e.target.id === 'btnTriggerItem') {
+      startNewItemAI(state.activeLayer || state.activeConv);
+      return;
+    }
+    if (e.target.id === 'btnTriggerSubItem' || e.target.id === 'toolbarSubItem') {
+      startNewItemAI(state.activeLayer || state.activeConv, { isSubItem: true });
+      return;
+    }
+    if (e.target.id === 'btnViewAIDemo') {
+      viewAIDemoHistory();
+      return;
+    }
+    if (e.target.id === 'btnOpenAI' || e.target.id === 'toolbarAI') {
+      startNewItemAI(state.activeLayer || state.activeConv);
+      return;
+    }
+    if (e.target.id === 'btnToggleCards') {
+      state.showCardPanel = !state.showCardPanel;
+      renderChat();
+      return;
+    }
+
+    if (e.target.id === 'draftConfirm') {
+      confirmDraft();
+      return;
+    }
+    if (e.target.id === 'draftEdit') {
+      showToast('请继续在对话框中补充修改信息');
+      return;
+    }
+
+    if (e.target.dataset.submitForm) {
+      submitForm(e.target.dataset.submitForm);
+      return;
+    }
+    if (e.target.dataset.fillForm) {
+      openItemChat('item15');
+      return;
+    }
+
+    if (e.target.closest('[data-user]')) {
+      const userId = e.target.closest('[data-user]').dataset.user;
+      const dmMap = { li: 'dm_li', wang: 'dm_wang', sun: 'dm_sun', liu: 'group_sales', zhou: 'group_sales' };
+      const dmId = dmMap[userId];
+      if (dmId) {
+        if (dmId.startsWith('group')) openConversation(dmId);
+        else openConversation(dmId);
+      }
+      return;
+    }
+
+    if (e.target.id === 'triggerCancel') {
+      $('#triggerModal').classList.remove('show');
+      state.pendingTrigger = null;
+      return;
+    }
+    if (e.target.id === 'triggerConfirm') {
+      $('#triggerModal').classList.remove('show');
+      const tr = state.pendingTrigger;
+      state.pendingTrigger = null;
+      if (tr?.presetKey === 'performance' && tr?.itemId) {
+        openItemChat(tr.itemId);
+        showToast('已进入业绩上报事项，可体验填报与汇总');
+      } else {
+        startNewItemAI(tr?.convId || state.activeConv);
+      }
+      return;
+    }
+  });
+
+  $('#fabBtn').addEventListener('click', () => startNewItemAI());
+  $('#quickNewItem').addEventListener('click', () => startNewItemAI());
+  $('#quickSales').addEventListener('click', () => {
+    state.currentUserId = 'liu';
+    openConversation('group_sales');
+    showToast('已切换为销售总监刘峰，浏览销售团队群完整场景');
+  });
+  $('#quickBrowse').addEventListener('click', () => {
+    state.section = 'items';
+    state.itemTab = 'todo';
+    state.itemCategory = 'all';
+    state.itemViewMode = 'list';
+    renderAll();
+  });
+
+  $('#quickLedger').addEventListener('click', () => {
+    state.section = 'items';
+    state.itemCategory = 'approval';
+    state.itemSubType = 'purchase';
+    state.itemViewMode = 'ledger';
+    state.itemPerspective = 'business';
+    renderAll();
+  });
+
+  $('#sendBtn').addEventListener('click', sendMessage);
+  $('#chatInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Auto-resize textarea
+  $('#chatInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  // Init
+  renderAll();
+  </script>
+</body>
+</html>

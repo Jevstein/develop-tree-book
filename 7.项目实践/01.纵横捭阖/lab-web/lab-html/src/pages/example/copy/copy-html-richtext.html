@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>富文本复制演示 - 复制 text/html 到剪贴板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 2rem 1.5rem;
+            color: #1a2c3e;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e466e, #2b5a8c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            color: #4a627a;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 1.2rem 1.5rem 0.6rem 1.5rem;
+            border-bottom: 2px solid #e9edf2;
+            background: #ffffffcc;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1f3a4b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header h2 i {
+            font-size: 1.4rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .rich-demo {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 1px 2px #00000008, 0 1px 3px #00000005;
+            transition: 0.1s;
+        }
+
+        .sample-content {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .btn-group {
+            margin-top: 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: flex-start;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            padding: 0.65rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #cfdfed;
+            background: #fefefe;
+            color: #1f4e79;
+        }
+
+        .btn-primary {
+            background: #1e6fdf;
+            border-color: #1a62c7;
+            color: white;
+            box-shadow: 0 2px 5px rgba(30,111,223,0.2);
+        }
+
+        .btn-primary:hover {
+            background: #0f5bc2;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(30,111,223,0.25);
+        }
+
+        .btn-outline {
+            background: #f8fafc;
+            border: 1px solid #bdd3e8;
+        }
+
+        .btn-outline:hover {
+            background: #eef3fc;
+            border-color: #8bb3d0;
+            transform: translateY(-1px);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .editable-area {
+            background: #fffdf7;
+            border-radius: 1rem;
+            border: 2px solid #e2edf7;
+            padding: 1rem;
+            min-height: 200px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            outline: none;
+            transition: 0.1s;
+            box-shadow: inset 0 1px 4px #00000008;
+        }
+
+        .editable-area:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .paste-test {
+            background: #fefaf0;
+            border-radius: 1rem;
+            border: 2px dashed #cbdbe0;
+            padding: 1rem;
+            min-height: 180px;
+        }
+
+        .info-bar {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            background: #eef2f9;
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+            color: #2c577c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1f2e3a;
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            backdrop-filter: blur(8px);
+            background: #0f212ecc;
+            z-index: 1000;
+            transition: 0.2s;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .badge {
+            background: #d9eafb;
+            border-radius: 30px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #0066b3;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #c0d9ed, transparent);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b7f94;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 780px) {
+            body { padding: 1.2rem; }
+            .grid { gap: 1.2rem; }
+            .btn { padding: 0.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 富文本复制 · text/html</h1>
+    <div class="subhead">保留粗体、颜色、列表等格式 — 使用 Clipboard API 写入 <code>text/html</code> 和 <code>text/plain</code></div>
+
+    <div class="grid">
+        <!-- 卡片 1：预设示例富文本 -->
+        <div class="card">
+            <div class="card-header">
+                <h2>✨ 精美示例卡片</h2>
+            </div>
+            <div class="card-body">
+                <div class="rich-demo" id="sampleRichContainer">
+                    <div id="sampleContent" class="sample-content">
+                        <h3 style="margin: 0 0 8px 0; color: #1f6392; font-weight: 700;">🎯 富文本复制演示</h3>
+                        <p style="margin: 6px 0;">支持 <strong style="color:#c2410c;">加粗颜色字</strong> 和 <em style="color:#2b6e3b; font-style:italic;">斜体高亮</em> ，以及内联样式：</p>
+                        <ul style="margin: 8px 0 6px 20px; padding-left: 0;">
+                            <li style="margin: 4px 0;"><span style="color:#b91c1c;">✔ 红色列表项</span> — 重点突出</li>
+                            <li style="margin: 4px 0;"><span style="background: #fef9c3; padding: 2px 5px; border-radius: 12px;">✨ 高亮背景</span> 标记重要内容</li>
+                            <li style="margin: 4px 0;"><span style="font-weight: bold; text-decoration: underline;">下划线+加粗</span> 复合样式</li>
+                        </ul>
+                        <div style="background: #eef4ff; border-left: 4px solid #3b82f6; padding: 6px 12px; border-radius: 12px; margin-top: 8px;">
+                            📌 <span style="font-family: monospace;">保留HTML结构</span> ，粘贴到 Word / 邮件 / 富文本编辑器 格式完美
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="copySampleBtn">📋 复制示例富文本</button>
+                    <button class="btn btn-outline" id="copySamplePlainBtn" style="display:none;">仅复制纯文本(备选)</button>
+                </div>
+                <div class="info-bar">
+                    <span>🔍 包含内联颜色、粗体、列表 → 复制后保留所有样式</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片 2：可编辑富文本区域 (用户自定义) -->
+        <div class="card">
+            <div class="card-header">
+                <h2>✏️ 可编辑富文本区</h2>
+            </div>
+            <div class="card-body">
+                <div id="editableRichDiv" class="editable-area" contenteditable="true" role="textbox" aria-multiline="true">
+                    <p><strong>✨ 可编辑区域</strong> — 你可以 <span style="color:#c2410c; font-weight:bold;">任意修改样式</span>，或者使用 <kbd style="background:#eef2f5; padding:2px 5px;">Ctrl+B</kbd> 加粗、<kbd>Ctrl+I</kbd> 斜体。</p>
+                    <ul style="margin: 8px 0 0 20px;">
+                        <li>✅ 支持富文本编辑</li>
+                        <li>🎨 <span style="background:#fde047;">背景高亮</span> 或 <span style="color:#2563eb;">彩色文字</span></li>
+                        <li>📎 可插入图片(URL)，但建议保留格式测试</li>
+                    </ul>
+                    <p style="margin-top: 8px;"><em>直接修改此处内容，点击下方按钮复制全部格式！</em></p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="copyEditableBtn">📋 复制编辑区内容 (HTML)</button>
+                </div>
+                <div class="info-bar">
+                    <span>💡 修改任意文字、样式后点击复制，保留所见即所得格式</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片 3：自定义高级富文本 & 额外演示 -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🎨 自定义复制 + 测试区</h2>
+            </div>
+            <div class="card-body">
+                <div class="btn-group" style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" id="copyCustomCardBtn">📌 复制「渐变贺卡」富文本</button>
+                    <button class="btn btn-outline" id="copyComplexTableBtn">📊 复制表格样式</button>
+                </div>
+                <div style="background: #f1f5f9; border-radius: 1rem; padding: 0.8rem; margin: 0.6rem 0;">
+                    <div style="font-weight: 600; margin-bottom: 6px;">🧪 粘贴测试区 (contenteditable)</div>
+                    <div id="pasteTestArea" class="paste-test" contenteditable="true" style="min-height: 130px;">
+                        <p>👉 在这里按 <kbd>Ctrl+V</kbd> 或右键粘贴，可以看到保留的富文本样式：</p>
+                        <p style="color:#6b7280;">粘贴后将展示完整的HTML格式效果</p>
+                    </div>
+                    <div class="info-bar" style="margin-top: 10px; background:#fff2df;">
+                        <span>📌 点击上述任意复制按钮 → 在下方测试区粘贴 ➕ 也可粘贴到 Word / WPS / 邮箱</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 额外说明和全局消息 -->
+    <div style="background: #ffffffcc; border-radius: 1.5rem; padding: 1rem 1.5rem; margin-top: 0.5rem; border: 1px solid #dce5ef;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+            <div><span class="badge">⚡ 技术实现</span> 使用 <code>navigator.clipboard.write()</code> + <code>ClipboardItem</code> 同时提供 <strong>text/html</strong> 和 <strong>text/plain</strong> 类型</div>
+            <div><span class="badge">✅ 兼容性</span> 现代浏览器 (Chrome, Edge, Safari, Firefox)</div>
+        </div>
+    </div>
+    <footer>
+        ⚡ 复制时保留了富文本原始格式 — 支持内联样式、列表、标题等。点击复制后，可以到任意支持HTML粘贴的应用中尝试。
+    </footer>
+</div>
+<div id="toastMsg" class="toast-msg">✨ 已复制富文本到剪贴板</div>
+
+<script>
+    (function() {
+        // 通用复制富文本函数 (同时写入 text/html 和 text/plain)
+        async function copyRichText(htmlContent, plainTextContent) {
+            // 处理纯文本备选：如果没有显式传入纯文本，则从 HTML 中剥离标签生成纯文本
+            let finalPlain = plainTextContent;
+            if (!finalPlain && htmlContent) {
+                // 简单剥离html标签获得纯文本 (适用于演示)
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                finalPlain = tempDiv.textContent || tempDiv.innerText || '';
+            }
+            if (!htmlContent) {
+                showToast('❌ 无有效HTML内容', false);
+                return false;
+            }
+            
+            // 确保 ClipboardItem 和 navigator.clipboard 支持
+            if (!navigator.clipboard || !window.ClipboardItem) {
+                showToast('⚠️ 当前浏览器不支持 Clipboard API，请升级或使用现代浏览器', false);
+                return false;
+            }
+
+            try {
+                // 构建 Blob: text/html 和 text/plain
+                const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+                const plainBlob = new Blob([finalPlain], { type: 'text/plain' });
+                
+                const clipboardItem = new ClipboardItem({
+                    'text/html': htmlBlob,
+                    'text/plain': plainBlob
+                });
+                
+                await navigator.clipboard.write([clipboardItem]);
+                showToast(`✅ 复制成功！富文本已保存 (HTML ${htmlContent.length} 字符)`, true);
+                return true;
+            } catch (err) {
+                console.error('复制失败: ', err);
+                let errorMsg = '复制失败: ';
+                if (err.name === 'NotAllowedError') errorMsg += '请确保通过用户交互触发 (点击按钮) 并授予剪贴板权限';
+                else if (err.message) errorMsg += err.message;
+                else errorMsg += '未知错误';
+                showToast(errorMsg, false);
+                return false;
+            }
+        }
+
+        // 显示漂浮消息
+        let toastTimeout = null;
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toastMsg');
+            if (!toast) return;
+            clearTimeout(toastTimeout);
+            toast.style.transition = 'opacity 0.2s';
+            toast.textContent = message;
+            toast.style.backgroundColor = isSuccess ? '#1f6e43dd' : '#ac3e2fdd';
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) scale(1)';
+            toastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) scale(0.9)';
+            }, 2600);
+        }
+
+        // 获取示例富文本的HTML及纯文本
+        function getSampleHtmlAndPlain() {
+            const sampleDiv = document.getElementById('sampleContent');
+            if (!sampleDiv) return { html: '', plain: '' };
+            // 克隆避免后续修改污染(但其实只读不污染，但是安全)
+            const clone = sampleDiv.cloneNode(true);
+            const html = clone.innerHTML;  // innerHTML 保持内部样式及结构
+            const plain = clone.innerText || clone.textContent;
+            return { html, plain };
+        }
+
+        // 获取可编辑区域的HTML和纯文本
+        function getEditableHtmlAndPlain() {
+            const editable = document.getElementById('editableRichDiv');
+            if (!editable) return { html: '', plain: '' };
+            const html = editable.innerHTML;
+            const plain = editable.innerText || editable.textContent;
+            return { html, plain };
+        }
+
+        // 自定义富文本: 渐变贺卡样式 (美观内联样式)
+        function getGreetingCardHtml() {
+            return `
+                <div style="background: linear-gradient(135deg, #fef9e6, #fff1dc); border-radius: 24px; padding: 20px; font-family: system-ui, sans-serif; max-width: 500px; border: 1px solid #ffd966; box-shadow: 0 8px 16px rgba(0,0,0,0.05);">
+                    <h2 style="margin: 0 0 10px 0; color: #b45309; display: flex; align-items: center; gap: 8px;">🎉 节日贺卡</h2>
+                    <p style="font-size: 1rem; line-height: 1.4;"><strong>✨ 祝您拥有美好的一天！</strong> 此卡片包含<span style="background: #fde68a; padding: 2px 8px; border-radius: 30px;">渐变背景</span>和<span style="color:#b45309; font-weight: bold;">精美样式</span>。</p>
+                    <ul style="margin-top: 12px; background: #fffbf0; border-radius: 20px; padding: 8px 12px 8px 28px;">
+                        <li>🌈 富文本复制保留圆角与阴影</li>
+                        <li>📧 适用邮件签名 / 文档展示</li>
+                    </ul>
+                    <div style="margin-top: 12px; text-align: right; font-style: italic;">— 来自 Clipboard API 演示 —</div>
+                </div>
+            `;
+        }
+        
+        // 表格演示富文本 (复杂结构)
+        function getTableDemoHtml() {
+            return `
+                <div style="font-family: 'Segoe UI', system-ui;">
+                    <h3 style="color:#2c5282;">📋 数据表格（样式保留）</h3>
+                    <table border="0" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; background: #f8fafc; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <thead>
+                            <tr><th style="background: #2c5282; color: white; padding: 8px 12px;">项目</th><th style="background: #2c5282; color: white;">状态</th><th style="background: #2c5282; color: white;">进度</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #cbd5e1;"><td style="padding: 8px 12px;"><strong>前端演示</strong></td><td style="padding: 8px 12px;">✅ 完成</td><td style="padding: 8px 12px;">100%</td></tr>
+                            <tr style="background: #f1f5f9;"><td style="padding: 8px 12px;"><span style="color:#2563eb;">剪贴板集成</span></td><td style="padding: 8px 12px;">🟢 工作正常</td><td style="padding: 8px 12px;">✔️ 支持HTML</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 8px; font-size: 0.8rem; color: #4b5563;">📌 表格样式及内联背景均保留，粘贴到富文本编辑器可见边框颜色。</p>
+                </div>
+            `;
+        }
+        
+        // ----- 绑定各个按钮事件 -----
+        // 1. 复制示例富文本
+        const copySampleBtn = document.getElementById('copySampleBtn');
+        if (copySampleBtn) {
+            copySampleBtn.addEventListener('click', async () => {
+                const { html, plain } = getSampleHtmlAndPlain();
+                if (!html) {
+                    showToast('未找到示例内容', false);
+                    return;
+                }
+                await copyRichText(html, plain);
+            });
+        }
+        
+        // 2. 复制可编辑区域内容
+        const copyEditableBtn = document.getElementById('copyEditableBtn');
+        if (copyEditableBtn) {
+            copyEditableBtn.addEventListener('click', async () => {
+                const { html, plain } = getEditableHtmlAndPlain();
+                if (!html || html.trim() === '') {
+                    showToast('编辑区暂无内容', false);
+                    return;
+                }
+                await copyRichText(html, plain);
+            });
+        }
+        
+        // 3. 自定义复制：渐变贺卡
+        const copyCustomCardBtn = document.getElementById('copyCustomCardBtn');
+        if (copyCustomCardBtn) {
+            copyCustomCardBtn.addEventListener('click', async () => {
+                const html = getGreetingCardHtml();
+                // 提取纯文本版本
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const plain = tempDiv.textContent || tempDiv.innerText;
+                await copyRichText(html, plain);
+            });
+        }
+        
+        // 4. 复制表格演示富文本
+        const copyComplexTableBtn = document.getElementById('copyComplexTableBtn');
+        if (copyComplexTableBtn) {
+            copyComplexTableBtn.addEventListener('click', async () => {
+                const html = getTableDemoHtml();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const plain = tempDiv.textContent || tempDiv.innerText;
+                await copyRichText(html, plain);
+            });
+        }
+        
+        // 可选：额外处理防止部分点击区域内存泄露，并且设置粘贴测试区域初始友好提示
+        const pasteArea = document.getElementById('pasteTestArea');
+        if (pasteArea) {
+            // 增加简单占位符行为: 不强制，但避免用户不清楚
+            pasteArea.addEventListener('focus', () => {
+                if (pasteArea.innerText.includes('👉 在这里按 Ctrl+V') === false && pasteArea.children.length === 0) {
+                    // 如果清空了，提供提示，但不强制
+                }
+            });
+        }
+        
+        // 附加演示: 提醒用户可以直接粘贴至测试区
+        const sampleContainer = document.getElementById('sampleRichContainer');
+        // 也可给示例添加高亮复制，避免无碍
+        
+        // 额外扩展: 显示浏览器原生支持情况检查
+        if (!window.ClipboardItem) {
+            const infoDiv = document.querySelector('.info-bar:last-of-type');
+            if (infoDiv) {
+                const warnSpan = document.createElement('span');
+                warnSpan.style.color = '#b91c1c';
+                warnSpan.style.marginLeft = '8px';
+                warnSpan.innerText = '⚠️ 当前浏览器不支持 ClipboardItem，请升级Chrome/Edge/Safari/Firefox';
+                document.querySelector('.container .grid + div')?.appendChild(warnSpan);
+            }
+            showToast('⚠️ 此浏览器不支持ClipboardItem，复制功能不可用', false);
+        }
+        
+        // 解决 iOS 或其他安全限制带来的 async 打印
+        console.log('富文本复制演示已启动，使用 Clipboard API + text/html MIME');
+    })();
+</script>
+</body>
+</html>

@@ -28,18 +28,21 @@
   # 方法一：brew命令 - 适用于macOS
   $ brew install node
   
-  # 方法二：nvm命令
+  # 方法二：winget命令 - 适用于windows
+  $ winget install OpenJS.NodeJS.LTS
+  
+  # 方法三：nvm命令
   $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   $ nvm install node
   
-  # 方法三：apt命令 - 适用于linux
+  # 方法四：apt命令 - 适用于linux
   $ sudo apt-get update
   $ sudo apt-get install -y nodejs
   或者：
   $ sudo apt update
   $ sudo apt install node
   
-  # 方法四：nvm命令-gitee镜像
+  # 方法五：nvm命令-gitee镜像
   $ curl -fsSL https://gitee.com/sdq/nvm/raw/master/install.sh | bash
   $ export NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/
   ```

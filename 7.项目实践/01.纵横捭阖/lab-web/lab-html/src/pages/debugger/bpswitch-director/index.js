@@ -231,7 +231,7 @@ class BitmapSwitchDirector {
         itemElement.classList.add('item');
         itemElement.setAttribute('id', `id-bitmap-item-btn-${index}`);
         isChecked && itemElement.classList.add('checked');
-        itemElement.innerHTML = `${isChecked ? '开启' : '关闭'}(${(j + 1).toString().padStart(2, '0')})`;
+        itemElement.innerHTML = `${isChecked ? '开启' : '关闭'} 1<<${j}`;
         const funcCreatebadge = () => {
           const badgeElement = document.createElement('div');
           badgeElement.classList.add('badge');
@@ -241,7 +241,7 @@ class BitmapSwitchDirector {
         itemElement.onclick = () => {
           const isChecked = this._core.getChecked(index);
           this._core.setChecked(index, !isChecked);
-          itemElement.innerHTML = `${!isChecked ? '开启' : '关闭'}(${(j + 1).toString().padStart(2, '0')})`;
+          itemElement.innerHTML = `${!isChecked ? '开启' : '关闭'} 1<<${j}`;
           itemElement.classList.toggle('checked', !isChecked);
 
           funcCreatebadge();

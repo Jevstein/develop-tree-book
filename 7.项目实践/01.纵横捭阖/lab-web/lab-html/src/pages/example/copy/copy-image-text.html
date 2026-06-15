@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浏览器复制图文混排示例</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #status {
+      margin-top: 10px;
+      color: green;
+    }
+
+    .preview {
+      margin-top: 20px;
+      border: 1px dashed #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>图文混排复制测试</h2>
+  <p>点击下方按钮，然后去微信、Word 或记事本中粘贴 (Ctrl+V)。</p>
+
+  <button id="copyBtn1">复制图文内容到剪贴板(base64)</button>
+  <button id="copyBtn2">复制图文内容到剪贴板(url)</button>
+  <div id="status"></div>
+
+  <div class="preview">
+    <h3>预览内容：</h3>
+    <p><strong>abc1</strong></p>
+    <img src="https://picsum.photos/id/104/200/150" width="100" />
+    <p><strong>abc2</strong></p>
+    <img src="https://picsum.photos/id/104/200/150" width="100" />
+    <p><strong>abc3</strong></p>
+    <img src="https://picsum.photos/id/104/200/150" width="100" />
+  </div>
+
+  <script>
+    // 模拟数据
+    const items = [
+      { text: "abc1", imgPath: "https://picsum.photos/id/104/200/150" },
+      { text: "abc2", imgPath: "https://picsum.photos/id/104/200/150" },
+      { text: "abc3", imgPath: "https://picsum.photos/id/104/200/150" }
+    ];
+
+    /**
+     * 辅助函数：将图片 URL 转换为 Base64 Data URI
+     * 注意：图片服务器必须支持 CORS (跨域)，否则 fetch 会失败
+     */
+    function imageUrlToBase64(url) {
+      return new Promise((resolve, reject) => {
+        // 使用 fetch 获取图片二进制数据
+        fetch(url)
+          .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.blob();
+          })
+          .then(blob => {
+            // 将 Blob 转换为 Base64
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+          .catch(reject);
+      });
+
+    }
+
+    /**
+     * 注意：如果图片服务器不支持 CORS，fetch 会失败。这时可以考虑以下替代方案：
+     * 1. 使用代理服务器：将图片请求发送到一个你控制的服务器，由服务器去获取图片并返回 Base64。
+     * 2. 直接使用图片 URL（不转换为 Base64），但这可能会导致某些应用（如记事本）无法正确显示图片。
+     * 3. 在用户端使用 Canvas 绘制图片并获取 Base64，但这同样受限于 CORS。
+     */
+    async function copyToClipboard(isUrl) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = '正在处理图片...';
+
+      try {
+        // 1. 构建 HTML 和 纯文本 内容
+        let htmlContent = '<div style="font-family: Arial, sans-serif; line-height: 1.5;">';
+        let plainTextContent = '';
+
+        for (const item of items) {
+          // 添加文本
+          htmlContent += `<p style="margin: 5px 0;">${item.text}</p>`;
+          plainTextContent += `${item.text}\n`;
+
+          // 添加图片 (关键：转换为 Base64)
+          try {
+            const base64Img = isUrl ? item.imgPath : await imageUrlToBase64(item.imgPath);
+            // 插入图片标签，限制最大宽度以防过大
+            htmlContent += `<img src="${base64Img}" style="max-width: 100%; height: auto; display: block; margin: 5px 0;" /><br/>`;
+          } catch (err) {
+            console.warn(`图片加载失败: ${item.imgPath}`, err);
+            htmlContent += `<p style="color:red;">[图片加载失败]</p>`;
+          }
+        }
+        htmlContent += '</div>';
+
+        // 2. 创建 Blob 对象
+        // type: 'text/html' 用于富文本应用 (Word, 微信)
+        // type: 'text/plain' 用于纯文本应用 (记事本)
+        const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+        const blobText = new Blob([plainTextContent], { type: 'text/plain' });
+
+        // 3. 创建 ClipboardItem
+        const data = [
+          new ClipboardItem({
+            'text/html': blobHtml,
+            'text/plain': blobText
+          })
+        ];
+
+        // 4. 写入剪贴板
+        await navigator.clipboard.write(data);
+
+        statusDiv.textContent = '✅ 复制成功！请去微信或 Word 中粘贴试试。';
+        statusDiv.style.color = 'green';
+
+      } catch (err) {
+        console.error('复制失败:', err);
+        statusDiv.textContent = '❌ 复制失败: ' + err.message;
+        statusDiv.style.color = 'red';
+      }
+    }
+
+    document.getElementById('copyBtn1').addEventListener('click', async () => copyToClipboard(false));
+    document.getElementById('copyBtn2').addEventListener('click', async () => copyToClipboard(true));
+  </script>
+</body>
+
+</html>
